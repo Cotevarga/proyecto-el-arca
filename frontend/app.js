@@ -4,8 +4,8 @@
   var API_URL = 'https://proyecto-el-arca-backend.onrender.com/api/upload';
   var API_KEY = 'MI_APK_SECRETO_SUPER_SEGURO_2026';
   var MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
-  var ALLOWED_TYPES = ['image/jpeg', 'image/png', 'audio/mpeg', 'audio/wav', 'audio/wave'];
-  var ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.mp3', '.wav'];
+  var ALLOWED_TYPES = ['image/jpeg', 'image/png', 'audio/mpeg', 'audio/wav', 'audio/wave', 'video/mp4'];
+  var ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.mp3', '.wav', '.mp4'];
 
   var form = document.getElementById('form-archivo');
   var fileError = document.getElementById('file-error');
@@ -25,7 +25,7 @@
 
     var ext = '.' + getFileExtension(file.name);
     if (!ALLOWED_EXTENSIONS.includes(ext)) {
-      return 'Formato no permitido. Solo: JPG, PNG, MP3, WAV.';
+      return 'Formato no permitido. Solo: JPG, PNG, MP3, WAV, MP4.';
     }
 
     if (!ALLOWED_TYPES.includes(file.type) && file.type !== '') {

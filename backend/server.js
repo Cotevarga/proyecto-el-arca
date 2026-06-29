@@ -64,14 +64,15 @@ const fileFilter = (req, file, cb) => {
     'audio/mpeg',
     'audio/wav',
     'audio/wave',
+    'video/mp4',
   ];
-  const allowedExts = ['.jpg', '.jpeg', '.png', '.mp3', '.wav'];
+  const allowedExts = ['.jpg', '.jpeg', '.png', '.mp3', '.wav', '.mp4'];
   const ext = path.extname(file.originalname).toLowerCase();
 
   if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error('Formato no permitido. Solo JPG, PNG, MP3, WAV.'), false);
+    cb(new Error('Formato no permitido. Solo JPG, PNG, MP3, WAV, MP4.'), false);
   }
 };
 
