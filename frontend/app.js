@@ -74,6 +74,11 @@
     var nombre = document.getElementById('nombre').value.trim();
     var anio = document.getElementById('anio').value.trim();
     var mensaje = document.getElementById('mensaje').value.trim();
+
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+      showMessage('Debes seleccionar un archivo para compartir.', 'red');
+      return;
+    }
     var file = fileInput.files[0];
 
     if (!nombre) {
