@@ -4,8 +4,7 @@
   var API_URL = 'https://proyecto-el-arca-backend.onrender.com/api/upload';
   var API_KEY = 'MI_APK_SECRETO_SUPER_SEGURO_2026';
   var MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
-  var ALLOWED_TYPES = ['image/jpeg', 'image/png', 'audio/mpeg', 'audio/wav', 'audio/wave', 'video/mp4'];
-  var ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.mp3', '.wav', '.mp4'];
+  var ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'mp3', 'wav', 'mp4'];
 
   var form = document.getElementById('form-archivo');
   var fileError = document.getElementById('file-error');
@@ -16,21 +15,8 @@
 
   if (!form || !fileInput) return;
 
-  function getFileExtension(filename) {
-    return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 1).toLowerCase();
-  }
-
   function validateFile(file) {
     if (!file) return 'Debes seleccionar un archivo.';
-
-    var ext = '.' + getFileExtension(file.name);
-    if (!ALLOWED_EXTENSIONS.includes(ext)) {
-      return 'Formato no permitido. Solo: JPG, PNG, MP3, WAV, MP4.';
-    }
-
-    if (!ALLOWED_TYPES.includes(file.type) && file.type !== '') {
-      return 'Tipo MIME no válido.';
-    }
 
     if (file.size > MAX_FILE_SIZE) {
       return 'El archivo supera los 50 MB. Comprime o selecciona otro.';
@@ -38,6 +24,11 @@
 
     if (file.size === 0) {
       return 'El archivo está vacío.';
+    }
+
+    var extension = file.name.slice(((file.name.lastIndexOf('.') - 1) >>> 0) + 2).toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(extension)) {
+      return 'Formato no permitido. Solo: JPG, PNG, MP3, WAV, MP4.';
     }
 
     return null;
