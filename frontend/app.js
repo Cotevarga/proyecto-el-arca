@@ -8,13 +8,13 @@
   var ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.mp3', '.wav'];
 
   var form = document.getElementById('form-archivo');
-  var fileInput = document.getElementById('archivo');
   var fileError = document.getElementById('file-error');
   var fileInfo = document.getElementById('file-info');
   var formMessages = document.getElementById('form-messages');
   var btnEnviar = document.getElementById('btn-enviar');
+  var fileInput = document.querySelector('input[type="file"]');
 
-  if (!form) return;
+  if (!form || !fileInput) return;
 
   function getFileExtension(filename) {
     return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 1).toLowerCase();
@@ -49,8 +49,8 @@
     fileError.textContent = '';
     fileInfo.textContent = '';
 
+    if (!fileInput.files || fileInput.files.length === 0) return;
     var file = fileInput.files[0];
-    if (!file) return;
 
     var error = validateFile(file);
     if (error) {
