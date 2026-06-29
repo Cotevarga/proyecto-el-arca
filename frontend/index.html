@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memoria de El Arca — Pedro "Cabezón Jano" González</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
+  <style>
+    /* Configuración compatible con Tailwind v4 y sobreescrituras críticas */
+    :root {
+      --color-mir: #E50914;
+      --color-resistencia-700: #b91c1c;
+      --color-noche: #111111;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000000 !important; color: #ffffff !important; }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+
+    /* Forzar títulos y colores que v4 pasaba en blanco */
+    .heading-mir {
+      font-family: 'Impact', 'Arial Black', sans-serif !important;
+      color: var(--color-mir) !important;
+      text-transform: uppercase;
+      letter-spacing: -0.025em;
+    }
+    .text-mir { color: var(--color-mir) !important; }
+    .border-mir { border-color: var(--color-mir) !important; }
+    .bg-mir { background-color: var(--color-mir) !important; }
+    .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229, 9, 20, 0.4) !important; padding: 1.5rem; }
+    .divider-mir { w-16; h-1; background-color: var(--color-mir) !important; width: 4rem; height: 0.25rem; my: 1.5rem; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+    
+    .btn-mir {
+      background-color: var(--color-mir) !important;
+      color: white !important;
+      font-weight: bold;
+      padding: 0.75rem 2rem;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.875rem;
+      border: 2px solid var(--color-mir);
+    }
+    .btn-mir:hover {
+      background-color: black !important;
+      color: var(--color-mir) !important;
+    }
+    .btn-outline-mir {
+      background-color: transparent !important;
+      color: white !important;
+      font-weight: bold;
+      padding: 0.75rem 2rem;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.875rem;
+      border: 2px solid var(--color-mir);
+    }
+    .btn-outline-mir:hover {
+      background-color: var(--color-mir) !important;
+    }
+  </style>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✊</text></svg>">
+</head>
+<body class="bg-black text-white antialiased">
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-b-[rgba(229,9,20,0.3)]">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/" class="text-white font-bold text-2xl tracking-tighter font-impact">EL ARCA</a>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="/" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
+        <a href="/galeria" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="/videos" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="/relatos" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
+        <a href="#archivo" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+      </div>
+      <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-t-[rgba(229,9,20,0.3)] px-4 py-4">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
+        <a href="/" class="hover:text-mir transition">Inicio</a>
+        <a href="/galeria" class="hover:text-mir transition">Galería</a>
+        <a href="/videos" class="hover:text-mir transition">Videos</a>
+        <a href="/relatos" class="hover:text-mir transition">Relatos</a>
+        <a href="#archivo" class="hover:text-mir transition">Archivo</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header class="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0">
+      <img src="images/FB_IMG_1782701655071.jpg" alt="Espacio físico El Arca" class="w-full h-full object-cover">
+      <div class="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/50"></div>
+    </div>
+    <div class="relative z-10 text-center px-4 max-w-4xl mx-auto animate-fade-in-up">
+      <div class="inline-block mb-6 px-4 py-1 border border-mir bg-black/60 text-mir text-xs font-bold tracking-widest uppercase">Población Francisco de Goya — La Pintana</div>
+      <h1 class="text-5xl md:text-8xl font-black text-white leading-tight mb-6 tracking-tighter uppercase" style="font-family: 'Impact', sans-serif;">
+        MEMORIA VIVA<br>
+        <span class="text-mir">DE EL ARCA</span>
+      </h1>
+      <p class="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-8 leading-relaxed font-light">
+        Pedro Alejandro González Reyes<br>
+        <span class="text-mir font-bold text-xl md:text-2xl">"El Cabezón Jano"</span>
+        <span class="block text-sm md:text-base text-white/60 mt-3">1972 — 2006 · Su sueño vive en cada vecino, en cada niñez, en cada lucha.</span>
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="#archivo" class="btn-mir">Comparte tu recuerdo</a>
+        <a href="#legado-mistica" class="btn-outline-mir">Conoce el legado</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== EJE 1: INICIOS ===== -->
+  <section id="inicios" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
+    <div class="max-w-6xl mx-auto px-4">
+      <span class="text-mir font-bold text-xs tracking-widest uppercase">Eje 1</span>
+      <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">Los Inicios en La Goya</h2>
+      <div class="divider-mir"></div>
+      <div class="grid md:grid-cols-2 gap-10 items-start mt-10">
+        <div class="space-y-6">
+          <div class="card-mir">
+            <img src="images/FB_IMG_1782701605358.jpg" alt="Foto del Jano" class="w-full h-72 object-cover mb-4 border border-[rgba(229,9,20,0.3)]">
+            <p class="text-white/80 leading-relaxed">
+              A mediados de los años 90, en plena Población Francisco de Goya —sector Paradero 30 y medio de Santa Rosa, La Pintana— un hombre de mirada inquieta y corazón gigante comenzó a tejer un sueño colectivo. <strong class="text-white">Pedro Alejandro González Reyes</strong>, más conocido como <strong class="text-mir">"El Cabezón Jano"</strong>, entendió desde joven que la cultura no era un lujo: era una trinchera.
+            </p>
+          </div>
+        </div>
+        <div class="space-y-6">
+          <div class="card-mir">
+            <img src="images/FB_IMG_1782701775498.jpg" alt="Jano pintando la sede" class="w-full h-64 object-cover mb-4 border border-[rgba(229,9,20,0.3)]">
+            <h3 class="text-mir font-bold text-2xl uppercase tracking-wide mb-2" style="font-family: 'Impact', sans-serif;">La Mística del Jano</h3>
+            <p class="text-white/80 leading-relaxed">
+              Pedagogía popular, amor por la comunidad y una convicción inquebrantable: <strong>solo el pueblo salva al pueblo</strong>. El Jano no daba discursos desde un escritorio; estaba en la cancha, en la sede, en la marcha, en las radios, hombro con hombro con su gente.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== EJE 3: SECCIÓN VIDEOS CORREGIDA ===== -->
+  <section id="comunicacion" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
+    <div class="max-w-6xl mx-auto px-4">
+      <span class="text-mir font-bold text-xs tracking-widest uppercase">Eje 3</span>
+      <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">RADIO LIBRE 90.1 / 100.5 FM</h2>
+      <p class="text-white/60 mb-4">Programas y registros de la radio comunitaria.</p>
+      <div class="divider-mir"></div>
+
+      <div class="max-w-4xl mx-auto mt-10 card-mir">
+        <div class="relative w-full aspect-video border border-[rgba(229,9,20,0.4)]">
+          <iframe 
+            class="w-full h-full"
+            src="https://www.youtube.com/embed/tNz15U2EZcw"
+            title="Radio Libre y Comunitaria El Arca"
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MAPA CORREGIDO ===== -->
+  <section id="mapa" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
+    <div class="max-w-5xl mx-auto px-4">
+      <span class="text-mir font-bold text-xs tracking-widest uppercase">Territorio</span>
+      <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">La Goya en el Mapa</h2>
+      <div class="divider-mir"></div>
+      <p class="text-white/60 mb-8">Población Francisco de Goya, Paradero 30 y medio de Santa Rosa, La Pintana. Aquí latía El Arca.</p>
+      <div class="border border-[rgba(229,9,20,0.4)]">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3327.781555695385!2d-70.640371!3d-33.491287!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662d5b9b0b0b0b0%3A0x0!2zMzPCsDI5JzI4LjYiUyA3MMKwMzgnMjUuMyJX!5e0!3m2!1ses!2scl!4v1"
+          width="100%"
+          height="450"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Mapa de la Población Francisco de Goya, La Pintana"
+        ></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ARCHIVO COMUNITARIO ===== -->
+  <section id="archivo" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
+    <div class="max-w-3xl mx-auto px-4">
+      <span class="text-mir font-bold text-xs tracking-widest uppercase">Participa</span>
+      <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">Archivo Comunitario</h2>
+      <div class="divider-mir"></div>
+      <form id="form-archivo" class="space-y-6 card-mir mt-6" enctype="multipart/form-data">
+        <div>
+          <label for="nombre" class="block text-sm font-bold text-white/80 mb-1 uppercase">Nombre o Pseudónimo</label>
+          <input type="text" id="nombre" name="nombre" required class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
+        </div>
+        <div>
+          <label for="anio" class="block text-sm font-bold text-white/80 mb-1 uppercase">Año estimado del material</label>
+          <input type="number" id="anio" name="anio" min="1990" max="2026" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
+        </div>
+        <div>
+          <label for="archivo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Foto o Audio</label>
+          <input type="file" id="archivo" name="archivo" accept=".jpg,.jpeg,.png,.mp3,.wav" class="block w-full text-sm text-white/50 border border-white/20 p-2 bg-black">
+          <div id="file-error" class="text-mir text-sm mt-1 hidden"></div>
+          <div id="file-info" class="text-white/50 text-sm mt-1 hidden"></div>
+        </div>
+        <div>
+          <label for="mensaje" class="block text-sm font-bold text-white/80 mb-1 uppercase">Mensaje (opcional)</label>
+          <textarea id="mensaje" name="mensaje" rows="3" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-none"></textarea>
+        </div>
+        <button type="submit" id="btn-enviar" class="btn-mir w-full">Subir y compartir recuerdo</button>
+        <div id="form-messages" class="text-center text-sm font-medium hidden"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== LEGADO MÍSTICA ===== -->
+  <section id="legado-mistica" class="py-20 md:py-28 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
+    <div class="max-w-5xl mx-auto px-4">
+      <span class="text-mir font-bold text-xs tracking-widest uppercase">La Mística de la Lucha</span>
+      <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">El Legado que Nos Mueve</h2>
+      <div class="divider-mir"></div>
+
+      <div class="space-y-10 text-white/80 text-lg leading-relaxed">
+
+        <div class="card-mir">
+          <p class="mb-4">
+            El Arca no fue solo un centro cultural. Fue la demostración palpable de que <strong class="text-white">el trabajo de masas con las niñeces</strong> es la tarea más revolucionaria que puede emprender un pueblo. En cada taller, en cada navidad popular, en cada programa de radio, el Jano y su comunidad tejieron una red de contención, dignidad y conciencia que arrancó a cientos de niños y niñas de las garras de la delincuencia, del consumismo y del sometimiento del sistema.
+          </p>
+          <p>
+            Porque la transformación real no se juega en las urnas ni en los titulares: <strong class="text-white">se juega en la cancha, en la sede vecinal, en la mirada de un niño que descubre que puede ser alguien</strong>. Esa es la apuesta de El Arca, y sigue siendo la apuesta de los pueblos que se niegan a doblegarse.
+          </p>
+        </div>
+
+        <div class="card-mir border-l-4">
+          <blockquote class="text-2xl md:text-3xl font-light italic text-white/90">
+            "Un revolucionario verdadero es guiado por grandes sentimientos de amor."
+          </blockquote>
+          <p class="text-mir mt-2 text-sm tracking-widest">— Ernesto "Che" Guevara</p>
+        </div>
+
+        <div class="card-mir">
+          <p class="mb-4">
+            Es imposible hablar de amor popular sin recordar las manos curtidas y la voz inmortal de <strong class="text-white">Víctor Jara</strong>. Cuando cantaba <em>"El amor es algo grande que no se puede medir"</em>, no hablaba de un amor romántico y burgués: hablaba del amor que mueve a un poblador a compartir su última comida, del amor que lleva a un joven a tomar un micrófono para denunciar la injusticia, del amor que sostiene a una madre en la fila de la ollacomún.
+          </p>
+          <p class="mb-4">
+            Por eso sus canciones <strong class="text-white">"Te recuerdo Amanda"</strong> y <strong class="text-white">"Plegaria a un labrador"</strong> resuenan en cada rincón de La Goya, porque cantan al amor que lucha, al amor que no se rinde, al amor que construye territorio. Víctor lo dijo claro:
+          </p>
+          <blockquote class="border-l-4 border-mir pl-4 text-lg italic text-white/70 my-4">
+            "Cómo luchar por la vida, si no es por la vida misma.<br>
+            Cómo luchar por la paz, si no es en la tierra misma.<br>
+            Cómo luchar por el amor, si no es con amor."
+          </blockquote>
+          <p>
+            Ese es el mandato que nos dejaron: <strong class="text-white">continuar la lucha, resistir en el territorio, y retomar con urgencia el trabajo de masas con nuestras infancias</strong>, porque allí está la semilla de la dignidad. No hay camino más corto hacia la liberación que el que se construye hombro con hombro, codo con codo, amando al pueblo como se ama la vida misma.
+          </p>
+        </div>
+
+        <div class="card-mir text-center border border-mir/60">
+          <p class="text-2xl md:text-3xl font-title text-mir uppercase tracking-wide mb-4">¡El Arca Vive!</p>
+          <p class="text-white/70 max-w-2xl mx-auto">
+            La lucha sigue en cada taller, en cada frecuencia de la 90.1 / 100.5 FM, en cada carnaval, en cada niño y niña que descubre su poder. El Jano, Carlos y Nino no se fueron: se multiplicaron en la conciencia del pueblo.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+      var menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    });
+  </script>
+</body>
+</html>
