@@ -1,114 +1,46 @@
 (function () {
   'use strict';
 
-  var S = {};
-  S.song = 'arca_song_idx';
-  S.time = 'arca_time';
-  S.playing = 'arca_playing';
-  S.order = 'arca_order';
-  S.pos = 'arca_pos';
-
-  var allSongs = [
-    '/musica/galeria.mp3', '/musica/galeria2.mp3', '/musica/galeria3.mp3',
-    '/musica/index.mp3', '/musica/index2.mp3', '/musica/index3.mp3',
-    '/musica/legado.mp3', '/musica/legado2.mp3', '/musica/legado3.mp3',
-    '/musica/relatos.mp3', '/musica/relatos2.mp3', '/musica/relatos3.mp3'
+  var canciones = [
+    './musica/galeria.mp3', './musica/galeria2.mp3', './musica/galeria3.mp3',
+    './musica/index.mp3', './musica/index2.mp3', './musica/index3.mp3',
+    './musica/legado.mp3', './musica/legado2.mp3', './musica/legado3.mp3',
+    './musica/relatos.mp3', './musica/relatos2.mp3', './musica/relatos3.mp3'
   ];
 
-  function shuffleIndex() {
-    var a = [];
-    for (var i = 0; i < allSongs.length; i++) a.push(i);
-    for (var i = a.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
-    }
-    return a;
-  }
-
-  var playOrder = JSON.parse(sessionStorage.getItem(S.order));
-  if (!playOrder || playOrder.length !== allSongs.length) {
-    playOrder = shuffleIndex();
-    sessionStorage.setItem(S.order, JSON.stringify(playOrder));
-  }
-
-  var currentIdx = parseInt(sessionStorage.getItem(S.song)) || 0;
-  if (currentIdx >= playOrder.length) currentIdx = 0;
-
   var audio = new Audio();
-  audio.preload = 'auto';
-  audio.src = allSongs[playOrder[currentIdx]];
   audio.volume = 0.7;
 
-  var savedTime = parseFloat(sessionStorage.getItem(S.time)) || 0;
-  if (savedTime > 0) {
-    audio.addEventListener('loadedmetadata', function onMeta() {
-      audio.removeEventListener('loadedmetadata', onMeta);
-      if (savedTime < audio.duration) audio.currentTime = savedTime;
-    });
-  }
-
-  var savedPlaying = sessionStorage.getItem(S.playing) === 'true';
   var isPlaying = false;
-  var audioUnlocked = false;
+  var currentIndex = -1;
 
-  function persist() {
-    try {
-      sessionStorage.setItem(S.song, String(currentIdx));
-      sessionStorage.setItem(S.time, String(audio.currentTime || 0));
-      sessionStorage.setItem(S.playing, isPlaying ? 'true' : 'false');
-      sessionStorage.setItem(S.order, JSON.stringify(playOrder));
-    } catch (e) {}
+  function pickRandom() {
+    var next;
+    do {
+      next = Math.floor(Math.random() * canciones.length);
+    } while (next === currentIndex && canciones.length > 1);
+    currentIndex = next;
+    return canciones[currentIndex];
   }
 
-  function nextRandom() {
-    currentIdx = (currentIdx + 1) % playOrder.length;
-    if (currentIdx === 0) {
-      playOrder = shuffleIndex();
-      sessionStorage.setItem(S.order, JSON.stringify(playOrder));
-    }
-    audio.src = allSongs[playOrder[currentIdx]];
-    console.log("Intentando reproducir:", audio.src);
-    audio.play().catch(function (err) {
-      console.error("Error al reproducir audio:", err);
-    });
-    persist();
-  }
-
-  audio.addEventListener('ended', nextRandom);
-  audio.addEventListener('error', function () {
-    setTimeout(nextRandom, 2000);
-  });
-
-  window.addEventListener('beforeunload', persist);
-
-  function unlockAudio() {
-    if (audioUnlocked) return;
-    audioUnlocked = true;
-    document.removeEventListener('click', unlockAudio);
-    document.removeEventListener('pointerdown', unlockAudio);
-    document.removeEventListener('touchstart', unlockAudio);
-    document.removeEventListener('keydown', unlockAudio);
-    var rutaCancion = audio.src;
-    console.log("Intentando reproducir:", rutaCancion);
-    audio.play().then(function () {
-      if (savedPlaying) {
+  function playCurrent() {
+    audio.play()
+      .then(function () {
         isPlaying = true;
         updateUI();
-        persist();
-      } else {
-        audio.pause();
+        console.log("Reproduciendo con éxito:", audio.src);
+      })
+      .catch(function (err) {
+        console.error("El navegador bloqueó la reproducción interactiva:", err);
+        isPlaying = false;
         updateUI();
-      }
-    }).catch(function (err) {
-      console.error("Error al reproducir audio:", err);
-      updateUI();
-    });
+      });
   }
 
-  document.addEventListener('click', unlockAudio);
-  document.addEventListener('pointerdown', unlockAudio);
-  document.addEventListener('touchstart', unlockAudio);
-  document.addEventListener('keydown', unlockAudio);
+  audio.addEventListener('ended', function () {
+    audio.src = pickRandom();
+    playCurrent();
+  });
 
   var btn = document.createElement('button');
   btn.id = 'audio-play-btn';
@@ -148,29 +80,18 @@
   }
 
   function togglePlay() {
-    if (!audioUnlocked) {
-      unlockAudio();
-      return;
-    }
     if (isPlaying) {
       audio.pause();
       isPlaying = false;
       updateUI();
-      persist();
       return;
     }
-    var rutaCancion = allSongs[playOrder[currentIdx]];
-    console.log("Intentando reproducir:", rutaCancion);
-    audio.play().then(function () {
-      isPlaying = true;
-      updateUI();
-      persist();
-    }).catch(function (err) {
-      console.error("Error al reproducir audio:", err);
-      updateUI();
-    });
-    updateUI();
-    persist();
+
+    if (audio.src === '' || audio.src === window.location.href + '/' || currentIndex === -1) {
+      audio.src = pickRandom();
+    }
+
+    playCurrent();
   }
 
   btn.addEventListener('click', togglePlay);
