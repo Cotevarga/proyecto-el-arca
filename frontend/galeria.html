@@ -23,11 +23,12 @@
     .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
     .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
     .bg-noche { background-color: var(--color-noche) !important; }
-    @keyframes tooltipPulse { 0%,100%{opacity:0.7;transform:translateX(0)} 50%{opacity:1;transform:translateX(4px)} }
+    .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
   </style>
 </head>
 <body class="bg-black text-white antialiased">
 
+  <!-- ===== NAVBAR ===== -->
   <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <a href="index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
@@ -55,91 +56,81 @@
     </div>
   </nav>
 
-  <div id="page-content">
-    <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
-      <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
-        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Memoria Visual</span>
-        <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Galería Histórica</h1>
-        <div class="divider-mir mx-auto"></div>
-        <p class="text-white/60 text-lg max-w-2xl mx-auto">Imágenes que preservan la memoria de El Arca, el Jano y la lucha popular en La Goya.</p>
-      </div>
-    </header>
+  <!-- ===== CONTENIDO ===== -->
+  <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
+      <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Memoria Visual</span>
+      <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Galería Histórica</h1>
+      <div class="divider-mir mx-auto"></div>
+      <p class="text-white/60 text-lg max-w-2xl mx-auto">Imágenes que preservan la memoria de El Arca, el Jano y la lucha popular en La Goya.</p>
+    </div>
+  </header>
 
-    <section class="py-16" style="background-color:#111111">
-      <div class="max-w-6xl mx-auto px-4">
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <section class="py-16" style="background-color:#111111">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="galeria-grid grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-          <div class="card-mir animate-fade-in-up">
-            <img src="images/FB_IMG_1782701605358.jpg" alt="Retrato del Cabezón Jano" class="w-full h-56 object-cover mb-3 border border-mir/30">
-            <h3 class="text-mir font-title text-sm uppercase tracking-wide">El Cabezón Jano</h3>
-            <p class="text-white/50 text-xs mt-1">Pedro Alejandro González Reyes, fundador de El Arca.</p>
-          </div>
-
-          <div class="card-mir animate-fade-in-up">
-            <img src="images/FB_IMG_1782701655071.jpg" alt="Espacio físico de El Arca" class="w-full h-56 object-cover mb-3 border border-mir/30">
-            <h3 class="text-mir font-title text-sm uppercase tracking-wide">Sede El Arca</h3>
-            <p class="text-white/50 text-xs mt-1">El espacio físico donde la comunidad se reunía.</p>
-          </div>
-
-          <div class="card-mir animate-fade-in-up">
-            <img src="images/FB_IMG_1782701775498.jpg" alt="Jano pintando la sede" class="w-full h-56 object-cover mb-3 border border-mir/30">
-            <h3 class="text-mir font-title text-sm uppercase tracking-wide">Jano pintando la sede</h3>
-            <p class="text-white/50 text-xs mt-1">Construyendo con sus propias manos el espacio comunitario.</p>
-          </div>
-
-          <div class="card-mir animate-fade-in-up">
-            <img src="images/FB_IMG_1782701859802.jpg" alt="Navidad Popular" class="w-full h-56 object-cover mb-3 border border-mir/30">
-            <h3 class="text-mir font-title text-sm uppercase tracking-wide">Actividades Comunitarias</h3>
-            <p class="text-white/50 text-xs mt-1">Entrega simbólica de las llaves de la Población.</p>
-          </div>
-
-          <div class="card-mir animate-fade-in-up">
-            <img src="images/FB_IMG_1782701766075.jpg" alt="Marcha comunitaria" class="w-full h-56 object-cover mb-3 border border-mir/30">
-            <h3 class="text-mir font-title text-sm uppercase tracking-wide">Marcha Comunitaria</h3>
-            <p class="text-white/50 text-xs mt-1">La Goya en las calles, organización popular y resistencia.</p>
-          </div>
-
-          <div class="card-mir animate-fade-in-up">
-            <img src="images/FB_IMG_1782701826979.jpg" alt="Jano planificando TV Comunitaria" class="w-full h-56 object-cover mb-3 border border-mir/30">
-            <h3 class="text-mir font-title text-sm uppercase tracking-wide">Sueño de TV Comunitaria</h3>
-            <p class="text-white/50 text-xs mt-1">Jano con un compañero planificando la comunicación popular.</p>
-          </div>
-
-          <div class="card-mir animate-fade-in-up">
-            <img src="images/jano_inicio.jpg" alt="El Jano" class="w-full h-56 object-cover mb-3 border border-mir/30">
-            <h3 class="text-mir font-title text-sm uppercase tracking-wide">El Jano</h3>
-            <p class="text-white/50 text-xs mt-1">Su mirada y su lucha siguen presentes.</p>
-          </div>
-
-          <div class="card-mir animate-fade-in-up">
-            <img src="images/navidad_popular.jpg" alt="Actividad con niños" class="w-full h-56 object-cover mb-3 border border-mir/30">
-            <h3 class="text-mir font-title text-sm uppercase tracking-wide">Infancias en El Arca</h3>
-            <p class="text-white/50 text-xs mt-1">Talleres y actividades para las niñas y niños de La Goya.</p>
-          </div>
-
-          <div class="card-mir animate-fade-in-up">
-            <img src="images/companeros_melon.jpg" alt="Compañeros de El Arca" class="w-full h-56 object-cover mb-3 border border-mir/30">
-            <h3 class="text-mir font-title text-sm uppercase tracking-wide">Compañeros</h3>
-            <p class="text-white/50 text-xs mt-1">Memoria de quienes partieron pero viven en el pueblo.</p>
-          </div>
-
-          <div class="card-mir animate-fade-in-up">
-            <img src="images/radio_libre.jpg" alt="Radio Libre" class="w-full h-56 object-cover mb-3 border border-mir/30">
-            <h3 class="text-mir font-title text-sm uppercase tracking-wide">Radio Libre</h3>
-            <p class="text-white/50 text-xs mt-1">Montaje y talleres del dial radial comunitario.</p>
-          </div>
-
-          <div class="card-mir animate-fade-in-up">
-            <img src="images/antupeñi.jpeg" alt="Antupeñi" class="w-full h-56 object-cover mb-3 border border-mir/30">
-            <h3 class="text-mir font-title text-sm uppercase tracking-wide">Antupeñi</h3>
-            <p class="text-white/50 text-xs mt-1">Hijos del Sol — organización territorial en La Pintana.</p>
-          </div>
-
+        <div class="card-mir animate-fade-in-up">
+          <img src="images/FB_IMG_1782701605358.jpg" alt="Retrato del Cabezón Jano" class="w-full h-56 object-cover mb-3 border border-mir/30">
+          <h3 class="text-mir font-title text-sm uppercase tracking-wide">El Cabezón Jano</h3>
+          <p class="text-white/50 text-xs mt-1">Pedro Alejandro González Reyes, fundador de El Arca.</p>
         </div>
-      </div>
-    </section>
-  </div>
+        <div class="card-mir animate-fade-in-up">
+          <img src="images/FB_IMG_1782701655071.jpg" alt="Espacio físico de El Arca" class="w-full h-56 object-cover mb-3 border border-mir/30">
+          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Sede El Arca</h3>
+          <p class="text-white/50 text-xs mt-1">El espacio físico donde la comunidad se reunía.</p>
+        </div>
+        <div class="card-mir animate-fade-in-up">
+          <img src="images/FB_IMG_1782701775498.jpg" alt="Jano pintando la sede" class="w-full h-56 object-cover mb-3 border border-mir/30">
+          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Jano pintando la sede</h3>
+          <p class="text-white/50 text-xs mt-1">Construyendo con sus propias manos el espacio comunitario.</p>
+        </div>
+        <div class="card-mir animate-fade-in-up">
+          <img src="images/FB_IMG_1782701859802.jpg" alt="Navidad Popular" class="w-full h-56 object-cover mb-3 border border-mir/30">
+          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Actividades Comunitarias</h3>
+          <p class="text-white/50 text-xs mt-1">Entrega simbólica de las llaves de la Población.</p>
+        </div>
+        <div class="card-mir animate-fade-in-up">
+          <img src="images/FB_IMG_1782701766075.jpg" alt="Marcha comunitaria" class="w-full h-56 object-cover mb-3 border border-mir/30">
+          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Marcha Comunitaria</h3>
+          <p class="text-white/50 text-xs mt-1">La Goya en las calles, organización popular y resistencia.</p>
+        </div>
+        <div class="card-mir animate-fade-in-up">
+          <img src="images/FB_IMG_1782701826979.jpg" alt="Jano planificando TV Comunitaria" class="w-full h-56 object-cover mb-3 border border-mir/30">
+          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Sueño de TV Comunitaria</h3>
+          <p class="text-white/50 text-xs mt-1">Jano con un compañero planificando la comunicación popular.</p>
+        </div>
+        <div class="card-mir animate-fade-in-up">
+          <img src="images/jano_inicio.jpg" alt="El Jano" class="w-full h-56 object-cover mb-3 border border-mir/30">
+          <h3 class="text-mir font-title text-sm uppercase tracking-wide">El Jano</h3>
+          <p class="text-white/50 text-xs mt-1">Su mirada y su lucha siguen presentes.</p>
+        </div>
+        <div class="card-mir animate-fade-in-up">
+          <img src="images/navidad_popular.jpg" alt="Actividad con niños" class="w-full h-56 object-cover mb-3 border border-mir/30">
+          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Infancias en El Arca</h3>
+          <p class="text-white/50 text-xs mt-1">Talleres y actividades para las niñas y niños de La Goya.</p>
+        </div>
+        <div class="card-mir animate-fade-in-up">
+          <img src="images/companeros_melon.jpg" alt="Compañeros de El Arca" class="w-full h-56 object-cover mb-3 border border-mir/30">
+          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Compañeros</h3>
+          <p class="text-white/50 text-xs mt-1">Memoria de quienes partieron pero viven en el pueblo.</p>
+        </div>
+        <div class="card-mir animate-fade-in-up">
+          <img src="images/radio_libre.jpg" alt="Radio Libre" class="w-full h-56 object-cover mb-3 border border-mir/30">
+          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Radio Libre</h3>
+          <p class="text-white/50 text-xs mt-1">Montaje y talleres del dial radial comunitario.</p>
+        </div>
+        <div class="card-mir animate-fade-in-up">
+          <img src="images/antupeñi.jpeg" alt="Antupeñi" class="w-full h-56 object-cover mb-3 border border-mir/30">
+          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Antupeñi</h3>
+          <p class="text-white/50 text-xs mt-1">Hijos del Sol — organización territorial en La Pintana.</p>
+        </div>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
   <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
     <div class="max-w-5xl mx-auto px-4 text-center">
       <a href="index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
@@ -148,13 +139,81 @@
     </div>
   </footer>
 
+  <!-- ===== LIGHTBOX MODAL ===== -->
+  <div id="lightbox-modal" style="display:none; position:fixed; z-index:99999; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); align-items:center; justify-content:center;">
+    <span id="lightbox-close" style="position:absolute; top:20px; right:30px; color:white; font-size:40px; cursor:pointer;">&times;</span>
+    <div id="lightbox-prev" style="position:absolute; left:20px; color:white; font-size:40px; cursor:pointer;">&#10094;</div>
+    <img id="lightbox-img" src="" style="max-width:85%; max-height:85%; object-fit:contain; border:2px solid #E50914; border-radius:8px;">
+    <div id="lightbox-next" style="position:absolute; right:20px; color:white; font-size:40px; cursor:pointer;">&#10095;</div>
+  </div>
+
   <script src="audio-player.js"></script>
   <script>
-    document.getElementById('menu-toggle').addEventListener('click', function() {
+    (function () {
+      'use strict';
+      var modal = document.getElementById('lightbox-modal');
+      var modalImg = document.getElementById('lightbox-img');
+      var closeBtn = document.getElementById('lightbox-close');
+      var prevBtn = document.getElementById('lightbox-prev');
+      var nextBtn = document.getElementById('lightbox-next');
+      if (!modal || !modalImg) return;
+
+      // Recolectar imágenes de la galería
+      var grid = document.querySelector('.galeria-grid');
+      var imagenes = grid ? grid.querySelectorAll('img') : document.querySelectorAll('.card-mir img');
+      if (imagenes.length === 0) return;
+
+      var srcs = [];
+      imagenes.forEach(function (img) { if (img.src) srcs.push(img.src); });
+      if (srcs.length === 0) return;
+
+      var currentIndex = 0;
+
+      function abrir(idx) {
+        currentIndex = idx;
+        modalImg.src = srcs[currentIndex];
+        modal.style.display = 'flex';
+      }
+      function cerrar() { modal.style.display = 'none'; }
+      function prev() {
+        currentIndex = (currentIndex - 1 + srcs.length) % srcs.length;
+        modalImg.src = srcs[currentIndex];
+      }
+      function next() {
+        currentIndex = (currentIndex + 1) % srcs.length;
+        modalImg.src = srcs[currentIndex];
+      }
+
+      // Click en miniaturas
+      imagenes.forEach(function (img, idx) {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', function (e) {
+          e.preventDefault();
+          abrir(idx);
+        });
+      });
+
+      // Controles del modal
+      if (closeBtn) closeBtn.onclick = cerrar;
+      modal.onclick = function (e) { if (e.target === modal) cerrar(); };
+      if (prevBtn) { prevBtn.onclick = function (e) { e.stopPropagation(); prev(); }; }
+      if (nextBtn) { nextBtn.onclick = function (e) { e.stopPropagation(); next(); }; }
+
+      // Teclado
+      document.addEventListener('keydown', function (e) {
+        if (modal.style.display !== 'flex') return;
+        if (e.key === 'Escape') cerrar();
+        if (e.key === 'ArrowLeft') prev();
+        if (e.key === 'ArrowRight') next();
+      });
+    })();
+
+    // Menú móvil
+    document.getElementById('menu-toggle').addEventListener('click', function () {
       document.getElementById('mobile-menu').classList.toggle('hidden');
     });
-    document.querySelectorAll('#mobile-menu a').forEach(function(l) {
-      l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
+    document.querySelectorAll('#mobile-menu a').forEach(function (l) {
+      l.addEventListener('click', function () { document.getElementById('mobile-menu').classList.add('hidden'); });
     });
   </script>
 </body>

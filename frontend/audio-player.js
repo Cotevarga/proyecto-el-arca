@@ -9,7 +9,21 @@
   ];
 
   var currentAudio = null;
+  var currentTrackIndex = -1;
 
+  /* ---- Leer estado guardado ---- */
+  var savedState = null;
+  try {
+    var raw = localStorage.getItem('arcaAudio');
+    if (raw) savedState = JSON.parse(raw);
+  } catch (_) {}
+
+  var estabaSonando = savedState && savedState.playing === true;
+  if (savedState && (savedState.trackIndex < 0 || savedState.trackIndex >= canciones.length)) {
+    savedState.trackIndex = Math.floor(Math.random() * canciones.length);
+  }
+
+  /* ---- Crear elementos DOM ---- */
   var btn = document.createElement('button');
   btn.id = 'audio-play-btn';
   btn.setAttribute('aria-label', 'Reproducir música ambiental');
@@ -35,55 +49,87 @@
   ].join('\n');
   document.head.appendChild(css);
 
-  function actualizarInterfazAModoPlay() {
-    btn.classList.add('playing');
-    btn.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
-    tooltip.innerHTML = 'Reproduciendo<br>Haz clic para pausar';
+  function iconoPausa() {
+    return '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+  }
+  function iconoPlay() {
+    return '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>';
   }
 
-  function actualizarInterfazAModoPausa() {
+  function modoPlay() {
+    btn.classList.add('playing');
+    btn.innerHTML = iconoPausa();
+    tooltip.innerHTML = 'Reproduciendo<br>Haz clic para pausar';
+  }
+  function modoPausa() {
     btn.classList.remove('playing');
-    btn.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>';
+    btn.innerHTML = iconoPlay();
     tooltip.innerHTML = 'Para hacer más increíble<br>tu experiencia - Play';
   }
 
+  /* ---- Guardar estado en localStorage ---- */
+  function guardarEstado() {
+    if (!currentAudio) return;
+    try {
+      localStorage.setItem('arcaAudio', JSON.stringify({
+        playing: !currentAudio.paused,
+        trackIndex: currentTrackIndex,
+        currentTime: currentAudio.currentTime
+      }));
+    } catch (_) {}
+  }
+
+  /* ---- Mostrar botón como "sonando" si antes se estaba reproduciendo ---- */
+  if (estabaSonando) {
+    modoPlay();
+  }
+
+  /* ---- Click del botón ---- */
   btn.addEventListener('click', function () {
     if (!currentAudio) {
-      var randomIndex = Math.floor(Math.random() * canciones.length);
-      currentAudio = new Audio(canciones[randomIndex]);
+      var idx = savedState ? savedState.trackIndex : Math.floor(Math.random() * canciones.length);
+      if (idx < 0 || idx >= canciones.length) idx = Math.floor(Math.random() * canciones.length);
+      currentTrackIndex = idx;
+      currentAudio = new Audio(canciones[currentTrackIndex]);
       currentAudio.volume = 0.6;
+
+      if (savedState && savedState.currentTime) {
+        currentAudio.currentTime = savedState.currentTime;
+      }
 
       currentAudio.play()
         .then(function () {
-          console.log("Sonando de forma interactiva:", canciones[randomIndex]);
-          actualizarInterfazAModoPlay();
+          console.log('Sonando:', canciones[currentTrackIndex]);
+          modoPlay();
+          guardarEstado();
         })
         .catch(function (err) {
-          console.error("Error crítico al reproducir:", err);
+          console.error('Error al reproducir:', err);
+          modoPausa();
         });
 
       currentAudio.addEventListener('ended', function () {
-        var nextIndex = Math.floor(Math.random() * canciones.length);
-        currentAudio.src = canciones[nextIndex];
-        currentAudio.play().catch(function (e) {
-          console.log(e);
-        });
+        currentTrackIndex = Math.floor(Math.random() * canciones.length);
+        currentAudio.src = canciones[currentTrackIndex];
+        currentAudio.play().catch(function (e) { console.log(e); });
+        guardarEstado();
       });
     } else {
       if (currentAudio.paused) {
         currentAudio.play()
-          .then(function () {
-            actualizarInterfazAModoPlay();
-          })
-          .catch(function (err) {
-            console.error("Error crítico al reproducir:", err);
-          });
+          .then(function () { modoPlay(); guardarEstado(); })
+          .catch(function (err) { console.error('Error:', err); });
       } else {
         currentAudio.pause();
-        actualizarInterfazAModoPausa();
+        modoPausa();
+        guardarEstado();
       }
     }
   });
+
+  /* ---- Auto-guardado periódico + antes de salir ---- */
+  setInterval(function () { guardarEstado(); }, 2000);
+  window.addEventListener('beforeunload', guardarEstado);
 
   document.body.appendChild(wrapper);
 })();

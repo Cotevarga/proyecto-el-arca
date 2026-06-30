@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Memoria de El Arca — Pedro "Cabezón Jano" González</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
   <style>
     :root {
       --color-mir: #E50914;
@@ -31,7 +30,7 @@
     .border-mir { border-color: var(--color-mir) !important; }
     .bg-mir { background-color: var(--color-mir) !important; }
     .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229, 9, 20, 0.4) !important; padding: 1.5rem; }
-    .divider-mir { w-16; h-1; background-color: var(--color-mir) !important; width: 4rem; height: 0.25rem; my: 1.5rem; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+    .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; }
 
     .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
     .btn-mir {
@@ -48,11 +47,6 @@
     .btn-mir:hover {
       background-color: black !important;
       color: var(--color-mir) !important;
-    }
-
-    @keyframes tooltipPulse {
-      0%, 100% { opacity: 0.7; transform: translateX(0); }
-      50% { opacity: 1; transform: translateX(4px); }
     }
 
     .btn-outline-mir {
@@ -79,12 +73,12 @@
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <a href="index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
       <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
-        <a href="#" data-ruta="inicio" class="text-mir border-b-2 border-mir pb-1">Inicio</a>
-        <a href="#" data-ruta="galeria" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
-        <a href="#" data-ruta="videos" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
-        <a href="#" data-ruta="relatos" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
-        <a href="#" data-ruta="legado" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
-        <a href="#" data-ruta="archivo" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+        <a href="index.html" class="text-mir border-b-2 border-mir pb-1">Inicio</a>
+        <a href="galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
+        <a href="legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
+        <a href="index.html#archivo" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
       </div>
       <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -92,18 +86,18 @@
     </div>
     <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-t-[rgba(229,9,20,0.3)] px-4 py-4">
       <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
-        <a href="#" data-ruta="inicio" class="text-mir">Inicio</a>
-        <a href="#" data-ruta="galeria" class="hover:text-mir transition">Galería</a>
-        <a href="#" data-ruta="videos" class="hover:text-mir transition">Videos</a>
-        <a href="#" data-ruta="relatos" class="hover:text-mir transition">Relatos</a>
-        <a href="#" data-ruta="legado" class="hover:text-mir transition">El Legado</a>
-        <a href="#" data-ruta="archivo" class="hover:text-mir transition">Archivo</a>
+        <a href="index.html" class="text-mir">Inicio</a>
+        <a href="galeria.html" class="hover:text-mir transition">Galería</a>
+        <a href="videos.html" class="hover:text-mir transition">Videos</a>
+        <a href="relatos.html" class="hover:text-mir transition">Relatos</a>
+        <a href="legado.html" class="hover:text-mir transition">El Legado</a>
+        <a href="index.html#archivo" class="hover:text-mir transition">Archivo</a>
       </div>
     </div>
   </nav>
 
-  <!-- ===== CONTENEDOR PRINCIPAL (SPA) ===== -->
-  <main id="contenedor-principal">
+  <!-- ===== CONTENIDO ===== -->
+  <main>
 
     <!-- ===== HERO ===== -->
     <header class="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -123,8 +117,8 @@
           <span class="block text-sm md:text-base text-white/60 mt-3">1972 — 2006 · Su sueño vive en cada vecino, en cada niñez, en cada lucha.</span>
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="#" data-ruta="archivo" class="btn-mir">Comparte tu recuerdo</a>
-          <a href="#" data-ruta="legado" class="btn-outline-mir">Conoce el legado</a>
+          <a href="index.html#archivo" class="btn-mir">Comparte tu recuerdo</a>
+          <a href="legado.html" class="btn-outline-mir">Conoce el legado</a>
         </div>
       </div>
     </header>
