@@ -29,16 +29,7 @@
     .tab-btn.active { background: var(--color-mir); color: white; border-color: var(--color-mir); }
     .tab-content { display: none; }
     .tab-content.active { display: block; animation: fadeInUp 0.5s ease-out forwards; }
-  <style>
-    /* AUDIO PLAYER */
-    #audio-player-wrapper { position: fixed; top: 90px; right: 16px; z-index: 9999; display: flex; align-items: center; gap: 10px; flex-direction: row-reverse; }
-    #audio-play-btn { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #E50914; background: rgba(17,17,17,0.9); color: #E50914; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; backdrop-filter: blur(4px); box-shadow: 0 0 15px rgba(229,9,20,0.3); flex-shrink: 0; }
-    #audio-play-btn:hover { background: #E50914; color: #fff; transform: scale(1.1); box-shadow: 0 0 25px rgba(229,9,20,0.6); }
-    #audio-play-btn.playing { background: #E50914; color: #fff; }
-    #audio-tooltip { background: rgba(17,17,17,0.92); color: rgba(255,255,255,0.9); font-family: Arial, Helvetica, sans-serif; font-size: 0.7rem; line-height: 1.4; padding: 8px 14px; border: 1px solid rgba(229,9,20,0.4); text-align: center; backdrop-filter: blur(4px); animation: tooltipBounce 1.8s ease-in-out infinite; }
-    @keyframes tooltipBounce { 0%, 100% { opacity: 0.7; transform: translateX(0); } 50% { opacity: 1; transform: translateX(-4px); } }
-    @media (max-width: 640px) { #audio-player-wrapper { top: 80px; right: 8px; } #audio-tooltip { display: none; } }
-  </style>
+  <script src="/audio-player.js" defer></script>
 </head>
 <body class="bg-black text-white antialiased">
 
@@ -103,16 +94,42 @@
               <div class="grid md:grid-cols-2 gap-6 items-start">
                 <div class="space-y-4 text-white/70 leading-relaxed">
                   <p>
-                    Los primeros pasos de la organización territorial en el sector sur de La Pintana nacieron desde "La Caleta", un espacio de encuentro donde vecinos y vecinas comenzaron a reunirse para discutir los problemas comunes del barrio. Allí, donde antes solo había silencio y abandono, empezó a tejerse una red de solidaridad que trascendió lo asistencial para convertirse en conciencia de clase.
+                    Los primeros pasos y la llegada a La Caleta (1998)
+                    El compromiso social de Carlos comenzó formalmente a finales de la década de los noventa, cuando apenas tenía 19 años. "Comencé el 98 en La Caleta y supe de la ONG por la Universidad donde estudiaba", recuerda. Su inserción territorial se dio de manera natural gracias a su ubicación, en el sector de Antumapu (paradero 32 de Santa Rosa): "como vivía cerca, me acerqué porque consideré interesante el proyecto".
                   </p>
                   <p>
-                    Fue en ese crisol de experiencias donde surgió "Antupeñi" —que en mapudungún significa "Hijos del Sol"—, una organización que tomó la posta del trabajo territorial con las niñeces y las juventudes. Desde 1998 hasta 2003, Antupeñi desarrolló talleres de arte, música y comunicación popular, recuperando el espacio público como escenario de lucha y dignidad.
+                    La Corporación La Caleta poseía ya una trayectoria histórica. Según explica, "era una ONG chilena fundada el 85 y en sus orígenes estuvo ligado a educadores y agentes pastorales que trabajaban con niños en extrema vulneralidad durante la dictadura".
                   </p>
                   <p>
-                    "Antupeñi no era solo un nombre bonito —recuerda una de sus fundadoras—. Era la declaración de que nuestros niños y niñas merecían crecer con el sol de la conciencia, no con las sombras de la desesperanza. Cada taller, cada actividad, era un acto de amor militante que sembraba futuro en medio del desierto."
+                    Filosofía de trabajo y el verdadero objetivo preventivo
+                    El enfoque institucional era moderno e integral. "La filosofía de La Caleta se basaba en la educación popular, trabajo comunitario y enfoque en los derechos de la niñez", detalla. La metodología priorizaba el trabajo territorial, "fortaleciendo las organizaciones comunitarias en lugar de intervenir solo de forma asistencial", viendo a los menores como "sujetos de derechos" y buscando incidir en las políticas públicas mediante el fomento del "'Buen Vivir', la diversidad cultural y el empoderamiento de los sectores populares".
                   </p>
                   <p>
-                    La experiencia de Antupeñi sentó las bases para lo que después sería el trabajo masivo con las infancias en El Arca, demostrando que la organización territorial es el único camino para construir poder popular desde la base. La memoria de aquellos años sigue viva en cada compañero y compañera que dio sus primeros pasos en la militancia social desde "La Caleta" y Antupeñi, aprendiendo que la transformación real se construye desde el territorio, con paciencia, con amor y con una convicción inquebrantable en el razonamiento social.
+                    Sin embargo, detrás del trabajo infantil existía una profunda y estratégica misión enfocada en la juventud. "Muchos piensan que nuestro trabajo iba enfocado a los niños, porque recibíamos niños desde 3 años, pero nuestro objetivo base era atacar la entrada de drogas en los jóvenes desde los 13 hasta los 18 y más", revela Carlos.
+                    El método de prevención consistía en dotar de sentido y deber a los adolescentes locales, "Dándoles responsabilidades visibles dentro de la comunidad a hacerse cargo de niños que veían a diario, evitando así que ellos tuvieran acceso enlace misma población o sector a las drogas duras". Sumar a los jóvenes se lograba del "boca a boca", ya que "es una edad donde están dispuestos a conocer a otros y buscar una identidad en común".
+                  </p>
+                  <p>
+                    El territorio, los espacios y la labor comunitaria
+                    El despliegue en la zona sur de Santiago era extenso. "La Caleta actuaba en 5 puntos de la comuna. El Bosque, Santo Tomás, El Castillo, Villa Colombia y (no recuerdo el nombre de la 5ta que estaba ahi mismo donde esta la Muni...)". Para asegurar un punto de reunión fijo en su sector, Carlos relata que "El grupo se juntaba en una de las salas de la iglesia que estaba en la Villa El Bosque y se consiguió hablando con el cura". Este acuerdo fue un beneficio mutuo que "Justo coincidió con un Encuentro Latinoamericano de Jovenes y la iglesia requería de nuevos jóvenes en ella".
+                  </p>
+                  <p>
+                    La capacitación de la ONG permitió entregar herramientas culturales y de liderazgo. "La Caleta nos aportó talleres de recreación para niños, batucadas (en esos años era la moda), zancos, pinta caras, circo teatro, talleres de monitores infantiles, pintura de murales", enumera. Estos aprendizajes se llevaban a la práctica mediante el modelo de prevención: "Y nosotros hacíamos talleres y aplicabamos lo aprendido con los niños desde 3 a 12 años con tíos desde los 13 a los 18 o más".
+                    La dedicación era constante, abarcando "todos los fines de semana y durante el verano se hacían las colonias de verano donde comentábamos con un cupo de 150 niños y terminábamos con cerca de 300", apoyados por una sólida base humana donde "Los tios o monitores eran cerca de 30 jóvenes del sector".
+                  </p>
+                  <p>
+                    El fin del financiamiento y el nacimiento de "Antupeñi" (2000 - 2003)
+                    El apoyo institucional no fue permanente. "Esta ONG nos apoyó por cerca de 2 años y luego se retiró por falta de recursos", narra Carlos. Frente a la ausencia de la Corporación original (alrededor del año 2000), los dirigentes barriales tomaron una decisión fundamental basada en el vínculo creado: "El tema es que no podíamos darle la espalda a los jóvenes y niños que habíamos acogido".
+                  </p>
+                  <p>
+                    Fue la propia juventud empoderada la que salvó la iniciativa. "El mismo grupo de tíos a los que iba dirigido el proyecto se hizo cargo de la continuidad del mismo", señala con orgullo, marcando el origen de una nueva etapa puramente autogestionada: "Así nació el grupo Antupeñi 'Niños de la tierra' hasta por el 2003".
+                  </p> 
+                  <p>
+                    La experiencia de Carlos en la organización territorial fue un proceso de aprendizaje y compromiso social. "Fue una experiencia que me marcó y me enseñó mucho sobre la importancia de la organización comunitaria y el trabajo con jóvenes", concluye.
+                  </p>
+                  <p>
+                    Reflexiones y el impacto en una generación
+                    Al mirar hacia atrás y evaluar aquellos años de labor territorial ininterrumpida, Carlos aterriza las expectativas frente a un contexto adverso. "No se pretendia una efectividad total, pero sí hacer una mudanza en el pensamiento social de cada uno de ellos respecto a su entorno".
+                    Reconoce abiertamente que "Muchos chicos se perdieron en la droga", pero rescata el legado invaluable y principal logro de la organización: "una gran mayoría consiguieron crear pensamiento crítico y razonamiento social".
                   </p>
                 </div>
                 <div class="card-mir">
@@ -142,15 +159,7 @@
     .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
   </style>
 
-  <!-- ===== AUDIO PLAYER ===== -->
-  <div id="audio-player-wrapper">
-    <button id="audio-play-btn" aria-label="Reproducir música ambiental">
-      <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
-    </button>
-    <span id="audio-tooltip">Para hacer más increíble<br>tu experiencia - Play</span>
-  </div>
 
-  <script src="../audio-player.js"></script>
   <script>
     document.getElementById('menu-toggle').addEventListener('click', function() {
       document.getElementById('mobile-menu').classList.toggle('hidden');

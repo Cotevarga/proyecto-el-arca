@@ -29,16 +29,7 @@
     @keyframes tooltipPulse { 0%,100%{opacity:0.7;transform:translateX(0)} 50%{opacity:1;transform:translateX(4px)} }
     .btn-mir { background-color: var(--color-mir) !important; color: white !important; font-weight: bold; padding: 0.75rem 2rem; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem; border: 2px solid var(--color-mir); }
     .btn-mir:hover { background-color: black !important; color: var(--color-mir) !important; }
-  <style>
-    /* AUDIO PLAYER */
-    #audio-player-wrapper { position: fixed; top: 90px; right: 16px; z-index: 9999; display: flex; align-items: center; gap: 10px; flex-direction: row-reverse; }
-    #audio-play-btn { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #E50914; background: rgba(17,17,17,0.9); color: #E50914; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; backdrop-filter: blur(4px); box-shadow: 0 0 15px rgba(229,9,20,0.3); flex-shrink: 0; }
-    #audio-play-btn:hover { background: #E50914; color: #fff; transform: scale(1.1); box-shadow: 0 0 25px rgba(229,9,20,0.6); }
-    #audio-play-btn.playing { background: #E50914; color: #fff; }
-    #audio-tooltip { background: rgba(17,17,17,0.92); color: rgba(255,255,255,0.9); font-family: Arial, Helvetica, sans-serif; font-size: 0.7rem; line-height: 1.4; padding: 8px 14px; border: 1px solid rgba(229,9,20,0.4); text-align: center; backdrop-filter: blur(4px); animation: tooltipBounce 1.8s ease-in-out infinite; }
-    @keyframes tooltipBounce { 0%, 100% { opacity: 0.7; transform: translateX(0); } 50% { opacity: 1; transform: translateX(-4px); } }
-    @media (max-width: 640px) { #audio-player-wrapper { top: 80px; right: 8px; } #audio-tooltip { display: none; } }
-  </style>
+  <script src="/audio-player.js" defer></script>
 </head>
 <body class="bg-black text-white antialiased">
 
@@ -134,15 +125,7 @@
     </div>
   </footer>
 
-  <!-- ===== AUDIO PLAYER ===== -->
-  <div id="audio-player-wrapper">
-    <button id="audio-play-btn" aria-label="Reproducir música ambiental">
-      <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
-    </button>
-    <span id="audio-tooltip">Para hacer más increíble<br>tu experiencia - Play</span>
-  </div>
 
-  <script src="audio-player.js"></script>
   <script>
     document.getElementById('menu-toggle').addEventListener('click', function() {
       document.getElementById('mobile-menu').classList.toggle('hidden');

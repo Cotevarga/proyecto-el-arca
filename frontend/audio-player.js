@@ -1,4 +1,4 @@
-(function () {
+window.addEventListener('DOMContentLoaded', function () {
   'use strict';
 
   var canciones = [
@@ -8,7 +8,18 @@
     '/musica/relatos.mp3', '/musica/relatos2.mp3', '/musica/relatos3.mp3'
   ];
 
-  var btn = document.getElementById('audio-play-btn');
+  var container = document.createElement('div');
+  container.id = 'global-audio-container';
+  container.innerHTML =
+    '<div id="audio-tooltip" style="position:fixed; top:20px; right:80px; background:#111; color:white; padding:8px 12px; border-radius:4px; font-size:12px; border:1px solid #E50914; z-index:99999; text-align:right;">' +
+      'Para hacer más increíble<br>tu experiencia - Play' +
+    '</div>' +
+    '<button id="btn-global-play" style="position:fixed; top:15px; right:15px; z-index:99999; background:#E50914; border:none; border-radius:50%; width:50px; height:50px; cursor:pointer; color:white; font-size:20px; display:flex; align-items:center; justify-content:center;">' +
+      '▶' +
+    '</button>';
+  document.body.appendChild(container);
+
+  var btn = document.getElementById('btn-global-play');
   var tooltip = document.getElementById('audio-tooltip');
   if (!btn) return;
 
@@ -23,21 +34,14 @@
     audioTrack = Math.floor(Math.random() * canciones.length);
   }
 
-  function iconoPausa() {
-    return '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
-  }
-  function iconoPlay() {
-    return '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>';
-  }
-
   function modoPlay() {
-    btn.classList.add('playing');
-    btn.innerHTML = iconoPausa();
+    btn.textContent = '⏸';
+    btn.style.background = '#c62828';
     if (tooltip) tooltip.innerHTML = 'Reproduciendo<br>Haz clic para pausar';
   }
   function modoPausa() {
-    btn.classList.remove('playing');
-    btn.innerHTML = iconoPlay();
+    btn.textContent = '▶';
+    btn.style.background = '#E50914';
     if (tooltip) tooltip.innerHTML = 'Para hacer más increíble<br>tu experiencia - Play';
   }
 
@@ -95,4 +99,4 @@
       localStorage.setItem('audioTrack', currentTrackIndex);
     }
   });
-})();
+});
