@@ -8,39 +8,7 @@
     './musica/relatos.mp3', './musica/relatos2.mp3', './musica/relatos3.mp3'
   ];
 
-  var audio = new Audio();
-  audio.volume = 0.7;
-
-  var isPlaying = false;
-  var currentIndex = -1;
-
-  function pickRandom() {
-    var next;
-    do {
-      next = Math.floor(Math.random() * canciones.length);
-    } while (next === currentIndex && canciones.length > 1);
-    currentIndex = next;
-    return canciones[currentIndex];
-  }
-
-  function playCurrent() {
-    audio.play()
-      .then(function () {
-        isPlaying = true;
-        updateUI();
-        console.log("Reproduciendo con éxito:", audio.src);
-      })
-      .catch(function (err) {
-        console.error("El navegador bloqueó la reproducción interactiva:", err);
-        isPlaying = false;
-        updateUI();
-      });
-  }
-
-  audio.addEventListener('ended', function () {
-    audio.src = pickRandom();
-    playCurrent();
-  });
+  var currentAudio = null;
 
   var btn = document.createElement('button');
   btn.id = 'audio-play-btn';
@@ -67,34 +35,55 @@
   ].join('\n');
   document.head.appendChild(css);
 
-  function updateUI() {
-    if (isPlaying) {
-      btn.classList.add('playing');
-      btn.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
-      tooltip.innerHTML = 'Reproduciendo<br>Haz clic para pausar';
+  function actualizarInterfazAModoPlay() {
+    btn.classList.add('playing');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+    tooltip.innerHTML = 'Reproduciendo<br>Haz clic para pausar';
+  }
+
+  function actualizarInterfazAModoPausa() {
+    btn.classList.remove('playing');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>';
+    tooltip.innerHTML = 'Para hacer más increíble<br>tu experiencia - Play';
+  }
+
+  btn.addEventListener('click', function () {
+    if (!currentAudio) {
+      var randomIndex = Math.floor(Math.random() * canciones.length);
+      currentAudio = new Audio(canciones[randomIndex]);
+      currentAudio.volume = 0.6;
+
+      currentAudio.play()
+        .then(function () {
+          console.log("Sonando de forma interactiva:", canciones[randomIndex]);
+          actualizarInterfazAModoPlay();
+        })
+        .catch(function (err) {
+          console.error("Error crítico al reproducir:", err);
+        });
+
+      currentAudio.addEventListener('ended', function () {
+        var nextIndex = Math.floor(Math.random() * canciones.length);
+        currentAudio.src = canciones[nextIndex];
+        currentAudio.play().catch(function (e) {
+          console.log(e);
+        });
+      });
     } else {
-      btn.classList.remove('playing');
-      btn.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>';
-      tooltip.innerHTML = 'Para hacer más increíble<br>tu experiencia - Play';
+      if (currentAudio.paused) {
+        currentAudio.play()
+          .then(function () {
+            actualizarInterfazAModoPlay();
+          })
+          .catch(function (err) {
+            console.error("Error crítico al reproducir:", err);
+          });
+      } else {
+        currentAudio.pause();
+        actualizarInterfazAModoPausa();
+      }
     }
-  }
+  });
 
-  function togglePlay() {
-    if (isPlaying) {
-      audio.pause();
-      isPlaying = false;
-      updateUI();
-      return;
-    }
-
-    if (audio.src === '' || audio.src === window.location.href + '/' || currentIndex === -1) {
-      audio.src = pickRandom();
-    }
-
-    playCurrent();
-  }
-
-  btn.addEventListener('click', togglePlay);
-  updateUI();
   document.body.appendChild(wrapper);
 })();
