@@ -13,7 +13,7 @@
     @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
     .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
     .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
-    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: white !important; text-transform: uppercase; letter-spacing: -0.025em; }
+    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: white !important; text-transform: uppercase; letter-spacing: 0.05em; }
     .text-mir { color: var(--color-mir) !important; }
     .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
     .border-mir\/40 { border-color: rgba(229,9,20,0.4) !important; }
@@ -30,7 +30,6 @@
 </head>
 <body class="bg-black text-white antialiased">
 
-  <!-- ===== NAVBAR ===== -->
   <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <a href="index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
@@ -58,57 +57,55 @@
     </div>
   </nav>
 
-  <!-- ===== HEADER ===== -->
-  <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
-    <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
-      <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Crónica Popular</span>
-      <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Relatos de El Arca</h1>
-      <div class="divider-mir mx-auto"></div>
-      <p class="text-white/60 text-lg max-w-2xl mx-auto">Explora las crónicas, entrevistas y testimonios que reconstruyen la historia del centro cultural y su fundador.</p>
-    </div>
-  </header>
-
-  <!-- ===== CATEGORÍAS ===== -->
-  <section class="py-20 bg-noche">
-    <div class="max-w-6xl mx-auto px-4">
-      <div class="grid md:grid-cols-3 gap-8">
-
-        <a href="relatos/jano.html" class="cat-card card-mir flex flex-col items-center text-center min-h-[320px] justify-center">
-          <div class="text-6xl mb-6">🔥</div>
-          <h2 class="text-mir font-title text-2xl uppercase mb-3">El Jano</h2>
-          <p class="text-white/50 text-sm leading-relaxed">Historia personal, sueños y testimonios de Pedro Alejandro González Reyes, "El Cabezón Jano".</p>
-          <span class="text-mir/60 text-xs mt-4 uppercase tracking-widest">Leer crónicas →</span>
-        </a>
-
-        <a href="relatos/arca.html" class="cat-card card-mir flex flex-col items-center text-center min-h-[320px] justify-center">
-          <div class="text-6xl mb-6">🏛️</div>
-          <h2 class="text-mir font-title text-2xl uppercase mb-3">El Arca</h2>
-          <p class="text-white/50 text-sm leading-relaxed">Historia institucional, trabajo territorial, La Goya en las Calles y el legado que camina.</p>
-          <span class="text-mir/60 text-xs mt-4 uppercase tracking-widest">Leer crónicas →</span>
-        </a>
-
-        <a href="relatos/organizaciones.html" class="cat-card card-mir flex flex-col items-center text-center min-h-[320px] justify-center">
-          <div class="text-6xl mb-6">✊</div>
-          <h2 class="text-mir font-title text-2xl uppercase mb-3">Otras Organizaciones</h2>
-          <p class="text-white/50 text-sm leading-relaxed">Memorias de organización social: La Caleta y Antupeñi.</p>
-          <span class="text-mir/60 text-xs mt-4 uppercase tracking-widest">Explorar →</span>
-        </a>
-
+  <div id="page-content">
+    <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
+      <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
+        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Crónica Popular</span>
+        <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Relatos de El Arca</h1>
+        <div class="divider-mir mx-auto"></div>
+        <p class="text-white/60 text-lg max-w-2xl mx-auto">Explora las crónicas, entrevistas y testimonios que reconstruyen la historia del centro cultural y su fundador.</p>
       </div>
-    </div>
-  </section>
+    </header>
 
-  <!-- ===== CTA FINAL ===== -->
-  <section class="py-16 bg-black border-t border-mir/20 text-center">
-    <div class="max-w-3xl mx-auto px-4">
-      <h2 class="heading-mir text-4xl md:text-5xl mb-4">Tu relato también importa</h2>
-      <div class="divider-mir mx-auto"></div>
-      <p class="text-white/60 text-lg mb-8">Si fuiste parte de El Arca, si conociste al Jano, si creciste en La Goya: tu memoria es parte de esta historia.</p>
+    <section class="py-20 bg-noche">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="grid md:grid-cols-3 gap-8">
+
+          <a href="relatos/jano.html" class="cat-card card-mir flex flex-col items-center text-center min-h-[320px] justify-center">
+            <div class="text-6xl mb-6">🔥</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">El Jano</h2>
+            <p class="text-white/50 text-sm leading-relaxed">Historia personal, sueños y testimonios de Pedro Alejandro González Reyes, "El Cabezón Jano".</p>
+            <span class="text-mir/60 text-xs mt-4 uppercase tracking-widest">Leer crónicas →</span>
+          </a>
+
+          <a href="relatos/arca.html" class="cat-card card-mir flex flex-col items-center text-center min-h-[320px] justify-center">
+            <div class="text-6xl mb-6">🏛️</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">El Arca</h2>
+            <p class="text-white/50 text-sm leading-relaxed">Historia institucional, trabajo territorial, La Goya en las Calles y el legado que camina.</p>
+            <span class="text-mir/60 text-xs mt-4 uppercase tracking-widest">Leer crónicas →</span>
+          </a>
+
+          <a href="relatos/organizaciones.html" class="cat-card card-mir flex flex-col items-center text-center min-h-[320px] justify-center">
+            <div class="text-6xl mb-6">✊</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">Otras Organizaciones</h2>
+            <p class="text-white/50 text-sm leading-relaxed">Memorias de organización social: La Caleta y Antupeñi.</p>
+            <span class="text-mir/60 text-xs mt-4 uppercase tracking-widest">Explorar →</span>
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="py-16 bg-black border-t border-mir/20 text-center">
+      <div class="max-w-3xl mx-auto px-4">
+        <h2 class="heading-mir text-4xl md:text-5xl mb-4">Tu relato también importa</h2>
+        <div class="divider-mir mx-auto"></div>
+        <p class="text-white/60 text-lg mb-8">Si fuiste parte de El Arca, si conociste al Jano, si creciste en La Goya: tu memoria es parte de esta historia.</p>
         <a href="index.html#archivo" class="inline-block bg-mir hover:bg-resistencia-700 text-white font-bold py-3 px-10 transition-all duration-300 tracking-wider uppercase text-sm border-2 border-mir hover:bg-black hover:text-mir">Comparte tu recuerdo</a>
-    </div>
-  </section>
+      </div>
+    </section>
+  </div>
 
-  <!-- ===== FOOTER ===== -->
   <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
     <div class="max-w-5xl mx-auto px-4 text-center">
       <a href="index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>

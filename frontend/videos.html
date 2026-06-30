@@ -13,7 +13,7 @@
     @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
     .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
     .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
-    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: white !important; text-transform: uppercase; letter-spacing: -0.025em; }
+    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: white !important; text-transform: uppercase; letter-spacing: 0.05em; }
     .text-mir { color: var(--color-mir) !important; }
     .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
     .border-mir\/40 { border-color: rgba(229,9,20,0.4) !important; }
@@ -34,7 +34,6 @@
 </head>
 <body class="bg-black text-white antialiased">
 
-  <!-- ===== NAVBAR ===== -->
   <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <a href="index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
@@ -62,77 +61,58 @@
     </div>
   </nav>
 
-  <!-- ===== HEADER ===== -->
-  <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
-    <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
-      <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Multimedia</span>
-      <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Videos y Audios</h1>
-      <div class="divider-mir mx-auto"></div>
-      <p class="text-white/60 text-lg max-w-2xl mx-auto">Material audiovisual de El Arca, la Radio Libre y la comunicación popular en La Goya.</p>
-    </div>
-  </header>
+  <div id="page-content">
+    <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
+      <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
+        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Multimedia</span>
+        <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Videos y Audios</h1>
+        <div class="divider-mir mx-auto"></div>
+        <p class="text-white/60 text-lg max-w-2xl mx-auto">Material audiovisual de El Arca, la Radio Libre y la comunicación popular en La Goya.</p>
+      </div>
+    </header>
 
-  <!-- ===== YOUTUBE EMBED ===== -->
-  <section class="py-16 bg-noche">
-    <div class="max-w-5xl mx-auto px-4">
+    <section class="py-16 bg-noche">
+      <div class="max-w-5xl mx-auto px-4">
         <div class="w-full max-w-4xl mx-auto my-8 p-4 bg-noche border border-red-600 shadow-lg">
           <h2 class="text-mir font-title text-2xl uppercase tracking-wide mb-4">Radio Libre 90.1 / 100.5 FM</h2>
           <p class="text-white/50 text-sm mb-6">Programas y registros de la radio comunitaria.</p>
-          <iframe 
-  class="w-full h-full"
-  src="https://www.youtube.com/embed/tNz15U2EZcw" 
-  title="Radio Libre 90.1 / 100.5 FM - Registros El Arca"
-  frameborder="0" 
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-  allowfullscreen>
-</iframe>
+          <iframe class="w-full aspect-video" src="https://www.youtube.com/embed/tNz15U2EZcw" title="Radio Libre 90.1 / 100.5 FM - Registros El Arca" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+
+        <h2 class="heading-mir text-3xl md:text-4xl mt-16 mb-8">Archivo Audiovisual Local</h2>
+        <div class="divider-mir"></div>
+        <p class="text-white/50 mb-8">Próximamente: material inédito recuperado de la comunidad.</p>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="card-mir flex flex-col items-center justify-center min-h-[200px] border-dashed border-mir/30 text-center">
+            <div class="text-5xl mb-4 opacity-30">🎬</div>
+            <h3 class="text-white/40 font-title text-lg uppercase">Video 01</h3>
+            <p class="text-white/30 text-sm mt-1">Talleres y actividades de El Arca</p>
+            <span class="text-mir/40 text-xs mt-3">Archivo pendiente de digitalización</span>
+          </div>
+          <div class="card-mir flex flex-col items-center justify-center min-h-[200px] border-dashed border-mir/30 text-center">
+            <div class="text-5xl mb-4 opacity-30">🎬</div>
+            <h3 class="text-white/40 font-title text-lg uppercase">Video 02</h3>
+            <p class="text-white/30 text-sm mt-1">Entrevistas a vecinos de La Goya</p>
+            <span class="text-mir/40 text-xs mt-3">Archivo pendiente de digitalización</span>
+          </div>
+          <div class="card-mir flex flex-col items-center justify-center min-h-[200px] border-dashed border-mir/30 text-center">
+            <div class="text-5xl mb-4 opacity-30">🎬</div>
+            <h3 class="text-white/40 font-title text-lg uppercase">Video 03</h3>
+            <p class="text-white/30 text-sm mt-1">Carnaval del 30 — La Pintana</p>
+            <span class="text-mir/40 text-xs mt-3">Archivo pendiente de digitalización</span>
+          </div>
+          <div class="card-mir flex flex-col items-center justify-center min-h-[200px] border-dashed border-mir/30 text-center">
+            <div class="text-5xl mb-4 opacity-30">🎤</div>
+            <h3 class="text-white/40 font-title text-lg uppercase">Audio 01</h3>
+            <p class="text-white/30 text-sm mt-1">Programa "El Sartén por el Mango"</p>
+            <span class="text-mir/40 text-xs mt-3">Archivo pendiente de digitalización</span>
+          </div>
+        </div>
       </div>
+    </section>
+  </div>
 
-      <!-- ===== PLACEHOLDERS PARA VIDEOS LOCALES ===== -->
-      <h2 class="heading-mir text-3xl md:text-4xl mt-16 mb-8">Archivo Audiovisual Local</h2>
-      <div class="divider-mir"></div>
-      <p class="text-white/50 mb-8">Próximamente: material inédito recuperado de la comunidad.</p>
-
-      <div class="grid md:grid-cols-2 gap-6">
-
-        <div class="card-mir flex flex-col items-center justify-center min-h-[200px] border-dashed border-mir/30 text-center">
-          <div class="text-5xl mb-4 opacity-30">🎬</div>
-          <h3 class="text-white/40 font-title text-lg uppercase">Video 01</h3>
-          <p class="text-white/30 text-sm mt-1">Talleres y actividades de El Arca</p>
-          <span class="text-mir/40 text-xs mt-3">Archivo pendiente de digitalización</span>
-        </div>
-
-        <div class="card-mir flex flex-col items-center justify-center min-h-[200px] border-dashed border-mir/30 text-center">
-          <div class="text-5xl mb-4 opacity-30">🎬</div>
-          <h3 class="text-white/40 font-title text-lg uppercase">Video 02</h3>
-          <p class="text-white/30 text-sm mt-1">Entrevistas a vecinos de La Goya</p>
-          <span class="text-mir/40 text-xs mt-3">Archivo pendiente de digitalización</span>
-        </div>
-
-        <div class="card-mir flex flex-col items-center justify-center min-h-[200px] border-dashed border-mir/30 text-center">
-          <div class="text-5xl mb-4 opacity-30">🎬</div>
-          <h3 class="text-white/40 font-title text-lg uppercase">Video 03</h3>
-          <p class="text-white/30 text-sm mt-1">Carnaval del 30 — La Pintana</p>
-          <span class="text-mir/40 text-xs mt-3">Archivo pendiente de digitalización</span>
-        </div>
-
-        <div class="card-mir flex flex-col items-center justify-center min-h-[200px] border-dashed border-mir/30 text-center">
-          <div class="text-5xl mb-4 opacity-30">🎤</div>
-          <h3 class="text-white/40 font-title text-lg uppercase">Audio 01</h3>
-          <p class="text-white/30 text-sm mt-1">Programa "El Sartén por el Mango"</p>
-          <span class="text-mir/40 text-xs mt-3">Archivo pendiente de digitalización</span>
-        </div>
-
-      </div>
-
-      <div class="mt-12 card-mir text-center p-8 border-dashed border-mir/30">
-        <p class="text-white/40 text-lg font-light">¿Tienes videos o audios de El Arca?</p>
-        <a href="index.html#archivo" class="btn-mir inline-block mt-4">Comparte tu material</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== FOOTER ===== -->
   <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
     <div class="max-w-5xl mx-auto px-4 text-center">
       <a href="index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
