@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anécdotas y Recuerdos — Memoria de El Arca</title>
+  <title>El Arca — Memoria de El Arca</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>😂</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
   <style>
     :root { --color-mir: #E50914; --color-noche: #111111; }
     html { scroll-behavior: smooth; }
@@ -13,7 +13,7 @@
     @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
     .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
     .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
-    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: white !important; text-transform: uppercase; letter-spacing: -0.025em; }
+    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: white !important; text-transform: uppercase; letter-spacing: 0.05em; }
     .text-mir { color: var(--color-mir) !important; }
     .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
     .border-mir\/40 { border-color: rgba(229,9,20,0.4) !important; }
@@ -23,7 +23,7 @@
     .bg-noche { background-color: var(--color-noche) !important; }
     .hover\:text-mir:hover { color: var(--color-mir) !important; }
     .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
-    @keyframes tooltipPulse { 0%,100%{opacity:0.7;transform:translateX(0)} 50%{opacity:1;transform:translateX(4px)} }
+    @keyframes tooltipBounce { 0%,100%{opacity:0.7;transform:translateX(0)} 50%{opacity:1;transform:translateX(-4px)} }
     .relato { margin-bottom: 4rem; }
   </style>
 </head>
@@ -61,9 +61,9 @@
   <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
     <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
       <a href="../relatos.html" class="text-mir/60 hover:text-mir text-xs tracking-widest uppercase transition mb-4 inline-block">&larr; Volver a Relatos</a>
-      <h1 class="heading-mir text-5xl md:text-7xl mt-2 mb-4">Anécdotas y Recuerdos Divertidos</h1>
+      <h1 class="heading-mir text-5xl md:text-7xl mt-2 mb-4">El Arca</h1>
       <div class="divider-mir mx-auto"></div>
-      <p class="text-white/60 text-lg max-w-2xl mx-auto">La mística del trabajo territorial, las navidades populares y los momentos que marcaron a la comunidad.</p>
+      <p class="text-white/60 text-lg max-w-2xl mx-auto">La mística del trabajo territorial, la historia comunitaria y el despliegue de la Radio Libre.</p>
     </div>
   </header>
 
@@ -71,12 +71,11 @@
   <section class="py-16 bg-noche">
     <div class="max-w-4xl mx-auto px-4">
 
-      <!-- RELATO 2 -->
       <article class="relato">
         <div class="flex items-center gap-3 mb-4">
           <span class="text-mir font-title text-4xl">01</span>
           <div>
-            <h2 class="text-mir font-title text-2xl md:text-3xl uppercase tracking-wide">La Mística del Trabajo Territorial</h2>
+            <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Mística del Trabajo Territorial</h2>
             <p class="text-white/40 text-sm">Infancias, Navidad Popular y resistencia</p>
           </div>
         </div>
@@ -95,6 +94,33 @@
             <p>
               La música, el arte, la comunicación: cada actividad era una semilla plantada en tierra fértil. De aquellos niños, algunos hoy son dirigentes sociales, comunicadores, educadores populares. La siembra dio frutos.
             </p>
+          </div>
+        </div>
+      </article>
+
+      <article class="relato">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-mir font-title text-4xl">02</span>
+          <div>
+            <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Tragedia y la Memoria</h2>
+            <p class="text-white/40 text-sm">Cuesta El Melón — 24 de Mayo de 2006.</p>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6 items-start">
+          <div class="space-y-4 text-white/70 leading-relaxed">
+            <p>
+              El 24 de Mayo del 2006, el destino golpeó con la crueldad que solo el azar sabe tener. En la Cuesta El Melón, un accidente de tránsito arrebató físicamente al Jano, al Nino y al Carlos. La comunidad quedó en shock. El Arca perdió a tres de sus hijos más queridos.
+            </p>
+            <p>
+              "Cuando supimos, nadie podía creerlo —recuerda Patricia, vecina del sector—. El Jano era tan inmenso que parecía indestructible. Pero esa noche entendimos que los gigantes también caen. Lo que no sabíamos es que sus sueños eran más grandes que su partida."
+            </p>
+            <p>
+              El dolor paralizó a La Goya. Pero la comunidad se organizó para mantener vivo el legado. Porque el Jano no había construido una obra personal: había sembrado conciencia colectiva. Y la conciencia colectiva no muere con un accidente de tránsito.
+            </p>
+          </div>
+          <div class="card-mir">
+            <img src="../images/companeros_melon.jpg" alt="Compañeros de El Arca" class="w-full border border-mir/30 mb-3">
+            <p class="text-white/40 text-xs italic">"No están muertos quienes viven en el corazón del pueblo."</p>
           </div>
         </div>
       </article>
