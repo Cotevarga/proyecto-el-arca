@@ -201,6 +201,18 @@ app.get('/relatos', (_req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/relatos.html'));
 });
 
+app.get('/relatos/jano-arca', (_req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/relatos/jano-arca.html'));
+});
+
+app.get('/relatos/anecdotas', (_req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/relatos/anecdotas.html'));
+});
+
+app.get('/relatos/organizaciones', (_req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/relatos/organizaciones.html'));
+});
+
 // ─── Catch-all: redirigir rutas no existentes al inicio ──────────
 app.get(/.*/, (_req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));

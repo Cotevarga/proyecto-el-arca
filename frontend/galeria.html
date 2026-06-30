@@ -23,6 +23,7 @@
     .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
     .font-title { font-family: 'Impact', 'Arial Black', sans-serif !important; }
     .bg-noche { background-color: var(--color-noche) !important; }
+    @keyframes tooltipPulse { 0%,100%{opacity:0.7;transform:translateX(0)} 50%{opacity:1;transform:translateX(4px)} }
   </style>
 </head>
 <body class="bg-black text-white antialiased">
@@ -30,7 +31,7 @@
   <!-- ===== NAVBAR ===== -->
   <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-      <a href="index.html" class="text-white font-bold text-2xl tracking-tighter" style="font-family:'Impact','Arial Black',sans-serif">EL ARCA</a>
+      <a href="index.html" class="text-white font-bold text-2xl tracking-tighter font-title">EL ARCA</a>
       <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
         <a href="index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
         <a href="galeria.html" class="text-mir border-b-2 border-mir pb-1">Galería</a>
@@ -143,6 +144,7 @@
     </div>
   </footer>
 
+  <script src="audio-player.js"></script>
   <script>
     document.getElementById('menu-toggle').addEventListener('click', function() {
       document.getElementById('mobile-menu').classList.toggle('hidden');

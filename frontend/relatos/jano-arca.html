@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Jano y El Arca — Memoria de El Arca</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+  <style>
+    :root { --color-mir: #E50914; --color-noche: #111111; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000000 !important; color: #ffffff !important; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+    .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
+    .heading-mir { font-family:'Impact','Arial Black',sans-serif !important; color: white !important; text-transform: uppercase; letter-spacing: -0.025em; }
+    .text-mir { color: var(--color-mir) !important; }
+    .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
+    .border-mir\/40 { border-color: rgba(229,9,20,0.4) !important; }
+    .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
+    .bg-mir { background-color: var(--color-mir) !important; }
+    .font-title { font-family: 'Impact', 'Arial Black', sans-serif !important; }
+    .bg-noche { background-color: var(--color-noche) !important; }
+    .hover\:text-mir:hover { color: var(--color-mir) !important; }
+    .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
+    @keyframes tooltipPulse { 0%,100%{opacity:0.7;transform:translateX(0)} 50%{opacity:1;transform:translateX(4px)} }
+    .relato { margin-bottom: 4rem; }
+  </style>
+</head>
+<body class="bg-black text-white antialiased">
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="../index.html" class="text-white font-bold text-2xl tracking-tighter font-title">EL ARCA</a>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="../index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
+        <a href="../galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="../videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="../relatos.html" class="text-mir border-b-2 border-mir pb-1">Relatos</a>
+        <a href="../legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
+        <a href="../index.html#archivo" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+      </div>
+      <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-mir/30 px-4 py-4">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
+        <a href="../index.html" class="hover:text-mir transition">Inicio</a>
+        <a href="../galeria.html" class="hover:text-mir transition">Galería</a>
+        <a href="../videos.html" class="hover:text-mir transition">Videos</a>
+        <a href="../relatos.html" class="text-mir">Relatos</a>
+        <a href="../legado.html" class="hover:text-mir transition">El Legado</a>
+        <a href="../index.html#archivo" class="hover:text-mir transition">Archivo</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== HEADER ===== -->
+  <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
+      <a href="../relatos.html" class="text-mir/60 hover:text-mir text-xs tracking-widest uppercase transition mb-4 inline-block">&larr; Volver a Relatos</a>
+      <h1 class="heading-mir text-5xl md:text-7xl mt-2 mb-4">El Jano y El Arca</h1>
+      <div class="divider-mir mx-auto"></div>
+      <p class="text-white/60 text-lg max-w-2xl mx-auto">El sueño del fundador, la comunicación popular y la tragedia que marcó a la comunidad.</p>
+    </div>
+  </header>
+
+  <!-- ===== RELATOS ===== -->
+  <section class="py-16 bg-noche">
+    <div class="max-w-4xl mx-auto px-4">
+
+      <!-- RELATO 1 -->
+      <article class="relato">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-mir font-title text-4xl">01</span>
+          <div>
+            <h2 class="text-mir font-title text-2xl md:text-3xl uppercase tracking-wide">El Sueño del Jano</h2>
+            <p class="text-white/40 text-sm">Los inicios en La Goya — Mediados de los 90</p>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6 items-start">
+          <div class="space-y-4 text-white/70 leading-relaxed">
+            <p>
+              Pedro Alejandro González Reyes llegó a la Población Francisco de Goya con una convicción: la cultura popular era la herramienta más poderosa para transformar la realidad. En un territorio golpeado por la exclusión, el narcotráfico y el abandono estatal, el Jano no vino a prometer: vino a hacer.
+            </p>
+            <p>
+              "Me acuerdo cuando llegó con un parlante viejo y un micrófono —recuerda Sonia, vecina del pasaje —. Dijo que iba a montar un centro cultural y todos pensamos que estaba loco. Pero a la semana siguiente ya había doce niños sentados en el suelo de la sede, aprendiendo a tocar la batería con tarros vacíos."
+            </p>
+            <p>
+              Así nació El Arca: sin plata, sin auspicios, sin permiso de nadie. Solo con la fuerza de la comunidad organizada y la convicción de un hombre que se negaba a aceptar que el destino de los niños pobres estuviera escrito.
+            </p>
+          </div>
+          <div class="card-mir">
+            <img src="../images/FB_IMG_1782701605358.jpg" alt="El Cabezón Jano" class="w-full border border-mir/30 mb-3">
+            <p class="text-white/40 text-xs italic">"El Jano nos enseñó que la cultura no era un lujo, era una trinchera."</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- RELATO 4 -->
+      <article class="relato">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-mir font-title text-4xl">02</span>
+          <div>
+            <h2 class="text-mir font-title text-2xl md:text-3xl uppercase tracking-wide">La TV del Pueblo</h2>
+            <p class="text-white/40 text-sm">El sueño de comunicación popular del Jano</p>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6 items-start">
+          <div class="card-mir md:order-2">
+            <img src="../images/FB_IMG_1782701826979.jpg" alt="Jano planificando TV Comunitaria" class="w-full border border-mir/30 mb-3">
+            <p class="text-white/40 text-xs italic">Planificando la comunicación popular, cámara en mano.</p>
+          </div>
+          <div class="space-y-4 text-white/70 leading-relaxed md:order-1">
+            <p>
+              "El Jano tenía una obsesión: que la población se viera a sí misma en pantalla. Decía que mientras la tele mostrara solo realidades ajenas, el pueblo nunca iba a creerse capaz de contar su propia historia."
+            </p>
+            <p>
+              Con una cámara prestada y cables que conseguía de aquí y allá, el Jano comenzó a grabar: las ollas comunes, los talleres, las marchas, los carnavales. Cada grabación era un acto de soberanía. No importaba la calidad técnica: importaba el contenido, la verdad, la mirada del pueblo.
+            </p>
+            <p>
+              Ese sueño de comunicación popular —la televisión comunitaria— fue el germen de la Radio Libre 90.1 / 100.5 FM. Donde no llegó la pantalla, llegó la frecuencia. El micrófono siempre fue del pueblo.
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- RELATO 5 -->
+      <article class="relato">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-mir font-title text-4xl">03</span>
+          <div>
+            <h2 class="text-mir font-title text-2xl md:text-3xl uppercase tracking-wide">La Tragedia y la Memoria</h2>
+            <p class="text-white/40 text-sm">Cuesta El Melón — 24 de Mayo de 2006.</p>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6 items-start">
+          <div class="space-y-4 text-white/70 leading-relaxed">
+            <p>
+              El 24 de Mayo del 2006, el destino golpeó con la crueldad que solo el azar sabe tener. En la Cuesta El Melón, un accidente de tránsito arrebató físicamente al Jano, al Nino y al Carlos . La comunidad quedó en shock. El Arca perdió a tres de sus hijos más queridos.
+            </p>
+            <p>
+              "Cuando supimos, nadie podía creerlo —recuerda Patricia, vecina del sector—. El Jano era tan inmenso que parecía indestructible. Pero esa noche entendimos que los gigantes también caen. Lo que no sabíamos es que sus sueños eran más grandes que su partida."
+            </p>
+            <p>
+              El dolor paralizó a La Goya. Pero la comunidad se organizó para mantener vivo el legado. Porque el Jano no había construido una obra personal: había sembrado conciencia colectiva. Y la conciencia colectiva no muere con un accidente de tránsito.
+            </p>
+          </div>
+          <div class="card-mir">
+            <img src="../images/companeros_melon.jpg" alt="Compañeros de El Arca" class="w-full border border-mir/30 mb-3">
+            <p class="text-white/40 text-xs italic">"No están muertos quienes viven en el corazón del pueblo."</p>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="../index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-tighter">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+  </footer>
+
+  <style>
+    .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
+  </style>
+
+  <script src="../audio-player.js"></script>
+  <script>
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+    document.querySelectorAll('#mobile-menu a').forEach(function(l) {
+      l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
+    });
+  </script>
+</body>
+</html>

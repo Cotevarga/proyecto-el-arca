@@ -23,8 +23,9 @@
     .bg-noche { background-color: var(--color-noche) !important; }
     .hover\:text-mir:hover { color: var(--color-mir) !important; }
     .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
-    .hover\:bg-resistencia-700:hover { background-color: #b91c1c !important; }
-    .relato { margin-bottom: 4rem; }
+    @keyframes tooltipPulse { 0%,100%{opacity:0.7;transform:translateX(0)} 50%{opacity:1;transform:translateX(4px)} }
+    .cat-card { transition: all 0.4s ease; cursor: pointer; }
+    .cat-card:hover { transform: translateY(-8px); border-color: var(--color-mir) !important; box-shadow: 0 10px 40px rgba(229,9,20,0.2); }
   </style>
 </head>
 <body class="bg-black text-white antialiased">
@@ -63,185 +64,37 @@
       <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Crónica Popular</span>
       <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Relatos de El Arca</h1>
       <div class="divider-mir mx-auto"></div>
-      <p class="text-white/60 text-lg max-w-2xl mx-auto">Entrevistas, crónicas y testimonios que reconstruyen la historia del centro cultural y su fundador.</p>
+      <p class="text-white/60 text-lg max-w-2xl mx-auto">Explora las crónicas, entrevistas y testimonios que reconstruyen la historia del centro cultural y su fundador.</p>
     </div>
   </header>
 
-  <!-- ===== RELATOS ===== -->
-  <section class="py-16 bg-noche">
-    <div class="max-w-4xl mx-auto px-4">
+  <!-- ===== CATEGORÍAS ===== -->
+  <section class="py-20 bg-noche">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid md:grid-cols-3 gap-8">
 
-      <!-- RELATO 1 -->
-      <article class="relato">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="text-mir font-title text-4xl">01</span>
-          <div>
-            <h2 class="text-mir font-title text-2xl md:text-3xl uppercase tracking-wide">El Sueño del Jano</h2>
-            <p class="text-white/40 text-sm">Los inicios en La Goya — Mediados de los 90</p>
-          </div>
-        </div>
-        <div class="grid md:grid-cols-2 gap-6 items-start">
-          <div class="space-y-4 text-white/70 leading-relaxed">
-            <p>
-              Pedro Alejandro González Reyes llegó a la Población Francisco de Goya con una convicción: la cultura popular era la herramienta más poderosa para transformar la realidad. En un territorio golpeado por la exclusión, el narcotráfico y el abandono estatal, el Jano no vino a prometer: vino a hacer.
-            </p>
-            <p>
-              "Me acuerdo cuando llegó con un parlante viejo y un micrófono —recuerda Sonia, vecina del pasaje —. Dijo que iba a montar un centro cultural y todos pensamos que estaba loco. Pero a la semana siguiente ya había doce niños sentados en el suelo de la sede, aprendiendo a tocar la batería con tarros vacíos."
-            </p>
-            <p>
-              Así nació El Arca: sin plata, sin auspicios, sin permiso de nadie. Solo con la fuerza de la comunidad organizada y la convicción de un hombre que se negaba a aceptar que el destino de los niños pobres estuviera escrito.
-            </p>
-          </div>
-          <div class="card-mir">
-            <img src="images/FB_IMG_1782701605358.jpg" alt="El Cabezón Jano" class="w-full border border-mir/30 mb-3">
-            <p class="text-white/40 text-xs italic">"El Jano nos enseñó que la cultura no era un lujo, era una trinchera."</p>
-          </div>
-        </div>
-      </article>
+        <a href="relatos/jano-arca.html" class="cat-card card-mir flex flex-col items-center text-center min-h-[320px] justify-center">
+          <div class="text-6xl mb-6">🔥</div>
+          <h2 class="text-mir font-title text-2xl uppercase tracking-wide mb-3">El Jano y El Arca</h2>
+          <p class="text-white/50 text-sm leading-relaxed">El sueño del fundador, la visión de la TV popular y la tragedia que marcó a la comunidad.</p>
+          <span class="text-mir/60 text-xs mt-4 uppercase tracking-widest">Leer crónicas →</span>
+        </a>
 
-      <!-- RELATO 2 -->
-      <article class="relato">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="text-mir font-title text-4xl">02</span>
-          <div>
-            <h2 class="text-mir font-title text-2xl md:text-3xl uppercase tracking-wide">La Mística del Trabajo Territorial</h2>
-            <p class="text-white/40 text-sm">Infancias, Navidad Popular y resistencia</p>
-          </div>
-        </div>
-        <div class="grid md:grid-cols-2 gap-6 items-start">
-          <div class="card-mir md:order-2">
-            <img src="images/FB_IMG_1782701859802.jpg" alt="Navidad Popular" class="w-full border border-mir/30 mb-3">
-            <p class="text-white/40 text-xs italic">La Navidad Popular: ningún niño sin celebrar en La Goya.</p>
-          </div>
-          <div class="space-y-4 text-white/70 leading-relaxed md:order-1">
-            <p>
-              Cada diciembre, El Arca organizaba la Navidad Popular. No era una celebración cualquiera: era un acto de dignidad y rebeldía. Mientras las grandes tiendas vendían la felicidad empacada, el Jano y los compañeros iban de empresa en empresa buscando donaciones de dulces y otras cosas para los niños de la población.
-            </p>
-            <p>
-              "El Jano decía que la delincuencia no se combatía con más carabineros, sino con oportunidades —cuenta Carlos, ex monitor de El Arca—. Por eso los talleres no eran un pasatiempo: eran una alternativa real al destino que el sistema tenía preparado para nuestros niños."
-            </p>
-            <p>
-              La música, el arte, la comunicación: cada actividad era una semilla plantada en tierra fértil. De aquellos niños, algunos hoy son dirigentes sociales, comunicadores, educadores populares. La siembra dio frutos.
-            </p>
-          </div>
-        </div>
-      </article>
+        <a href="relatos/anecdotas.html" class="cat-card card-mir flex flex-col items-center text-center min-h-[320px] justify-center">
+          <div class="text-6xl mb-6">😂</div>
+          <h2 class="text-mir font-title text-2xl uppercase tracking-wide mb-3">Anécdotas y Recuerdos Divertidos</h2>
+          <p class="text-white/50 text-sm leading-relaxed">La mística del trabajo territorial, las navidades populares y los momentos que marcaron a la comunidad.</p>
+          <span class="text-mir/60 text-xs mt-4 uppercase tracking-widest">Leer crónicas →</span>
+        </a>
 
-      <!-- RELATO 3 -->
-      <article class="relato">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="text-mir font-title text-4xl">03</span>
-          <div>
-            <h2 class="text-mir font-title text-2xl md:text-3xl uppercase tracking-wide">La Goya en las Calles</h2>
-            <p class="text-white/40 text-sm">Organización, marchas y lucha popular</p>
-          </div>
-        </div>
-        <div class="grid md:grid-cols-2 gap-6 items-start">
-          <div class="space-y-4 text-white/70 leading-relaxed">
-            <p>
-              El Arca no era solo un espacio físico: era un movimiento. Cuando la comunidad necesitaba organizarse, la sede se convertía en asamblea. Cuando había que salir a la calle, el Jano estaba al frente, con su cámara al hombro y su megáfono en la mano.
-            </p>
-            <p>
-              "La marcha comunitaria no se improvisaba: se construía en las reuniones, en los talleres, en la radio —dice Marta, dirigenta vecinal—. El Jano nos enseñó que la queja sin organización es ruido, pero la organización sin calle es letra muerta."
-            </p>
-            <p>
-              La lucha por Av. Violeta Parra, el Carnaval del 30, las tomas culturales: cada acción era una lección de pedagogía popular. Herencia del jano. El pueblo aprendía haciendo, organizándose, enfrentándose al sistema con la frente en alto.
-            </p>
-          </div>
-          <div class="card-mir">
-            <img src="images/FB_IMG_1782701766075.jpg" alt="Marcha comunitaria en La Goya" class="w-full border border-mir/30 mb-3">
-            <p class="text-white/40 text-xs italic">La comunidad organizada en las calles de La Pintana.</p>
-          </div>
-        </div>
-      </article>
+        <a href="relatos/organizaciones.html" class="cat-card card-mir flex flex-col items-center text-center min-h-[320px] justify-center">
+          <div class="text-6xl mb-6">✊</div>
+          <h2 class="text-mir font-title text-2xl uppercase tracking-wide mb-3">Otras Organizaciones Territoriales</h2>
+          <p class="text-white/50 text-sm leading-relaxed">La Goya en las calles, la Radio Libre y el legado que sigue caminando en cada rincón de La Pintana.</p>
+          <span class="text-mir/60 text-xs mt-4 uppercase tracking-widest">Leer crónicas →</span>
+        </a>
 
-      <!-- RELATO 4 -->
-      <article class="relato">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="text-mir font-title text-4xl">04</span>
-          <div>
-            <h2 class="text-mir font-title text-2xl md:text-3xl uppercase tracking-wide">La TV del Pueblo</h2>
-            <p class="text-white/40 text-sm">El sueño de comunicación popular del Jano</p>
-          </div>
-        </div>
-        <div class="grid md:grid-cols-2 gap-6 items-start">
-          <div class="card-mir md:order-2">
-            <img src="images/FB_IMG_1782701826979.jpg" alt="Jano planificando TV Comunitaria" class="w-full border border-mir/30 mb-3">
-            <p class="text-white/40 text-xs italic">Planificando la comunicación popular, cámara en mano.</p>
-          </div>
-          <div class="space-y-4 text-white/70 leading-relaxed md:order-1">
-            <p>
-              "El Jano tenía una obsesión: que la población se viera a sí misma en pantalla. Decía que mientras la tele mostrara solo realidades ajenas, el pueblo nunca iba a creerse capaz de contar su propia historia."
-            </p>
-            <p>
-              Con una cámara prestada y cables que conseguía de aquí y allá, el Jano comenzó a grabar: las ollas comunes, los talleres, las marchas, los carnavales. Cada grabación era un acto de soberanía. No importaba la calidad técnica: importaba el contenido, la verdad, la mirada del pueblo.
-            </p>
-            <p>
-              Ese sueño de comunicación popular —la televisión comunitaria— fue el germen de la Radio Libre 90.1 / 100.5 FM. Donde no llegó la pantalla, llegó la frecuencia. El micrófono siempre fue del pueblo.
-            </p>
-          </div>
-        </div>
-      </article>
-
-      <!-- RELATO 5 -->
-      <article class="relato">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="text-mir font-title text-4xl">05</span>
-          <div>
-            <h2 class="text-mir font-title text-2xl md:text-3xl uppercase tracking-wide">La Tragedia y la Memoria</h2>
-            <p class="text-white/40 text-sm">Cuesta El Melón — 24 de Mayo de 2006.</p>
-          </div>
-        </div>
-        <div class="grid md:grid-cols-2 gap-6 items-start">
-          <div class="space-y-4 text-white/70 leading-relaxed">
-            <p>
-              El 24 de Mayo del 2006, el destino golpeó con la crueldad que solo el azar sabe tener. En la Cuesta El Melón, un accidente de tránsito arrebató físicamente al Jano, al Nino y al Carlos . La comunidad quedó en shock. El Arca perdió a tres de sus hijos más queridos.
-            </p>
-            <p>
-              "Cuando supimos, nadie podía creerlo —recuerda Patricia, vecina del sector—. El Jano era tan inmenso que parecía indestructible. Pero esa noche entendimos que los gigantes también caen. Lo que no sabíamos es que sus sueños eran más grandes que su partida."
-            </p>
-            <p>
-              El dolor paralizó a La Goya. Pero la comunidad se organizó para mantener vivo el legado. Porque el Jano no había construido una obra personal: había sembrado conciencia colectiva. Y la conciencia colectiva no muere con un accidente de tránsito.
-            </p>
-          </div>
-          <div class="card-mir">
-            <img src="images/companeros_melon.jpg" alt="Compañeros de El Arca" class="w-full border border-mir/30 mb-3">
-            <p class="text-white/40 text-xs italic">"No están muertos quienes viven en el corazón del pueblo."</p>
-          </div>
-        </div>
-      </article>
-
-      <!-- RELATO 6 -->
-      <article class="relato">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="text-mir font-title text-4xl">06</span>
-          <div>
-            <h2 class="text-mir font-title text-2xl md:text-3xl uppercase tracking-wide">El Legado que Camina</h2>
-            <p class="text-white/40 text-sm">Radio, Preuniversitario, Carnaval y lucha vigente</p>
-          </div>
-        </div>
-        <div class="grid md:grid-cols-2 gap-6 items-start">
-          <div class="card-mir md:order-2">
-            <img src="images/radio_libre.jpg" alt="Radio Libre" class="w-full border border-mir/30 mb-3">
-            <p class="text-white/40 text-xs italic">La Radio Libre 90.1 / 100.5 FM: el sueño hecho frecuencia.</p>
-          </div>
-          <div class="space-y-4 text-white/70 leading-relaxed md:order-1">
-            <p>
-              El Arca no se cerró. El Arca se multiplicó. La Radio Libre 90.1 / 100.5 FM salió al aire, con programas como "El Sartén por el Mango", "La Gozadera" y espacios informativos que mantenian viva la comunicación popular.
-            </p>
-            <p>
-              El Preuniversitario Popular "Pedro Alejandro González" abrió las puertas de la educación superior a los jóvenes de La Pintana. La nivelación de estudios recuperó a quienes el sistema expulsó. El Carnaval del 30 llenó de colores y comparsas el Paradero 30 de Santa Rosa.
-            </p>
-            <p>
-              "El Jano nos enseñó que la lucha no termina con la muerte de un compañero —dice un monitor de El Arca—. La lucha termina cuando el pueblo deja de soñar. Y nosotros seguimos soñando."
-            </p>
-            <p class="text-mir font-bold mt-4">
-              El legado vive. La memoria resiste. El Arca es el pueblo.
-            </p>
-          </div>
-        </div>
-      </article>
-
+      </div>
     </div>
   </section>
 
@@ -264,6 +117,12 @@
     </div>
   </footer>
 
+  <style>
+    .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
+    .hover\:bg-resistencia-700:hover { background-color: #b91c1c !important; }
+  </style>
+
+  <script src="audio-player.js"></script>
   <script>
     document.getElementById('menu-toggle').addEventListener('click', function() {
       document.getElementById('mobile-menu').classList.toggle('hidden');
