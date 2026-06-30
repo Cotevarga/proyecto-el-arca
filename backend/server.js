@@ -2,14 +2,15 @@ const express = require('express');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const multer = require('multer');
-const nodemailer = require('nodemailer');
 const cors = require('cors');
 const path = require('path');
 
 require('dotenv').config();
 
 const app = express();
+// Indicar a Express que confíe en el proxy inverso de Render (elimina alertas de rate-limit)
 app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 3000;
 
 // ─── Helmet: seguridad en cabeceras HTTP ──────────────────────────
@@ -25,7 +26,6 @@ app.use(
         connectSrc: ["'self'", "https://*.youtube.com", "https://*.google.com", "https://*.ytimg.com", "https://*.vercel.app", "https://*.onrender.com"]
       },
     },
-    // Desactivar estas políticas permite que el navegador acepte los scripts de streaming de YouTube vía ngrok
     crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: false,
     crossOriginOpenerPolicy: false
@@ -86,15 +86,6 @@ const upload = multer({
   },
 });
 
-// ─── Nodemailer transporter ──────────────────────────────────────
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
-
 // ─── POST /api/upload ─────────────────────────────────────────────
 app.post('/api/upload', (req, res) => {
   // Validar API Key
@@ -103,7 +94,7 @@ app.post('/api/upload', (req, res) => {
     return res.status(401).json({ error: 'API Key inválida o ausente.' });
   }
 
-  upload.single('archivo')(req, res, (err) => {
+  upload.single('archivo')(req, res, async (err) => {
     if (err) {
       if (err instanceof multer.MulterError) {
         if (err.code === 'LIMIT_FILE_SIZE') {
@@ -122,41 +113,64 @@ app.post('/api/upload', (req, res) => {
     const anio = req.body.anio || 'Sin año';
     const mensaje = req.body.mensaje || 'Sin mensaje';
 
-    const mailOptions = {
-      from: `"Archivo El Arca" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_RECEIVER,
-      subject: `Nuevo recuerdo de ${nombre} — Archivo El Arca`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #d97706;">Nuevo aporte al Archivo Comunitario</h2>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr><td style="padding: 8px; font-weight: bold; color: #374151;">Nombre:</td><td style="padding: 8px;">${escapeHtml(nombre)}</td></tr>
-            <tr><td style="padding: 8px; font-weight: bold; color: #374151;">Año:</td><td style="padding: 8px;">${escapeHtml(anio)}</td></tr>
-            <tr><td style="padding: 8px; font-weight: bold; color: #374151;">Mensaje:</td><td style="padding: 8px;">${escapeHtml(mensaje)}</td></tr>
-            <tr><td style="padding: 8px; font-weight: bold; color: #374151;">Archivo:</td><td style="padding: 8px;">${escapeHtml(req.file.originalname)} (${(req.file.size / 1024).toFixed(1)} KB)</td></tr>
-          </table>
-          <p style="color: #6b7280; font-size: 12px; margin-top: 16px;">Archivo El Arca — Memoria Viva de La Goya</p>
-        </div>
-      `,
-      attachments: [
-        {
-          filename: req.file.originalname,
-          content: req.file.buffer,
-        },
-      ],
-    };
+    // Construcción del contenido HTML del correo para Resend
+    const htmlContent = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px; border-radius: 8px;">
+        <h2 style="color: #E50914; border-bottom: 2px solid #E50914; padding-bottom: 8px;">Nuevo aporte al Archivo Comunitario</h2>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+          <tr><td style="padding: 8px; font-weight: bold; color: #374151; width: 120px;">Nombre:</td><td style="padding: 8px;">${escapeHtml(nombre)}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold; color: #374151;">Año:</td><td style="padding: 8px;">${escapeHtml(anio)}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold; color: #374151;">Mensaje:</td><td style="padding: 8px;">${escapeHtml(mensaje)}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold; color: #374151;">Archivo:</td><td style="padding: 8px;">${escapeHtml(req.file.originalname)} (${(req.file.size / (1024 * 1024)).toFixed(2)} MB)</td></tr>
+        </table>
+        <p style="color: #6b7280; font-size: 12px; margin-top: 25px; border-top: 1px solid #eee; padding-top: 10px;">Archivo El Arca — Memoria Viva Territorial</p>
+      </div>
+    `;
 
-    transporter.sendMail(mailOptions, (mailErr, info) => {
-      if (mailErr) {
-        console.error('Error al enviar correo:', mailErr);
-        return res.status(500).json({ error: 'Error al enviar el recuerdo. Intenta de nuevo.' });
+    try {
+      console.log('Iniciando envío de correo vía API de Resend...');
+      
+      // Convertir el buffer del archivo en una cadena Base64 (Requisito de Resend para adjuntos)
+      const base64Content = req.file.buffer.toString('base64');
+
+      // Petición HTTP POST nativa a la API REST de Resend (Bypass total al bloqueo SMTP)
+      const resendResponse = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
+        },
+        body: JSON.stringify({
+          from: 'Archivo El Arca <onboarding@resend.dev>', // Remitente por defecto requerido en cuentas gratuitas
+          to: process.env.EMAIL_RECEIVER || 'archivo.elarca@gmail.com',
+          subject: `Nuevo recuerdo de ${nombre} — Archivo El Arca`,
+          html: htmlContent,
+          attachments: [
+            {
+              filename: req.file.originalname,
+              content: base64Content
+            }
+          ]
+        })
+      });
+
+      const resendData = await resendResponse.json();
+
+      if (!resendResponse.ok) {
+        console.error('Error reportado por la API de Resend:', resendData);
+        throw new Error(resendData.message || 'Fallo la respuesta de la API de Resend');
       }
-      console.log('Correo enviado:', info.messageId);
+
+      console.log('Correo enviado con éxito mediante Resend ID:', resendData.id);
       return res.json({
         success: true,
-        message: 'Recuerdo recibido. Gracias por contribuir a la memoria de El Arca.',
+        message: 'Recuerdo recibido con éxito. Gracias por contribuir a la memoria de El Arca.',
       });
-    });
+
+    } catch (apiErr) {
+      console.error('Error crítico en el flujo de envío HTTP:', apiErr);
+      return res.status(500).json({ error: 'Error al procesar o enviar el recuerdo por restricciones de red. Intenta de nuevo.' });
+    }
   });
 });
 
