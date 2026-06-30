@@ -37,6 +37,7 @@
   var audio = new Audio();
   audio.preload = 'auto';
   audio.src = allSongs[playOrder[currentIdx]];
+  audio.volume = 0.7;
 
   var savedTime = parseFloat(sessionStorage.getItem(S.time)) || 0;
   if (savedTime > 0) {
@@ -47,6 +48,8 @@
   }
 
   var savedPlaying = sessionStorage.getItem(S.playing) === 'true';
+  var isPlaying = false;
+  var audioUnlocked = false;
 
   function persist() {
     try {
@@ -73,9 +76,30 @@
     setTimeout(nextRandom, 2000);
   });
 
-  var isPlaying = false;
-
   window.addEventListener('beforeunload', persist);
+
+  function unlockAudio() {
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+    document.removeEventListener('click', unlockAudio);
+    document.removeEventListener('pointerdown', unlockAudio);
+    document.removeEventListener('touchstart', unlockAudio);
+    document.removeEventListener('keydown', unlockAudio);
+    audio.play().then(function () {
+      if (savedPlaying) {
+        isPlaying = true;
+        updateUI();
+        persist();
+      } else {
+        audio.pause();
+      }
+    }).catch(function () {});
+  }
+
+  document.addEventListener('click', unlockAudio);
+  document.addEventListener('pointerdown', unlockAudio);
+  document.addEventListener('touchstart', unlockAudio);
+  document.addEventListener('keydown', unlockAudio);
 
   var btn = document.createElement('button');
   btn.id = 'audio-play-btn';
@@ -115,6 +139,10 @@
   }
 
   function togglePlay() {
+    if (!audioUnlocked) {
+      unlockAudio();
+      return;
+    }
     if (isPlaying) {
       audio.pause();
       isPlaying = false;
@@ -132,14 +160,6 @@
   }
 
   btn.addEventListener('click', togglePlay);
-
-  if (savedPlaying) {
-    audio.play().then(function () {
-      isPlaying = true;
-      updateUI();
-    }).catch(function () {});
-  }
-
   updateUI();
   document.body.appendChild(wrapper);
 })();

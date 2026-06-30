@@ -27,7 +27,7 @@
       font-family: Arial, Helvetica, sans-serif !important;
       color: var(--color-mir) !important;
       text-transform: uppercase;
-      letter-spacing: -0.025em;
+      letter-spacing: 0.05em;
     }
     .text-mir { color: var(--color-mir) !important; }
     .border-mir { border-color: var(--color-mir) !important; }
@@ -112,9 +112,9 @@
     </div>
     <div class="relative z-10 text-center px-4 max-w-4xl mx-auto animate-fade-in-up">
       <div class="inline-block mb-6 px-4 py-1 border border-mir bg-black/60 text-mir text-xs font-bold tracking-widest uppercase">Población Francisco de Goya — La Pintana</div>
-      <h1 class="text-5xl md:text-8xl font-black text-white leading-tight mb-6 tracking-wide uppercase" style="font-family: Arial, Helvetica, sans-serif; letter-spacing: 0.05em;">
+      <h1 class="text-5xl md:text-8xl font-black text-white leading-tight mb-6 uppercase" style="font-family: 'Impact', 'Arial Black', sans-serif; letter-spacing: 0.08em;">
         MEMORIA VIVA<br>
-        <span class="text-mir" style="letter-spacing: 0.1em;">EL ARCA</span>
+        <span class="text-mir" style="letter-spacing: 0.12em;">EL ARCA</span>
       </h1>
       <p class="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-8 leading-relaxed font-light">
         Pedro Alejandro González Reyes<br>
@@ -128,30 +128,20 @@
     </div>
   </header>
 
-  <!-- ===== EJE 1: INICIOS ===== -->
+  <!-- ===== INICIOS ===== -->
   <section id="inicios" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
     <div class="max-w-6xl mx-auto px-4">
       <span class="text-mir font-bold text-xs tracking-widest uppercase">Historia</span>
       <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">Los Inicios en La Goya</h2>
       <div class="divider-mir"></div>
-      <div class="grid md:grid-cols-2 gap-10 items-start mt-10">
-        <div class="space-y-6">
-          <div class="card-mir">
-            <img src="images/FB_IMG_1782701605358.jpg" alt="Foto del Jano" class="w-full h-72 object-cover mb-4 border border-[rgba(229,9,20,0.3)]">
-            <p class="text-white/80 leading-relaxed">
-              A mediados de los años 90, en plena Población Francisco de Goya —sector Paradero 30 y medio de Santa Rosa, La Pintana— un hombre de mirada inquieta y corazón gigante comenzó a tejer un sueño colectivo. <strong class="text-white">Pedro Alejandro González Reyes</strong>, más conocido como <strong class="text-mir">"El Cabezón Jano"</strong>, entendió desde joven que la cultura no era un lujo: era una trinchera.
-            </p>
-          </div>
-        </div>
-        <div class="space-y-6">
-          <div class="card-mir">
-            <img src="images/FB_IMG_1782701775498.jpg" alt="Jano pintando la sede" class="w-full h-64 object-cover mb-4 border border-[rgba(229,9,20,0.3)]">
-            <h3 class="text-mir font-title text-2xl uppercase mb-2">La Mística del Jano</h3>
-            <p class="text-white/80 leading-relaxed">
-              Pedagogía popular, amor por la comunidad y una convicción inquebrantable: <strong>solo el pueblo salva al pueblo</strong>. El Jano no daba discursos desde un escritorio; estaba en la cancha, en la sede, en la marcha, en las radios, hombro con hombro con su gente.
-            </p>
-          </div>
-        </div>
+      <div class="mt-10 max-w-3xl mx-auto text-center">
+        <p class="text-white/80 text-lg leading-relaxed mb-6">
+          A mediados de los años 90, en plena Población Francisco de Goya, un hombre de mirada inquieta y corazón gigante comenzó a tejer un sueño colectivo. <strong class="text-white">Pedro Alejandro González Reyes</strong>, "El Cabezón Jano", entendió que la cultura era una trinchera.
+        </p>
+        <p class="text-white/60 leading-relaxed mb-8">
+          Desde un parlante viejo y un micrófono prestado, nació El Arca: sin plata, sin auspicios, con la fuerza de la comunidad organizada.
+        </p>
+        <a href="relatos/jano.html" class="btn-mir inline-block">Ver más</a>
       </div>
     </div>
   </section>
@@ -179,27 +169,24 @@
     </div>
   </section>
 
-  <!-- ===== MAPA CORREGIDO ===== -->
+  <!-- ===== MAPA ===== -->
   <section id="mapa" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
     <div class="max-w-5xl mx-auto px-4">
       <span class="text-mir font-bold text-xs tracking-widest uppercase">Territorio</span>
       <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">La Goya en el Mapa</h2>
       <div class="divider-mir"></div>
       <p class="text-white/60 mb-8">Población Francisco de Goya, Paradero 30 y medio de Santa Rosa, La Pintana. Aquí latía El Arca.</p>
-      <a
-        href="https://maps.app.goo.gl/Ra1GegGsSAoL9tDb6"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="block border border-[rgba(229,9,20,0.4)] hover:border-mir transition duration-300 group"
-      >
-        <div class="bg-[#111111] p-8 text-center flex flex-col items-center justify-center min-h-[300px]">
-          <svg class="w-16 h-16 text-mir mb-4 opacity-80 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-          </svg>
-          <p class="text-white/80 text-lg font-semibold mb-2">Abrir en Google Maps</p>
-          <p class="text-white/40 text-sm">Población Francisco de Goya, La Pintana</p>
-        </div>
-      </a>
+      <div class="border border-[rgba(229,9,20,0.4)]">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3324.6312480665917!2d-70.637172!3d-33.5629161!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662dae37a7cb787%3A0x63dae2702a00c7bc!2sFrancisco%20de%20Goya%2C%20La%20Pintana%2C%20Regi%C3%B3n%20Metropolitana!5e0!3m2!1ses-419!2scl!4v1719700000000!5m2!1ses-419!2scl"
+          width="100%"
+          height="450"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          title="Mapa de la Población Francisco de Goya, La Pintana"
+        ></iframe>
+      </div>
     </div>
   </section>
 
