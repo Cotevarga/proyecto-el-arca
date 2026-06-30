@@ -9,8 +9,8 @@
   S.pos = 'arca_pos';
 
   var allSongs = [
-    'musica/index.mp3', 'musica/index2.mp3', 'musica/index3.mp3',
     'musica/galeria.mp3', 'musica/galeria2.mp3', 'musica/galeria3.mp3',
+    'musica/index.mp3', 'musica/index2.mp3', 'musica/index3.mp3',
     'musica/legado.mp3', 'musica/legado2.mp3', 'musica/legado3.mp3',
     'musica/relatos.mp3', 'musica/relatos2.mp3', 'musica/relatos3.mp3'
   ];
