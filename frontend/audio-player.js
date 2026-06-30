@@ -9,10 +9,10 @@
   S.pos = 'arca_pos';
 
   var allSongs = [
-    './musica/galeria.mp3', './musica/galeria2.mp3', './musica/galeria3.mp3',
-    './musica/index.mp3', './musica/index2.mp3', './musica/index3.mp3',
-    './musica/legado.mp3', './musica/legado2.mp3', './musica/legado3.mp3',
-    './musica/relatos.mp3', './musica/relatos2.mp3', './musica/relatos3.mp3'
+    '/musica/galeria.mp3', '/musica/galeria2.mp3', '/musica/galeria3.mp3',
+    '/musica/index.mp3', '/musica/index2.mp3', '/musica/index3.mp3',
+    '/musica/legado.mp3', '/musica/legado2.mp3', '/musica/legado3.mp3',
+    '/musica/relatos.mp3', '/musica/relatos2.mp3', '/musica/relatos3.mp3'
   ];
 
   function shuffleIndex() {
@@ -67,7 +67,10 @@
       sessionStorage.setItem(S.order, JSON.stringify(playOrder));
     }
     audio.src = allSongs[playOrder[currentIdx]];
-    audio.play().catch(function () {});
+    console.log("Intentando reproducir:", audio.src);
+    audio.play().catch(function (err) {
+      console.error("Error al reproducir audio:", err);
+    });
     persist();
   }
 
@@ -85,6 +88,8 @@
     document.removeEventListener('pointerdown', unlockAudio);
     document.removeEventListener('touchstart', unlockAudio);
     document.removeEventListener('keydown', unlockAudio);
+    var rutaCancion = audio.src;
+    console.log("Intentando reproducir:", rutaCancion);
     audio.play().then(function () {
       if (savedPlaying) {
         isPlaying = true;
@@ -94,7 +99,8 @@
         audio.pause();
         updateUI();
       }
-    }).catch(function () {
+    }).catch(function (err) {
+      console.error("Error al reproducir audio:", err);
       updateUI();
     });
   }
@@ -149,15 +155,20 @@
     if (isPlaying) {
       audio.pause();
       isPlaying = false;
-    } else {
-      audio.play().then(function () {
-        isPlaying = true;
-        updateUI();
-        persist();
-      }).catch(function () {
-        updateUI();
-      });
+      updateUI();
+      persist();
+      return;
     }
+    var rutaCancion = allSongs[playOrder[currentIdx]];
+    console.log("Intentando reproducir:", rutaCancion);
+    audio.play().then(function () {
+      isPlaying = true;
+      updateUI();
+      persist();
+    }).catch(function (err) {
+      console.error("Error al reproducir audio:", err);
+      updateUI();
+    });
     updateUI();
     persist();
   }
