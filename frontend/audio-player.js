@@ -1,4 +1,4 @@
-window.addEventListener('DOMContentLoaded', function () {
+(function () {
   'use strict';
 
   var canciones = [
@@ -8,13 +8,38 @@ window.addEventListener('DOMContentLoaded', function () {
     '/musica/relatos.mp3', '/musica/relatos2.mp3', '/musica/relatos3.mp3'
   ];
 
+  var musicaIniciada = localStorage.getItem('musicaIniciada') === 'true';
+  var audioTrack = parseInt(localStorage.getItem('audioTrack') || '-1', 10);
+  var audioTime = parseFloat(localStorage.getItem('audioTime') || '0');
+
+  if (isNaN(audioTrack) || audioTrack < 0 || audioTrack >= canciones.length) {
+    audioTrack = Math.floor(Math.random() * canciones.length);
+  }
+
+  var currentAudio = null;
+  var currentTrackIndex = -1;
+
+  if (musicaIniciada) {
+    currentTrackIndex = audioTrack;
+    currentAudio = new Audio();
+    currentAudio.preload = 'auto';
+    currentAudio.src = canciones[currentTrackIndex];
+    currentAudio.volume = 0.6;
+    if (audioTime > 0) {
+      currentAudio.currentTime = audioTime;
+    }
+  }
+
+  function iconoPausa() { return '\u23f8'; }
+  function iconoPlay() { return '\u25b6'; }
+
   var container = document.createElement('div');
   container.id = 'global-audio-container';
   container.innerHTML =
-    '<div id="audio-tooltip" style="position:fixed; top:20px; right:80px; background:#111; color:white; padding:8px 12px; border-radius:4px; font-size:12px; border:1px solid #E50914; z-index:99999; text-align:right;">' +
+    '<div id="audio-tooltip" style="position:fixed; top:90px; right:80px; background:#111; color:white; padding:8px 12px; border-radius:4px; font-size:12px; border:1px solid #E50914; z-index:99999; text-align:right;">' +
       'Para hacer m\u00e1s incre\u00edble<br>tu experiencia - Play' +
     '</div>' +
-    '<button id="btn-global-play" style="position:fixed; top:15px; right:15px; z-index:99999; background:#E50914; border:none; border-radius:50%; width:50px; height:50px; cursor:pointer; color:white; font-size:20px; display:flex; align-items:center; justify-content:center;">' +
+    '<button id="btn-global-play" style="position:fixed; top:85px; right:15px; z-index:99999; background:#E50914; border:none; border-radius:50%; width:50px; height:50px; cursor:pointer; color:white; font-size:20px; display:flex; align-items:center; justify-content:center;">' +
       '\u25b6' +
     '</button>';
   document.body.appendChild(container);
@@ -22,20 +47,6 @@ window.addEventListener('DOMContentLoaded', function () {
   var btn = document.getElementById('btn-global-play');
   var tooltip = document.getElementById('audio-tooltip');
   if (!btn) return;
-
-  var currentAudio = null;
-  var currentTrackIndex = -1;
-
-  var musicaIniciada = localStorage.getItem('musicaIniciada') === 'true';
-  var audioTrack = parseInt(localStorage.getItem('audioTrack') || '-1');
-  var audioTime = parseFloat(localStorage.getItem('audioTime') || '0');
-
-  if (isNaN(audioTrack) || audioTrack < 0 || audioTrack >= canciones.length) {
-    audioTrack = Math.floor(Math.random() * canciones.length);
-  }
-
-  function iconoPausa() { return '\u23f8'; }
-  function iconoPlay() { return '\u25b6'; }
 
   function modoPlay() {
     btn.textContent = iconoPausa();
@@ -64,12 +75,6 @@ window.addEventListener('DOMContentLoaded', function () {
 
   if (musicaIniciada) {
     modoPlay();
-    currentTrackIndex = audioTrack;
-    currentAudio = new Audio(canciones[currentTrackIndex]);
-    currentAudio.volume = 0.6;
-    if (audioTime > 0) {
-      currentAudio.currentTime = audioTime;
-    }
     currentAudio.play().catch(function () {});
     configurarListeners();
   }
@@ -77,7 +82,9 @@ window.addEventListener('DOMContentLoaded', function () {
   btn.addEventListener('click', function () {
     if (!currentAudio) {
       currentTrackIndex = audioTrack;
-      currentAudio = new Audio(canciones[currentTrackIndex]);
+      currentAudio = new Audio();
+      currentAudio.preload = 'auto';
+      currentAudio.src = canciones[currentTrackIndex];
       currentAudio.volume = 0.6;
       if (audioTime > 0) {
         currentAudio.currentTime = audioTime;
@@ -105,4 +112,4 @@ window.addEventListener('DOMContentLoaded', function () {
       localStorage.setItem('audioTrack', currentTrackIndex);
     }
   });
-});
+})();
