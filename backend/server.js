@@ -8,12 +8,11 @@ const path = require('path');
 require('dotenv').config();
 
 const app = express();
-// Indicar a Express que confíe en el proxy inverso de Render (elimina alertas de rate-limit)
 app.set('trust proxy', 1);
 
 const PORT = process.env.PORT || 3000;
 
-// ─── Helmet: seguridad en cabeceras HTTP ──────────────────────────
+// ─── Helmet ──────────────────────────────────────────────────────────
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -32,30 +31,47 @@ app.use(
   })
 );
 
-// ─── CORS: solo el frontend ───────────────────────────────────────
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || '*',
-    methods: ['POST'],
-    allowedHeaders: ['X-API-Key', 'Content-Type'],
-  })
-);
+// ─── CORS: orígenes explícitos ───────────────────────────────────────
+const allowedOrigins = [
+  'https://proyecto-el-arca.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:5500',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5500',
+];
 
-// ─── Servir frontend como estático ───────────────────────────────
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('No autorizado por CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['X-API-Key', 'Content-Type'],
+  credentials: true,
+  optionsSuccessStatus: 200,
+}));
+
+// ─── Servir frontend como estático ───────────────────────────────────
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// ─── Rate limiting ────────────────────────────────────────────────
+// ─── Rate limiting ────────────────────────────────────────────────────
 const uploadLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 20, // máximo 20 intentos por IP
+  windowMs: 15 * 60 * 1000,
+  max: 20,
   message: { error: 'Demasiadas solicitudes. Intenta de nuevo en 15 minutos.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 app.use('/api/upload', uploadLimiter);
+app.use('/api/subir', uploadLimiter);
 
-// ─── Multer: solo memoria, nada en disco ─────────────────────────
+// ─── Multer: solo memoria ────────────────────────────────────────────
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
@@ -81,18 +97,19 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50 MB
+    fileSize: 50 * 1024 * 1024,
     files: 1,
   },
 });
 
-// ─── POST /api/upload ─────────────────────────────────────────────
-app.post('/api/upload', (req, res) => {
-  // Validar API Key
+// ─── Handler de upload (reutilizado en /upload y /subir) ──────────────
+const uploadHandler = (req, res) => {
+  /* VALIDACIÓN DE API KEY COMENTADA PARA PERMITIR SUBIDAS PÚBLICAS
   const apiKey = req.headers['x-api-key'];
   if (!apiKey || apiKey !== process.env.API_KEY_SECRET) {
     return res.status(401).json({ error: 'API Key inválida o ausente.' });
   }
+  */
 
   upload.single('archivo')(req, res, async (err) => {
     if (err) {
@@ -113,7 +130,6 @@ app.post('/api/upload', (req, res) => {
     const anio = req.body.anio || 'Sin año';
     const mensaje = req.body.mensaje || 'Sin mensaje';
 
-    // Construcción del contenido HTML del correo para Resend
     const htmlContent = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px; border-radius: 8px;">
         <h2 style="color: #E50914; border-bottom: 2px solid #E50914; padding-bottom: 8px;">Nuevo aporte al Archivo Comunitario</h2>
@@ -129,11 +145,9 @@ app.post('/api/upload', (req, res) => {
 
     try {
       console.log('Iniciando envío de correo vía API de Resend...');
-      
-      // Convertir el buffer del archivo en una cadena Base64 (Requisito de Resend para adjuntos)
+
       const base64Content = req.file.buffer.toString('base64');
 
-      // Petición HTTP POST nativa a la API REST de Resend (Bypass total al bloqueo SMTP)
       const resendResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -141,7 +155,7 @@ app.post('/api/upload', (req, res) => {
           'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
         },
         body: JSON.stringify({
-          from: 'Archivo El Arca <onboarding@resend.dev>', // Remitente por defecto requerido en cuentas gratuitas
+          from: 'Archivo El Arca <onboarding@resend.dev>',
           to: process.env.EMAIL_RECEIVER || 'archivo.elarca@gmail.com',
           subject: `Nuevo recuerdo de ${nombre} — Archivo El Arca`,
           html: htmlContent,
@@ -172,19 +186,23 @@ app.post('/api/upload', (req, res) => {
       return res.status(500).json({ error: 'Error al procesar o enviar el recuerdo por restricciones de red. Intenta de nuevo.' });
     }
   });
-});
+};
+
+// ─── Rutas POST (ambos endpoints activos) ─────────────────────────────
+app.post('/api/upload', uploadHandler);
+app.post('/api/subir', uploadHandler);
 
 function escapeHtml(text) {
   const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
   return String(text).replace(/[&<>"']/g, (c) => map[c]);
 }
 
-// ─── Health check ─────────────────────────────────────────────────
+// ─── Health check ─────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', service: 'Archivo El Arca' });
 });
 
-// ─── Rutas del frontend (multipágina) ────────────────────────────
+// ─── Rutas del frontend (multipágina) ────────────────────────────────
 app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
@@ -217,21 +235,27 @@ app.get('/relatos/organizaciones', (_req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/relatos/organizaciones.html'));
 });
 
-// ─── Catch-all: redirigir rutas no existentes al inicio ──────────
+// ─── Catch-all: redirigir rutas no existentes al inicio ──────────────
 app.get(/.*/, (_req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
-// ─── Error handler global ────────────────────────────────────────
+// ─── Error handler global ────────────────────────────────────────────
 app.use((err, _req, res, _next) => {
   console.error('Error no capturado:', err);
   res.status(500).json({ error: 'Error interno del servidor.' });
 });
 
-// ─── Iniciar servidor ─────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`Servidor de El Arca corriendo en http://localhost:${PORT}`);
-  console.log(`Endpoints:`);
-  console.log(`  POST http://localhost:${PORT}/api/upload`);
-  console.log(`  GET  http://localhost:${PORT}/api/health`);
-});
+// ─── Exportación Serverless para Vercel ──────────────────────────────
+module.exports = app;
+
+// ─── Iniciar servidor (solo en local) ────────────────────────────────
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Servidor de El Arca corriendo en http://localhost:${PORT}`);
+    console.log(`Endpoints:`);
+    console.log(`  POST http://localhost:${PORT}/api/upload`);
+    console.log(`  POST http://localhost:${PORT}/api/subir`);
+    console.log(`  GET  http://localhost:${PORT}/api/health`);
+  });
+}
