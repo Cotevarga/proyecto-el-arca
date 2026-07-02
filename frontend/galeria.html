@@ -25,136 +25,70 @@
     .bg-noche { background-color: var(--color-noche) !important; }
     .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
 
-    /* ─── Modern Lightbox ─── */
-    #arca-lightbox {
-      position: fixed;
-      z-index: 99999;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.96);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    #arca-lightbox.open {
+    /* ─── Gallery Layout ─── */
+    #gallery-layout {
       display: flex;
-      opacity: 1;
+      gap: 16px;
+      align-items: flex-start;
+      min-height: 65vh;
     }
-    #arca-lightbox .lb-close {
-      position: absolute;
-      top: 20px; right: 24px;
-      color: rgba(255,255,255,0.5);
-      font-size: 32px;
-      cursor: pointer;
-      z-index: 10;
-      transition: color 0.2s;
-      line-height: 1;
-      background: none; border: none;
-    }
-    #arca-lightbox .lb-close:hover { color: var(--color-mir); }
-    #arca-lightbox .lb-prev,
-    #arca-lightbox .lb-next {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      color: rgba(255,255,255,0.3);
-      font-size: 36px;
-      cursor: pointer;
-      z-index: 10;
-      padding: 16px 12px;
-      transition: all 0.2s;
-      background: rgba(0,0,0,0.3);
-      border-radius: 8px;
-      border: none;
-      line-height: 1;
-    }
-    #arca-lightbox .lb-prev:hover,
-    #arca-lightbox .lb-next:hover { color: white; background: rgba(229,9,20,0.3); }
-    #arca-lightbox .lb-prev { left: 12px; }
-    #arca-lightbox .lb-next { right: 12px; }
-
-    #arca-lightbox .lb-img-wrapper {
-      position: relative;
-      max-width: 85vw;
+    #thumb-col {
+      width: 120px;
+      flex-shrink: 0;
       max-height: 70vh;
+      overflow-y: auto;
       display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #arca-lightbox .lb-main-img {
-      max-width: 100%;
-      max-height: 70vh;
-      object-fit: contain;
-      border-radius: 4px;
-      box-shadow: 0 0 60px rgba(229,9,20,0.08);
-      transition: transform 0.3s ease;
-      transform: scale(0.95);
-    }
-    #arca-lightbox.open .lb-main-img { transform: scale(1); }
-    #arca-lightbox .lb-info {
-      position: absolute;
-      bottom: -48px;
-      left: 0; right: 0;
-      text-align: center;
-      color: rgba(255,255,255,0.5);
-      font-size: 13px;
-    }
-    #arca-lightbox .lb-info strong { color: rgba(255,255,255,0.7); }
-    #arca-lightbox .lb-counter {
-      position: absolute;
-      top: -36px;
-      left: 0; right: 0;
-      text-align: center;
-      color: rgba(255,255,255,0.2);
-      font-size: 12px;
-      letter-spacing: 0.1em;
-    }
-
-    /* ─── Thumbnail Strip ─── */
-    .lb-thumbs {
-      position: absolute;
-      bottom: -100px;
-      left: 0; right: 0;
-      display: flex;
-      justify-content: center;
+      flex-direction: column;
       gap: 8px;
-      padding: 12px 0;
-      overflow-x: auto;
+      padding-right: 8px;
       scrollbar-width: thin;
       scrollbar-color: rgba(229,9,20,0.3) transparent;
     }
-    .lb-thumbs::-webkit-scrollbar { height: 4px; }
-    .lb-thumbs::-webkit-scrollbar-thumb { background: rgba(229,9,20,0.3); border-radius: 2px; }
-    .lb-thumb {
-      width: 56px;
-      height: 42px;
+    #thumb-col::-webkit-scrollbar { width: 4px; }
+    #thumb-col::-webkit-scrollbar-thumb { background: rgba(229,9,20,0.3); border-radius: 2px; }
+    .gallery-thumb {
+      width: 100%;
+      aspect-ratio: 4/3;
       object-fit: cover;
       border-radius: 4px;
       cursor: pointer;
-      opacity: 0.4;
+      opacity: 0.5;
       transition: all 0.2s;
       border: 2px solid transparent;
-      flex-shrink: 0;
     }
-    .lb-thumb:hover { opacity: 0.7; }
-    .lb-thumb.active { opacity: 1; border-color: var(--color-mir); }
+    .gallery-thumb:hover { opacity: 0.8; }
+    .gallery-thumb.active { opacity: 1; border-color: var(--color-mir); }
 
-    /* ─── Loading ─── */
-    .lb-loader {
+    #viewer-col {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-noche);
+      border: 1px solid rgba(229,9,20,0.15);
+      border-radius: 8px;
+      min-height: 60vh;
+      position: relative;
+      overflow: hidden;
+    }
+    #main-viewer-img {
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      transition: opacity 0.3s ease;
+      cursor: zoom-in;
+    }
+    #viewer-loader {
+      position: absolute;
+      top: 50%; left: 50%;
       width: 40px; height: 40px;
+      margin: -20px 0 0 -20px;
       border: 3px solid rgba(255,255,255,0.05);
       border-top-color: var(--color-mir);
       border-radius: 50%;
-      animation: lb-spin 0.7s linear infinite;
-      position: absolute;
-      top: 50%; left: 50%;
-      margin: -20px 0 0 -20px;
+      animation: spin 0.7s linear infinite;
     }
-    @keyframes lb-spin { to { transform: rotate(360deg); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .galeria-grid img {
       cursor: pointer;
@@ -214,20 +148,25 @@
       </div>
     </header>
 
-    <section class="py-16" style="background-color:#111111">
+    <section class="py-8" style="background-color:#111111">
       <div class="max-w-6xl mx-auto px-4">
-        <div class="galeria-grid grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="galeria-grid">
-          <div class="col-span-full text-center py-12" id="galeria-loader">
-            <div style="display:inline-block;width:40px;height:40px;border:3px solid rgba(255,255,255,0.05);border-top-color:#E50914;border-radius:50%;animation:spin 0.7s linear infinite;"></div>
-            <p class="text-white/30 mt-4 text-sm">Cargando galería...</p>
-            <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+        <div id="gallery-layout">
+          <div id="thumb-col">
+            <div id="thumb-loader" style="text-align:center;padding:24px;">
+              <div style="display:inline-block;width:24px;height:24px;border:2px solid rgba(255,255,255,0.05);border-top-color:#E50914;border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+            </div>
+          </div>
+          <div id="viewer-col">
+            <div id="viewer-loader" style="display:none;"></div>
+            <img id="main-viewer-img" src="" alt="Galería El Arca" style="opacity:0;">
+            <p id="viewer-empty" class="text-white/20 text-sm">Selecciona una imagen</p>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- ─── MODERN LIGHTBOX ─── -->
+  <!-- ─── LIGHTBOX (full-screen overlay) ─── -->
   <div id="arca-lightbox">
     <button class="lb-close" id="lb-close">&times;</button>
     <button class="lb-prev" id="lb-prev">&#10094;</button>
@@ -235,9 +174,6 @@
     <div class="lb-img-wrapper">
       <div class="lb-loader" id="lb-loader" style="display:none;"></div>
       <img class="lb-main-img" id="lb-main-img" src="" alt="Galería El Arca">
-      <div class="lb-counter" id="lb-counter"></div>
-      <div class="lb-info" id="lb-info"></div>
-      <div class="lb-thumbs" id="lb-thumbs"></div>
     </div>
   </div>
 
@@ -258,6 +194,26 @@
     });
   </script>
 
+  <style>
+    #arca-lightbox {
+      position:fixed;z-index:99999;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.96);display:none;align-items:center;justify-content:center;
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity 0.3s ease;
+    }
+    #arca-lightbox.open{display:flex;opacity:1}
+    #arca-lightbox .lb-close{position:absolute;top:20px;right:24px;color:rgba(255,255,255,0.5);font-size:32px;cursor:pointer;z-index:10;transition:color 0.2s;line-height:1;background:none;border:none}
+    #arca-lightbox .lb-close:hover{color:var(--color-mir)}
+    #arca-lightbox .lb-prev,#arca-lightbox .lb-next{position:absolute;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);font-size:36px;cursor:pointer;z-index:10;padding:16px 12px;transition:all 0.2s;background:rgba(0,0,0,0.3);border-radius:8px;border:none;line-height:1}
+    #arca-lightbox .lb-prev:hover,#arca-lightbox .lb-next:hover{color:#fff;background:rgba(229,9,20,0.3)}
+    #arca-lightbox .lb-prev{left:12px}
+    #arca-lightbox .lb-next{right:12px}
+    #arca-lightbox .lb-img-wrapper{position:relative;max-width:85vw;max-height:80vh;display:flex;align-items:center;justify-content:center}
+    #arca-lightbox .lb-main-img{max-width:100%;max-height:80vh;object-fit:contain;border-radius:4px;box-shadow:0 0 60px rgba(229,9,20,0.08);transition:transform 0.3s ease;transform:scale(0.95)}
+    #arca-lightbox.open .lb-main-img{transform:scale(1)}
+    .lb-loader{width:40px;height:40px;border:3px solid rgba(255,255,255,0.05);border-top-color:var(--color-mir);border-radius:50%;animation:lb-spin 0.7s linear infinite;position:absolute;top:50%;left:50%;margin:-20px 0 0 -20px}
+    @keyframes lb-spin{to{transform:rotate(360deg)}}
+  </style>
+
   <script>
   (function () {
     'use strict';
@@ -267,16 +223,20 @@
     var imagenes = [];
     var currentIndex = 0;
 
+    // Viewer
+    var thumbCol = document.getElementById('thumb-col');
+    var viewerImg = document.getElementById('main-viewer-img');
+    var viewerEmpty = document.getElementById('viewer-empty');
+    var viewerLoader = document.getElementById('viewer-loader');
+    var thumbLoader = document.getElementById('thumb-loader');
+
+    // Lightbox
     var lb = document.getElementById('arca-lightbox');
     var lbImg = document.getElementById('lb-main-img');
     var lbClose = document.getElementById('lb-close');
     var lbPrev = document.getElementById('lb-prev');
     var lbNext = document.getElementById('lb-next');
-    var lbInfo = document.getElementById('lb-info');
-    var lbCounter = document.getElementById('lb-counter');
-    var lbThumbs = document.getElementById('lb-thumbs');
     var lbLoader = document.getElementById('lb-loader');
-    var grid = document.getElementById('galeria-grid');
 
     // ─── Cargar desde API ───
     fetch(API_BASE + '/api/galeria')
@@ -284,69 +244,89 @@
       .then(function (data) {
         if (Array.isArray(data) && data.length > 0) {
           imagenes = data;
-          renderGrid();
+          renderThumbs();
+          showImage(0);
         }
       })
       .catch(function () {
-        var loader = document.getElementById('galeria-loader');
-        if (loader) {
-          loader.innerHTML = '<div style="text-align:center;padding:24px;"><p style="color:rgba(229,9,20,0.6);font-size:13px;">Error de conexión — mostrando galería local</p></div>';
-          setTimeout(function () { loader.remove(); }, 3000);
-        }
         loadFallback();
       });
 
     function loadFallback() {
       imagenes = [
-        { url: '/images/FB_IMG_1782701605358.jpg', titulo: 'El Cabezón Jano', descripcion: 'Pedro Alejandro González Reyes, fundador de El Arca.' },
-        { url: '/images/FB_IMG_1782701655071.jpg', titulo: 'Sede El Arca', descripcion: 'El espacio físico donde la comunidad se reunía.' },
-        { url: '/images/FB_IMG_1782701775498.jpg', titulo: 'Jano pintando la sede', descripcion: 'Construyendo con sus propias manos el espacio comunitario.' },
-        { url: '/images/FB_IMG_1782701859802.jpg', titulo: 'Actividades Comunitarias', descripcion: 'Entrega simbólica de las llaves de la Población.' },
-        { url: '/images/FB_IMG_1782701766075.jpg', titulo: 'Marcha Comunitaria', descripcion: 'La Goya en las calles, organización popular.' },
-        { url: '/images/FB_IMG_1782701826979.jpg', titulo: 'Sueño de TV Comunitaria', descripcion: 'Jano planificando la comunicación popular.' },
-        { url: '/images/jano_inicio.jpg', titulo: 'El Jano', descripcion: 'Su mirada y su lucha siguen presentes.' },
-        { url: '/images/navidad_popular.jpg', titulo: 'Infancias en El Arca', descripcion: 'Talleres para las niñas y niños de La Goya.' },
-        { url: '/images/companeros_melon.jpg', titulo: 'Compañeros', descripcion: 'Memoria de quienes partieron pero viven en el pueblo.' },
-        { url: '/images/radio_libre.jpg', titulo: 'Radio Libre', descripcion: 'Montaje y talleres del dial radial comunitario.' },
-        { url: '/images/antupeñi.jpeg', titulo: 'Antupeñi', descripcion: 'Hijos del Sol — organización territorial.' }
+        { url: '/images/FB_IMG_1782701605358.jpg' },
+        { url: '/images/FB_IMG_1782701655071.jpg' },
+        { url: '/images/FB_IMG_1782701775498.jpg' },
+        { url: '/images/FB_IMG_1782701859802.jpg' },
+        { url: '/images/FB_IMG_1782701766075.jpg' },
+        { url: '/images/FB_IMG_1782701826979.jpg' },
+        { url: '/images/jano_inicio.jpg' },
+        { url: '/images/navidad_popular.jpg' },
+        { url: '/images/companeros_melon.jpg' },
+        { url: '/images/radio_libre.jpg' },
+        { url: '/images/antupeñi.jpeg' }
       ];
-      renderGrid();
+      renderThumbs();
+      showImage(0);
     }
 
-    function renderGrid() {
-      var loader = document.getElementById('galeria-loader');
-      if (loader) loader.remove();
-
+    function renderThumbs() {
+      if (thumbLoader) thumbLoader.remove();
+      thumbCol.innerHTML = '';
       imagenes.forEach(function (img, idx) {
-        var card = document.createElement('div');
-        card.className = 'card-mir animate-fade-in-up';
-        card.style.animationDelay = (idx * 0.05) + 's';
-        card.innerHTML =
-          '<img src="' + escapeHtml(img.url) + '" alt="' + escapeHtml(img.titulo || '') + '" class="w-full h-56 object-cover mb-3 border border-mir/30" loading="lazy">' +
-          '<h3 class="text-mir font-title text-sm uppercase tracking-wide">' + escapeHtml(img.titulo || '') + '</h3>' +
-          '<p class="text-white/50 text-xs mt-1">' + escapeHtml(img.descripcion || '') + '</p>';
-        card.querySelector('img').addEventListener('click', function () {
-          abrir(idx);
+        var thumb = document.createElement('img');
+        thumb.className = 'gallery-thumb' + (idx === 0 ? ' active' : '');
+        thumb.src = img.url;
+        thumb.loading = 'lazy';
+        thumb.addEventListener('click', function () {
+          showImage(idx);
         });
-        grid.appendChild(card);
+        thumbCol.appendChild(thumb);
+      });
+    }
+
+    function showImage(idx) {
+      if (!imagenes[idx]) return;
+      currentIndex = idx;
+      viewerLoader.style.display = 'block';
+      viewerImg.style.opacity = '0';
+      if (viewerEmpty) viewerEmpty.style.display = 'none';
+
+      var img = new Image();
+      img.onload = function () {
+        viewerImg.src = imagenes[idx].url;
+        viewerImg.style.opacity = '1';
+        viewerLoader.style.display = 'none';
+      };
+      img.onerror = function () {
+        viewerImg.src = imagenes[idx].url;
+        viewerImg.style.opacity = '1';
+        viewerLoader.style.display = 'none';
+      };
+      img.src = imagenes[idx].url;
+
+      // Update thumb active state
+      var thumbs = thumbCol.querySelectorAll('.gallery-thumb');
+      thumbs.forEach(function (t, i) {
+        t.classList.toggle('active', i === idx);
+        if (i === idx) t.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
     }
 
     // ─── Lightbox ───
-    function abrir(idx) {
+    function openLightbox(idx) {
       currentIndex = idx;
-      mostrarImg(idx);
+      mostrarLb(idx);
       lb.classList.add('open');
       document.body.style.overflow = 'hidden';
-      renderThumbs();
     }
 
-    function cerrar() {
+    function cerrarLb() {
       lb.classList.remove('open');
       document.body.style.overflow = '';
     }
 
-    function mostrarImg(idx) {
+    function mostrarLb(idx) {
       if (!imagenes[idx]) return;
       lbLoader.style.display = 'block';
       lbImg.style.opacity = '0';
@@ -357,62 +337,39 @@
         lbLoader.style.display = 'none';
       };
       img.onerror = function () {
-        lbLoader.style.display = 'none';
         lbImg.src = imagenes[idx].url;
         lbImg.style.opacity = '1';
+        lbLoader.style.display = 'none';
       };
       img.src = imagenes[idx].url;
-
-      lbInfo.innerHTML = '<strong>' + escapeHtml(imagenes[idx].titulo || '') + '</strong> &mdash; ' + escapeHtml(imagenes[idx].descripcion || '');
-      lbCounter.textContent = (idx + 1) + ' / ' + imagenes.length;
-      actualizarThumbs(idx);
     }
 
-    function prev() {
+    function prevLb() {
       currentIndex = (currentIndex - 1 + imagenes.length) % imagenes.length;
-      mostrarImg(currentIndex);
+      mostrarLb(currentIndex);
     }
 
-    function next() {
+    function nextLb() {
       currentIndex = (currentIndex + 1) % imagenes.length;
-      mostrarImg(currentIndex);
+      mostrarLb(currentIndex);
     }
 
-    function renderThumbs() {
-      lbThumbs.innerHTML = '';
-      imagenes.forEach(function (img, idx) {
-        var thumb = document.createElement('img');
-        thumb.className = 'lb-thumb' + (idx === currentIndex ? ' active' : '');
-        thumb.src = img.url;
-        thumb.alt = img.titulo || '';
-        thumb.loading = 'lazy';
-        thumb.addEventListener('click', function () {
-          currentIndex = idx;
-          mostrarImg(idx);
-        });
-        lbThumbs.appendChild(thumb);
-      });
-    }
+    // Click main image → open lightbox
+    viewerImg.addEventListener('click', function () {
+      if (imagenes.length > 0) openLightbox(currentIndex);
+    });
 
-    function actualizarThumbs(activeIdx) {
-      var thumbs = lbThumbs.querySelectorAll('.lb-thumb');
-      thumbs.forEach(function (t, i) {
-        t.classList.toggle('active', i === activeIdx);
-        if (i === activeIdx) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      });
-    }
-
-    // ─── Eventos ───
-    lbClose.addEventListener('click', cerrar);
-    lb.addEventListener('click', function (e) { if (e.target === lb) cerrar(); });
-    lbPrev.addEventListener('click', function (e) { e.stopPropagation(); prev(); });
-    lbNext.addEventListener('click', function (e) { e.stopPropagation(); next(); });
+    // ─── Lightbox events ───
+    lbClose.addEventListener('click', cerrarLb);
+    lb.addEventListener('click', function (e) { if (e.target === lb) cerrarLb(); });
+    lbPrev.addEventListener('click', function (e) { e.stopPropagation(); prevLb(); });
+    lbNext.addEventListener('click', function (e) { e.stopPropagation(); nextLb(); });
 
     document.addEventListener('keydown', function (e) {
       if (!lb.classList.contains('open')) return;
-      if (e.key === 'Escape') cerrar();
-      if (e.key === 'ArrowLeft') prev();
-      if (e.key === 'ArrowRight') next();
+      if (e.key === 'Escape') cerrarLb();
+      if (e.key === 'ArrowLeft') prevLb();
+      if (e.key === 'ArrowRight') nextLb();
     });
 
     // ─── Touch support ───
@@ -423,15 +380,10 @@
     lb.addEventListener('touchend', function (e) {
       var diff = touchStartX - e.changedTouches[0].screenX;
       if (Math.abs(diff) > 50) {
-        if (diff > 0) next(); else prev();
+        if (diff > 0) nextLb(); else prevLb();
       }
     }, { passive: true });
 
-    function escapeHtml(text) {
-      if (!text) return '';
-      var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-      return String(text).replace(/[&<>"']/g, function (c) { return map[c]; });
-    }
   })();
   </script>
   <script src="/app.js"></script>

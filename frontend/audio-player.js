@@ -24,10 +24,10 @@
   var isPlaying = false;
   var playerInited = false;
 
-  // ─── Estado persistente ───
-  var savedPlaying = localStorage.getItem('arca_playing') === 'true';
-  var savedTrack = parseInt(localStorage.getItem('arca_track') || '-1', 10);
-  var savedTime = parseFloat(localStorage.getItem('arca_time') || '0');
+  // ─── Estado persistente (sessionStorage + localStorage fallback) ───
+  var savedPlaying = sessionStorage.getItem('arca_playing') === 'true' || localStorage.getItem('arca_playing') === 'true';
+  var savedTrack = parseInt(sessionStorage.getItem('arca_track') || localStorage.getItem('arca_track') || '-1', 10);
+  var savedTime = parseFloat(sessionStorage.getItem('arca_time') || localStorage.getItem('arca_time') || '0');
 
   // ─── Referencias DOM ───
   var navPlayer = document.getElementById('nav-player');
@@ -242,14 +242,24 @@
     }
   }
 
+  function guardarEstado() {
+    if (!currentAudio) return;
+    var t = currentAudio.currentTime;
+    if (isFinite(t)) {
+      sessionStorage.setItem('arca_time', t);
+      sessionStorage.setItem('arca_track', currentTrackIndex);
+      sessionStorage.setItem('arca_playing', isPlaying ? 'true' : 'false');
+      localStorage.setItem('arca_time', t);
+      localStorage.setItem('arca_track', currentTrackIndex);
+      localStorage.setItem('arca_playing', isPlaying ? 'true' : 'false');
+    }
+  }
+
   // ─── Persistencia ───
   function setupPersistencia() {
     var audio = getAudio();
     audio.addEventListener('timeupdate', function () {
-      if (isFinite(audio.currentTime)) {
-        localStorage.setItem('arca_time', audio.currentTime);
-        localStorage.setItem('arca_track', currentTrackIndex);
-      }
+      guardarEstado();
     });
     audio.addEventListener('ended', function () {
       ensureCanciones();
@@ -269,12 +279,14 @@
     audio.addEventListener('play', function () {
       isPlaying = true;
       updateUI();
+      guardarEstado();
     });
     audio.addEventListener('pause', function () {
       if (audio.ended) {
         isPlaying = false;
         updateUI();
       }
+      guardarEstado();
     });
     audio.addEventListener('error', function () {
       ensureCanciones();
@@ -285,11 +297,7 @@
   }
 
   window.addEventListener('beforeunload', function () {
-    if (currentAudio) {
-      localStorage.setItem('arca_time', currentAudio.currentTime);
-      localStorage.setItem('arca_track', currentTrackIndex);
-      localStorage.setItem('arca_playing', isPlaying ? 'true' : 'false');
-    }
+    guardarEstado();
   });
 
   window.__arcaPlayer = {

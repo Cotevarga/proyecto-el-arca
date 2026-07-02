@@ -144,10 +144,10 @@ app.post('/api/admin/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email y contraseña requeridos.' });
+      return res.status(400).json({ success: false, message: 'Email y contraseña requeridos.' });
     }
     if (!isSupabaseAvailable()) {
-      return res.status(503).json({ error: 'Servicio de autenticación no disponible.' });
+      return res.status(503).json({ success: false, message: 'Servicio de autenticación no disponible.' });
     }
     const { data: users, error } = await supabaseAdmin
       .from('admin_users')
@@ -156,22 +156,22 @@ app.post('/api/admin/login', async (req, res) => {
       .limit(1);
 
     if (error || !users || users.length === 0) {
-      return res.status(401).json({ error: 'Credenciales inválidas.' });
+      return res.status(401).json({ success: false, message: 'Credenciales inválidas.' });
     }
     const user = users[0];
     const validPassword = await bcrypt.compare(password, user.password_hash);
     if (!validPassword) {
-      return res.status(401).json({ error: 'Credenciales inválidas.' });
+      return res.status(401).json({ success: false, message: 'Credenciales inválidas.' });
     }
     const token = jwt.sign(
       { id: user.id, email: user.email, nombre: user.nombre },
       JWT_SECRET,
       { expiresIn: '8h' }
     );
-    res.json({ token, user: { id: user.id, email: user.email, nombre: user.nombre } });
+    res.json({ success: true, token, user: { id: user.id, email: user.email, nombre: user.nombre } });
   } catch (err) {
     console.error('Error en login:', err);
-    res.status(500).json({ error: 'Error interno del servidor.' });
+    res.status(500).json({ success: false, message: 'Error interno del servidor.' });
   }
 });
 
@@ -642,7 +642,12 @@ app.get('/relatos/organizaciones', (_req, res) => res.sendFile(path.join(__dirna
 app.get('/relatos/anecdotas', (_req, res) => res.sendFile(path.join(__dirname, '../frontend/relatos/anecdotas.html')));
 app.get('/relatos/jano-arca', (_req, res) => res.sendFile(path.join(__dirname, '../frontend/relatos/jano-arca.html')));
 
-// ─── Catch-all ───────────────────────────────────────────────
+// ─── Catch-all API 404 (NUNCA devolver HTML para /api/) ───
+app.use('/api', (_req, res) => {
+  res.status(404).json({ success: false, message: 'Endpoint no encontrado.' });
+});
+
+// ─── Catch-all frontend ───────────────────────────────────
 app.get(/.*/, (_req, res) => res.sendFile(path.join(__dirname, '../frontend/index.html')));
 
 // ─── Error handler global ────────────────────────────────────
