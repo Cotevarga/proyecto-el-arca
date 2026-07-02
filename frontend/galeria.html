@@ -259,10 +259,15 @@
     var lbNext = document.getElementById('lb-next');
     var lbLoader = document.getElementById('lb-loader');
 
-    // ─── Cargar desde API ───
-    fetch(API_BASE + '/api/galeria')
+    // ─── Cargar desde API con timeout de 5s ───
+    var API_URL = 'https://proyecto-el-arca.vercel.app/api/galeria';
+    var controller = new AbortController();
+    var timeout = setTimeout(function () { controller.abort(); }, 5000);
+
+    fetch(API_URL, { signal: controller.signal })
       .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
       .then(function (data) {
+        clearTimeout(timeout);
         if (Array.isArray(data) && data.length > 0) {
           imagenes = data;
           renderThumbs();
@@ -270,6 +275,7 @@
         }
       })
       .catch(function () {
+        clearTimeout(timeout);
         loadFallback();
       });
 
