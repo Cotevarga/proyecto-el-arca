@@ -260,7 +260,7 @@
     var lbLoader = document.getElementById('lb-loader');
 
     // ─── Cargar desde API con timeout de 5s ───
-    var API_URL = 'https://proyecto-el-arca.vercel.app/api/galeria';
+    var API_URL = '/api/galeria';
     var controller = new AbortController();
     var timeout = setTimeout(function () { controller.abort(); }, 5000);
 

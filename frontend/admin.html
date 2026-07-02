@@ -766,7 +766,7 @@
       btnLogin.disabled = true;
 
       try {
-        var res = await fetch('https://proyecto-el-arca.vercel.app/api/admin/login', {
+        var res = await fetch('/api/admin/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: email, password: password })
