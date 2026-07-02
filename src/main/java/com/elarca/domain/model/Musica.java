@@ -7,6 +7,7 @@ public record Musica(
     String titulo,
     String artista,
     String urlMp3,
+    String storagePath,
     Boolean activo,
     Integer orden,
     Instant createdAt

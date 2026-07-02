@@ -31,7 +31,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .headers(headers -> headers
-                .xssProtection(xss -> xss.enable(true))
+                .xssProtection(xss -> xss.disable())
                 .contentSecurityPolicy(csp -> csp
                     .policyDirectives("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:")))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -48,9 +48,7 @@ public class SecurityConfig {
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/musica/**", "/relatos/**").permitAll()
                 .requestMatchers("/", "/index.html", "/{path:[^\\.]*}").permitAll()
-                .requestMatchers("/error").permitAll()
-                .requestMatchers("/admin.html", "/galeria.html", "/recuerdos.html", "/relatos.html", "/archivo.html", "/legado.html", "/subir.html", "/videos.html").permitAll()
-                .requestMatchers("/relatos/**").permitAll()
+                .requestMatchers("/*.html").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS).permitAll()
                 .anyRequest().permitAll()
             )

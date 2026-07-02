@@ -47,7 +47,7 @@ public class MusicaServiceImpl implements MusicaService {
             null,
             titulo != null ? titulo : originalFilename.replaceFirst("\\.[^.]+$", ""),
             artista != null ? artista : "El Arca",
-            publicUrl, true, nextOrden, Instant.now()
+            publicUrl, storedPath, true, nextOrden, Instant.now()
         );
 
         Musica saved = musicaRepository.save(musica);
@@ -62,7 +62,7 @@ public class MusicaServiceImpl implements MusicaService {
 
         Musica updated = new Musica(
             musica.id(), musica.titulo(), musica.artista(),
-            musica.urlMp3(),
+            musica.urlMp3(), musica.storagePath(),
             activo != null ? activo : !musica.activo(),
             musica.orden(), musica.createdAt()
         );
@@ -89,7 +89,7 @@ public class MusicaServiceImpl implements MusicaService {
     public List<Musica> getFallbackList() {
         return List.of(new Musica(
             0L, "Radio Libre", "El Arca",
-            "/musica/index.mp3", true, 1, null
+            "/musica/index.mp3", null, true, 1, null
         ));
     }
 }

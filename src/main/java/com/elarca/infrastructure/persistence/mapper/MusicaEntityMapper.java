@@ -11,7 +11,8 @@ public class MusicaEntityMapper {
         if (entity == null) return null;
         return new Musica(
             entity.getId(), entity.getTitulo(), entity.getArtista(),
-            entity.getUrlMp3(), entity.getActivo(), entity.getOrden(),
+            entity.getUrlMp3(), entity.getStoragePath(),
+            entity.getActivo(), entity.getOrden(),
             entity.getCreatedAt()
         );
     }
@@ -23,7 +24,7 @@ public class MusicaEntityMapper {
             .titulo(domain.titulo())
             .artista(domain.artista())
             .urlMp3(domain.urlMp3())
-            .storagePath(null)
+            .storagePath(domain.storagePath())
             .activo(domain.activo())
             .orden(domain.orden())
             .createdAt(domain.createdAt())
