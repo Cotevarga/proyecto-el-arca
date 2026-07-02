@@ -92,13 +92,19 @@
       '<button id="arca-btn-prev" class="text-white/50 hover:text-mir transition text-sm md:text-base p-1 cursor-pointer" title="Canción anterior">⏮</button>' +
       '<button id="arca-btn-play" class="text-white hover:text-mir transition text-base md:text-lg p-1 cursor-pointer" title="Reproducir / Pausar">▶</button>' +
       '<button id="arca-btn-next" class="text-white/50 hover:text-mir transition text-sm md:text-base p-1 cursor-pointer" title="Siguiente canción">⏭</button>' +
-      '<span id="arca-track-info" class="text-white/30 text-[9px] md:text-[10px] truncate max-w-[100px] md:max-w-[140px] hidden md:inline">Mejora tu Experiencia — PLAY</span>';
+      '<span id="arca-track-info" class="text-white/30 text-[9px] md:text-[10px] truncate max-w-[100px] md:max-w-[140px] hidden md:inline arca-heartbeat">Mejora tu Experiencia — PLAY</span>';
     navPlayer.innerHTML = html;
 
     btnPrev = document.getElementById('arca-btn-prev');
     btnPlay = document.getElementById('arca-btn-play');
     btnNext = document.getElementById('arca-btn-next');
     trackInfo = document.getElementById('arca-track-info');
+    if (!document.getElementById('arca-heartbeat-style')) {
+      var style = document.createElement('style');
+      style.id = 'arca-heartbeat-style';
+      style.textContent = '@keyframes arcaHeartbeat { 0%,100%{opacity:0.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.08)} } .arca-heartbeat{animation:arcaHeartbeat 2s ease-in-out infinite;display:inline-block}';
+      document.head.appendChild(style);
+    }
 
     if (!btnPlay) return;
     attachEvents();

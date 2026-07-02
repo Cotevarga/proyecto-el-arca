@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archivo — El Arca</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+  <style>
+    :root { --color-mir: #E50914; --color-noche: #111111; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000 !important; color: #fff !important; }
+    .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
+    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; }
+    .text-mir { color: var(--color-mir) !important; }
+    .border-mir { border-color: var(--color-mir) !important; }
+    .bg-mir { background-color: var(--color-mir) !important; }
+    .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
+    .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
+    .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
+    .hover\:text-mir:hover { color: var(--color-mir) !important; }
+    .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+    .btn-outline-mir { background-color: transparent !important; color: white !important; font-weight: bold; padding: 0.75rem 2rem; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem; border: 2px solid var(--color-mir); }
+    .btn-outline-mir:hover { background-color: var(--color-mir) !important; }
+  </style>
+  <script src="/audio-player.js" defer></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0M3Q8DQ3QF');
+  </script>
+</head>
+<body class="bg-black text-white antialiased">
+
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div id="nav-player" class="flex items-center gap-1 md:gap-2 mx-1 md:mx-3"></div>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
+        <a href="/archivo.html" class="text-mir border-b-2 border-mir pb-1">Archivo</a>
+      </div>
+      <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-mir/30 px-4 py-4">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition">Galería</a>
+        <a href="/videos.html" class="hover:text-mir transition">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition">El Legado</a>
+        <a href="/archivo.html" class="text-mir">Archivo</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content">
+    <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
+      <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
+        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Memoria Colectiva</span>
+        <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Archivo Comunitario</h1>
+        <div style="width:4rem;height:0.25rem;background-color:var(--color-mir);margin:1.5rem auto;"></div>
+        <p class="text-white/60 text-lg max-w-2xl mx-auto">Explora el archivo histórico de El Arca: fotos, audios, videos y documentos que preservan la memoria viva de La Goya.</p>
+      </div>
+    </header>
+
+    <section class="py-16" style="background-color:#111111">
+      <div class="max-w-5xl mx-auto px-4">
+        <div class="grid md:grid-cols-2 gap-8">
+          <a href="/galeria.html" class="card-mir flex flex-col items-center text-center min-h-[250px] justify-center hover:border-mir transition-all">
+            <div class="text-6xl mb-4 opacity-70">📷</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">Galería Histórica</h2>
+            <p class="text-white/50 text-sm leading-relaxed">Imágenes que preservan la memoria visual de El Arca, el Jano y la lucha popular.</p>
+          </a>
+          <a href="/videos.html" class="card-mir flex flex-col items-center text-center min-h-[250px] justify-center hover:border-mir transition-all">
+            <div class="text-6xl mb-4 opacity-70">🎥</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">Videos y Audios</h2>
+            <p class="text-white/50 text-sm leading-relaxed">Material audiovisual de la Radio Libre y la comunicación popular en La Goya.</p>
+          </a>
+          <a href="/subir.html" class="card-mir flex flex-col items-center text-center min-h-[250px] justify-center hover:border-mir transition-all">
+            <div class="text-6xl mb-4 opacity-70">📤</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">Aporta tu recuerdo</h2>
+            <p class="text-white/50 text-sm leading-relaxed">Comparte tu foto, audio o video para engrosar la memoria colectiva de El Arca.</p>
+          </a>
+          <a href="/legado.html" class="card-mir flex flex-col items-center text-center min-h-[250px] justify-center hover:border-mir transition-all">
+            <div class="text-6xl mb-4 opacity-70">🔥</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">El Legado</h2>
+            <p class="text-white/50 text-sm leading-relaxed">La mística de la lucha, el amor popular y el trabajo de masas con nuestras infancias.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+    document.querySelectorAll('#mobile-menu a').forEach(function(l) {
+      l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
+    });
+  </script>
+  <script src="/app.js"></script>
+</body>
+</html>

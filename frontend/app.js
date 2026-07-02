@@ -134,8 +134,9 @@ window.API_BASE = (window.location.hostname === 'localhost' || window.location.h
     if (urlObj.origin !== window.location.origin) return;
     if (urlObj.pathname === window.location.pathname && urlObj.hash) return;
 
-    e.preventDefault();
-    navegar(urlObj.pathname + urlObj.search + urlObj.hash);
+    // PJAX desactivado — navegación tradicional
+    // e.preventDefault();
+    // navegar(urlObj.pathname + urlObj.search + urlObj.hash);
   });
 
   // ─── popstate ───────────────────────────────────────────────
