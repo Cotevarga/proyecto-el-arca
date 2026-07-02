@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     { "src": "backend/server.js", "use": "@vercel/node" },
-    { "src": "frontend/*.html", "use": "@vercel/static" },
+    { "src": "frontend/**/*.html", "use": "@vercel/static" },
     { "src": "frontend/images/*", "use": "@vercel/static" },
     { "src": "frontend/musica/*", "use": "@vercel/static" }
   ],
