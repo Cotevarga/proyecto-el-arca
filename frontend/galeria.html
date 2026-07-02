@@ -9,7 +9,7 @@
   <style>
     :root { --color-mir: #E50914; --color-noche: #111111; }
     html { scroll-behavior: smooth; }
-    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000000 !important; color: #ffffff !important; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000 !important; color: #fff !important; }
     @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
     .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
     .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
@@ -24,24 +24,162 @@
     .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
     .bg-noche { background-color: var(--color-noche) !important; }
     .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
+
+    /* ─── Modern Lightbox ─── */
+    #arca-lightbox {
+      position: fixed;
+      z-index: 99999;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.96);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #arca-lightbox.open {
+      display: flex;
+      opacity: 1;
+    }
+    #arca-lightbox .lb-close {
+      position: absolute;
+      top: 20px; right: 24px;
+      color: rgba(255,255,255,0.5);
+      font-size: 32px;
+      cursor: pointer;
+      z-index: 10;
+      transition: color 0.2s;
+      line-height: 1;
+      background: none; border: none;
+    }
+    #arca-lightbox .lb-close:hover { color: var(--color-mir); }
+    #arca-lightbox .lb-prev,
+    #arca-lightbox .lb-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.3);
+      font-size: 36px;
+      cursor: pointer;
+      z-index: 10;
+      padding: 16px 12px;
+      transition: all 0.2s;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      border: none;
+      line-height: 1;
+    }
+    #arca-lightbox .lb-prev:hover,
+    #arca-lightbox .lb-next:hover { color: white; background: rgba(229,9,20,0.3); }
+    #arca-lightbox .lb-prev { left: 12px; }
+    #arca-lightbox .lb-next { right: 12px; }
+
+    #arca-lightbox .lb-img-wrapper {
+      position: relative;
+      max-width: 85vw;
+      max-height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #arca-lightbox .lb-main-img {
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      border-radius: 4px;
+      box-shadow: 0 0 60px rgba(229,9,20,0.08);
+      transition: transform 0.3s ease;
+      transform: scale(0.95);
+    }
+    #arca-lightbox.open .lb-main-img { transform: scale(1); }
+    #arca-lightbox .lb-info {
+      position: absolute;
+      bottom: -48px;
+      left: 0; right: 0;
+      text-align: center;
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+    }
+    #arca-lightbox .lb-info strong { color: rgba(255,255,255,0.7); }
+    #arca-lightbox .lb-counter {
+      position: absolute;
+      top: -36px;
+      left: 0; right: 0;
+      text-align: center;
+      color: rgba(255,255,255,0.2);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+
+    /* ─── Thumbnail Strip ─── */
+    .lb-thumbs {
+      position: absolute;
+      bottom: -100px;
+      left: 0; right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 0;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(229,9,20,0.3) transparent;
+    }
+    .lb-thumbs::-webkit-scrollbar { height: 4px; }
+    .lb-thumbs::-webkit-scrollbar-thumb { background: rgba(229,9,20,0.3); border-radius: 2px; }
+    .lb-thumb {
+      width: 56px;
+      height: 42px;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0.4;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+      flex-shrink: 0;
+    }
+    .lb-thumb:hover { opacity: 0.7; }
+    .lb-thumb.active { opacity: 1; border-color: var(--color-mir); }
+
+    /* ─── Loading ─── */
+    .lb-loader {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(255,255,255,0.05);
+      border-top-color: var(--color-mir);
+      border-radius: 50%;
+      animation: lb-spin 0.7s linear infinite;
+      position: absolute;
+      top: 50%; left: 50%;
+      margin: -20px 0 0 -20px;
+    }
+    @keyframes lb-spin { to { transform: rotate(360deg); } }
+
+    .galeria-grid img {
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .galeria-grid img:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 30px rgba(229,9,20,0.15);
+    }
   </style>
   <script src="/audio-player.js" defer></script>
-    <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-0M3Q8DQ3QF');
   </script>
 </head>
 <body class="bg-black text-white antialiased">
 
-  <!-- ===== NAVBAR ===== -->
   <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <a href="index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div id="nav-player" class="flex items-center gap-1 md:gap-2 mx-1 md:mx-3"></div>
       <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
         <a href="index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
         <a href="galeria.html" class="text-mir border-b-2 border-mir pb-1">Galería</a>
@@ -67,149 +205,42 @@
   </nav>
 
   <main id="main-content">
-
-  <!-- ===== CONTENIDO ===== -->
-  <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
-    <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
-      <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Memoria Visual</span>
-      <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Galería Histórica</h1>
-      <div class="divider-mir mx-auto"></div>
-      <p class="text-white/60 text-lg max-w-2xl mx-auto">Imágenes que preservan la memoria de El Arca, el Jano y la lucha popular en La Goya.</p>
-    </div>
-  </header>
-
-  <section class="py-16" style="background-color:#111111">
-    <div class="max-w-6xl mx-auto px-4">
-      <div class="galeria-grid grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-        <div class="card-mir animate-fade-in-up">
-          <img src="images/FB_IMG_1782701605358.jpg" alt="Retrato del Cabezón Jano" class="w-full h-56 object-cover mb-3 border border-mir/30">
-          <h3 class="text-mir font-title text-sm uppercase tracking-wide">El Cabezón Jano</h3>
-          <p class="text-white/50 text-xs mt-1">Pedro Alejandro González Reyes, fundador de El Arca.</p>
-        </div>
-        <div class="card-mir animate-fade-in-up">
-          <img src="images/FB_IMG_1782701655071.jpg" alt="Espacio físico de El Arca" class="w-full h-56 object-cover mb-3 border border-mir/30">
-          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Sede El Arca</h3>
-          <p class="text-white/50 text-xs mt-1">El espacio físico donde la comunidad se reunía.</p>
-        </div>
-        <div class="card-mir animate-fade-in-up">
-          <img src="images/FB_IMG_1782701775498.jpg" alt="Jano pintando la sede" class="w-full h-56 object-cover mb-3 border border-mir/30">
-          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Jano pintando la sede</h3>
-          <p class="text-white/50 text-xs mt-1">Construyendo con sus propias manos el espacio comunitario.</p>
-        </div>
-        <div class="card-mir animate-fade-in-up">
-          <img src="images/FB_IMG_1782701859802.jpg" alt="Navidad Popular" class="w-full h-56 object-cover mb-3 border border-mir/30">
-          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Actividades Comunitarias</h3>
-          <p class="text-white/50 text-xs mt-1">Entrega simbólica de las llaves de la Población.</p>
-        </div>
-        <div class="card-mir animate-fade-in-up">
-          <img src="images/FB_IMG_1782701766075.jpg" alt="Marcha comunitaria" class="w-full h-56 object-cover mb-3 border border-mir/30">
-          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Marcha Comunitaria</h3>
-          <p class="text-white/50 text-xs mt-1">La Goya en las calles, organización popular y resistencia.</p>
-        </div>
-        <div class="card-mir animate-fade-in-up">
-          <img src="images/FB_IMG_1782701826979.jpg" alt="Jano planificando TV Comunitaria" class="w-full h-56 object-cover mb-3 border border-mir/30">
-          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Sueño de TV Comunitaria</h3>
-          <p class="text-white/50 text-xs mt-1">Jano con un compañero planificando la comunicación popular.</p>
-        </div>
-        <div class="card-mir animate-fade-in-up">
-          <img src="images/jano_inicio.jpg" alt="El Jano" class="w-full h-56 object-cover mb-3 border border-mir/30">
-          <h3 class="text-mir font-title text-sm uppercase tracking-wide">El Jano</h3>
-          <p class="text-white/50 text-xs mt-1">Su mirada y su lucha siguen presentes.</p>
-        </div>
-        <div class="card-mir animate-fade-in-up">
-          <img src="images/navidad_popular.jpg" alt="Actividad con niños" class="w-full h-56 object-cover mb-3 border border-mir/30">
-          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Infancias en El Arca</h3>
-          <p class="text-white/50 text-xs mt-1">Talleres y actividades para las niñas y niños de La Goya.</p>
-        </div>
-        <div class="card-mir animate-fade-in-up">
-          <img src="images/companeros_melon.jpg" alt="Compañeros de El Arca" class="w-full h-56 object-cover mb-3 border border-mir/30">
-          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Compañeros</h3>
-          <p class="text-white/50 text-xs mt-1">Memoria de quienes partieron pero viven en el pueblo.</p>
-        </div>
-        <div class="card-mir animate-fade-in-up">
-          <img src="images/radio_libre.jpg" alt="Radio Libre" class="w-full h-56 object-cover mb-3 border border-mir/30">
-          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Radio Libre</h3>
-          <p class="text-white/50 text-xs mt-1">Montaje y talleres del dial radial comunitario.</p>
-        </div>
-        <div class="card-mir animate-fade-in-up">
-          <img src="images/antupeñi.jpeg" alt="Antupeñi" class="w-full h-56 object-cover mb-3 border border-mir/30">
-          <h3 class="text-mir font-title text-sm uppercase tracking-wide">Antupeñi</h3>
-          <p class="text-white/50 text-xs mt-1">Hijos del Sol — organización territorial en La Pintana.</p>
-        </div>
-
+    <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
+      <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
+        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Memoria Visual</span>
+        <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Galería Histórica</h1>
+        <div class="divider-mir mx-auto"></div>
+        <p class="text-white/60 text-lg max-w-2xl mx-auto">Imágenes que preservan la memoria de El Arca, el Jano y la lucha popular en La Goya.</p>
       </div>
-    </div>
-  </section>
+    </header>
 
-    <!-- ===== LIGHTBOX MODAL ===== -->
-    <div id="lightbox-modal" style="display:none; position:fixed; z-index:99999; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); align-items:center; justify-content:center;">
-      <span id="lightbox-close" style="position:absolute; top:20px; right:30px; color:white; font-size:40px; cursor:pointer;">&times;</span>
-      <div id="lightbox-prev" style="position:absolute; left:20px; color:white; font-size:40px; cursor:pointer;">&#10094;</div>
-      <img id="lightbox-img" src="" style="max-width:85%; max-height:85%; object-fit:contain; border:2px solid #E50914; border-radius:8px;">
-      <div id="lightbox-next" style="position:absolute; right:20px; color:white; font-size:40px; cursor:pointer;">&#10095;</div>
-    </div>
-
-    <script>
-    (function () {
-      'use strict';
-      var modal = document.getElementById('lightbox-modal');
-      var modalImg = document.getElementById('lightbox-img');
-      var closeBtn = document.getElementById('lightbox-close');
-      var prevBtn = document.getElementById('lightbox-prev');
-      var nextBtn = document.getElementById('lightbox-next');
-      if (!modal || !modalImg) return;
-
-      var grid = document.querySelector('.galeria-grid');
-      var imagenes = grid ? grid.querySelectorAll('img') : document.querySelectorAll('.card-mir img');
-      if (imagenes.length === 0) return;
-
-      var srcs = [];
-      imagenes.forEach(function (img) { if (img.src) srcs.push(img.src); });
-      if (srcs.length === 0) return;
-
-      var currentIndex = 0;
-
-      function abrir(idx) {
-        currentIndex = idx;
-        modalImg.src = srcs[currentIndex];
-        modal.style.display = 'flex';
-      }
-      function cerrar() { modal.style.display = 'none'; }
-      function prev() {
-        currentIndex = (currentIndex - 1 + srcs.length) % srcs.length;
-        modalImg.src = srcs[currentIndex];
-      }
-      function next() {
-        currentIndex = (currentIndex + 1) % srcs.length;
-        modalImg.src = srcs[currentIndex];
-      }
-
-      imagenes.forEach(function (img, idx) {
-        img.style.cursor = 'pointer';
-        img.addEventListener('click', function (e) {
-          e.preventDefault();
-          abrir(idx);
-        });
-      });
-
-      if (closeBtn) closeBtn.onclick = cerrar;
-      modal.onclick = function (e) { if (e.target === modal) cerrar(); };
-      if (prevBtn) { prevBtn.onclick = function (e) { e.stopPropagation(); prev(); }; }
-      if (nextBtn) { nextBtn.onclick = function (e) { e.stopPropagation(); next(); }; }
-
-      document.addEventListener('keydown', function (e) {
-        if (modal.style.display !== 'flex') return;
-        if (e.key === 'Escape') cerrar();
-        if (e.key === 'ArrowLeft') prev();
-        if (e.key === 'ArrowRight') next();
-      });
-    })();
-    </script>
-
+    <section class="py-16" style="background-color:#111111">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="galeria-grid grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="galeria-grid">
+          <div class="col-span-full text-center py-12" id="galeria-loader">
+            <div style="display:inline-block;width:40px;height:40px;border:3px solid rgba(255,255,255,0.05);border-top-color:#E50914;border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+            <p class="text-white/30 mt-4 text-sm">Cargando galería...</p>
+            <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <!-- ===== FOOTER ===== -->
+  <!-- ─── MODERN LIGHTBOX ─── -->
+  <div id="arca-lightbox">
+    <button class="lb-close" id="lb-close">&times;</button>
+    <button class="lb-prev" id="lb-prev">&#10094;</button>
+    <button class="lb-next" id="lb-next">&#10095;</button>
+    <div class="lb-img-wrapper">
+      <div class="lb-loader" id="lb-loader" style="display:none;"></div>
+      <img class="lb-main-img" id="lb-main-img" src="" alt="Galería El Arca">
+      <div class="lb-counter" id="lb-counter"></div>
+      <div class="lb-info" id="lb-info"></div>
+      <div class="lb-thumbs" id="lb-thumbs"></div>
+    </div>
+  </div>
+
   <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
     <div class="max-w-5xl mx-auto px-4 text-center">
       <a href="index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
@@ -225,6 +256,183 @@
     document.querySelectorAll('#mobile-menu a').forEach(function (l) {
       l.addEventListener('click', function () { document.getElementById('mobile-menu').classList.add('hidden'); });
     });
+  </script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var API_BASE = window.API_BASE || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3000' : '');
+
+    var imagenes = [];
+    var currentIndex = 0;
+
+    var lb = document.getElementById('arca-lightbox');
+    var lbImg = document.getElementById('lb-main-img');
+    var lbClose = document.getElementById('lb-close');
+    var lbPrev = document.getElementById('lb-prev');
+    var lbNext = document.getElementById('lb-next');
+    var lbInfo = document.getElementById('lb-info');
+    var lbCounter = document.getElementById('lb-counter');
+    var lbThumbs = document.getElementById('lb-thumbs');
+    var lbLoader = document.getElementById('lb-loader');
+    var grid = document.getElementById('galeria-grid');
+
+    // ─── Cargar desde API ───
+    fetch(API_BASE + '/api/galeria')
+      .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function (data) {
+        if (Array.isArray(data) && data.length > 0) {
+          imagenes = data;
+          renderGrid();
+        }
+      })
+      .catch(function () {
+        var loader = document.getElementById('galeria-loader');
+        if (loader) {
+          loader.innerHTML = '<div style="text-align:center;padding:24px;"><p style="color:rgba(229,9,20,0.6);font-size:13px;">Error de conexión — mostrando galería local</p></div>';
+          setTimeout(function () { loader.remove(); }, 3000);
+        }
+        loadFallback();
+      });
+
+    function loadFallback() {
+      imagenes = [
+        { url: '/images/FB_IMG_1782701605358.jpg', titulo: 'El Cabezón Jano', descripcion: 'Pedro Alejandro González Reyes, fundador de El Arca.' },
+        { url: '/images/FB_IMG_1782701655071.jpg', titulo: 'Sede El Arca', descripcion: 'El espacio físico donde la comunidad se reunía.' },
+        { url: '/images/FB_IMG_1782701775498.jpg', titulo: 'Jano pintando la sede', descripcion: 'Construyendo con sus propias manos el espacio comunitario.' },
+        { url: '/images/FB_IMG_1782701859802.jpg', titulo: 'Actividades Comunitarias', descripcion: 'Entrega simbólica de las llaves de la Población.' },
+        { url: '/images/FB_IMG_1782701766075.jpg', titulo: 'Marcha Comunitaria', descripcion: 'La Goya en las calles, organización popular.' },
+        { url: '/images/FB_IMG_1782701826979.jpg', titulo: 'Sueño de TV Comunitaria', descripcion: 'Jano planificando la comunicación popular.' },
+        { url: '/images/jano_inicio.jpg', titulo: 'El Jano', descripcion: 'Su mirada y su lucha siguen presentes.' },
+        { url: '/images/navidad_popular.jpg', titulo: 'Infancias en El Arca', descripcion: 'Talleres para las niñas y niños de La Goya.' },
+        { url: '/images/companeros_melon.jpg', titulo: 'Compañeros', descripcion: 'Memoria de quienes partieron pero viven en el pueblo.' },
+        { url: '/images/radio_libre.jpg', titulo: 'Radio Libre', descripcion: 'Montaje y talleres del dial radial comunitario.' },
+        { url: '/images/antupeñi.jpeg', titulo: 'Antupeñi', descripcion: 'Hijos del Sol — organización territorial.' }
+      ];
+      renderGrid();
+    }
+
+    function renderGrid() {
+      var loader = document.getElementById('galeria-loader');
+      if (loader) loader.remove();
+
+      imagenes.forEach(function (img, idx) {
+        var card = document.createElement('div');
+        card.className = 'card-mir animate-fade-in-up';
+        card.style.animationDelay = (idx * 0.05) + 's';
+        card.innerHTML =
+          '<img src="' + escapeHtml(img.url) + '" alt="' + escapeHtml(img.titulo || '') + '" class="w-full h-56 object-cover mb-3 border border-mir/30" loading="lazy">' +
+          '<h3 class="text-mir font-title text-sm uppercase tracking-wide">' + escapeHtml(img.titulo || '') + '</h3>' +
+          '<p class="text-white/50 text-xs mt-1">' + escapeHtml(img.descripcion || '') + '</p>';
+        card.querySelector('img').addEventListener('click', function () {
+          abrir(idx);
+        });
+        grid.appendChild(card);
+      });
+    }
+
+    // ─── Lightbox ───
+    function abrir(idx) {
+      currentIndex = idx;
+      mostrarImg(idx);
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      renderThumbs();
+    }
+
+    function cerrar() {
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function mostrarImg(idx) {
+      if (!imagenes[idx]) return;
+      lbLoader.style.display = 'block';
+      lbImg.style.opacity = '0';
+      var img = new Image();
+      img.onload = function () {
+        lbImg.src = imagenes[idx].url;
+        lbImg.style.opacity = '1';
+        lbLoader.style.display = 'none';
+      };
+      img.onerror = function () {
+        lbLoader.style.display = 'none';
+        lbImg.src = imagenes[idx].url;
+        lbImg.style.opacity = '1';
+      };
+      img.src = imagenes[idx].url;
+
+      lbInfo.innerHTML = '<strong>' + escapeHtml(imagenes[idx].titulo || '') + '</strong> &mdash; ' + escapeHtml(imagenes[idx].descripcion || '');
+      lbCounter.textContent = (idx + 1) + ' / ' + imagenes.length;
+      actualizarThumbs(idx);
+    }
+
+    function prev() {
+      currentIndex = (currentIndex - 1 + imagenes.length) % imagenes.length;
+      mostrarImg(currentIndex);
+    }
+
+    function next() {
+      currentIndex = (currentIndex + 1) % imagenes.length;
+      mostrarImg(currentIndex);
+    }
+
+    function renderThumbs() {
+      lbThumbs.innerHTML = '';
+      imagenes.forEach(function (img, idx) {
+        var thumb = document.createElement('img');
+        thumb.className = 'lb-thumb' + (idx === currentIndex ? ' active' : '');
+        thumb.src = img.url;
+        thumb.alt = img.titulo || '';
+        thumb.loading = 'lazy';
+        thumb.addEventListener('click', function () {
+          currentIndex = idx;
+          mostrarImg(idx);
+        });
+        lbThumbs.appendChild(thumb);
+      });
+    }
+
+    function actualizarThumbs(activeIdx) {
+      var thumbs = lbThumbs.querySelectorAll('.lb-thumb');
+      thumbs.forEach(function (t, i) {
+        t.classList.toggle('active', i === activeIdx);
+        if (i === activeIdx) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      });
+    }
+
+    // ─── Eventos ───
+    lbClose.addEventListener('click', cerrar);
+    lb.addEventListener('click', function (e) { if (e.target === lb) cerrar(); });
+    lbPrev.addEventListener('click', function (e) { e.stopPropagation(); prev(); });
+    lbNext.addEventListener('click', function (e) { e.stopPropagation(); next(); });
+
+    document.addEventListener('keydown', function (e) {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') cerrar();
+      if (e.key === 'ArrowLeft') prev();
+      if (e.key === 'ArrowRight') next();
+    });
+
+    // ─── Touch support ───
+    var touchStartX = 0;
+    lb.addEventListener('touchstart', function (e) {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    lb.addEventListener('touchend', function (e) {
+      var diff = touchStartX - e.changedTouches[0].screenX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) next(); else prev();
+      }
+    }, { passive: true });
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return String(text).replace(/[&<>"']/g, function (c) { return map[c]; });
+    }
+  })();
   </script>
   <script src="/app.js"></script>
 </body>

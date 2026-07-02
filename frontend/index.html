@@ -82,6 +82,7 @@
   <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-b-[rgba(229,9,20,0.3)]">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <a href="index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div id="nav-player" class="flex items-center gap-1 md:gap-2 mx-1 md:mx-3"></div>
       <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
         <a href="index.html" class="text-mir border-b-2 border-mir pb-1">Inicio</a>
         <a href="galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
@@ -133,28 +134,33 @@
       </div>
     </header>
 
-    <!-- ===== INICIOS ===== -->
-    <section id="inicios" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
+    <!-- ===== LEGADO ===== -->
+    <section id="legado" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
       <div class="max-w-6xl mx-auto px-4">
-        <span class="text-mir font-bold text-xs tracking-widest uppercase">Historia</span>
-        <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">Los Inicios en La Goya</h2>
+        <span class="text-mir font-bold text-xs tracking-widest uppercase">La Mística de la Lucha</span>
+        <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">El Legado que Nos Mueve</h2>
         <div class="divider-mir"></div>
         <div class="grid md:grid-cols-2 gap-10 items-center mt-10">
           <div class="space-y-6">
             <p class="text-white/80 text-lg leading-relaxed">
-              A mediados de los años 90, en plena Población Francisco de Goya, un hombre de mirada inquieta y corazón gigante comenzó a tejer un sueño colectivo. <strong class="text-white">Pedro Alejandro González Reyes</strong>, "El Cabezón Jano", entendió que la cultura era una trinchera.
+              Es imposible hablar de amor popular sin recordar las manos curtidas y la voz inmortal de <strong class="text-white">Víctor Jara</strong>. Cuando cantaba <em>"El amor es algo grande que no se puede medir"</em>, no hablaba de un amor romántico y burgués: hablaba del amor que mueve a un poblador a compartir su última comida, del amor que lleva a un joven a tomar un micrófono para denunciar la injusticia, del amor que sostiene a una madre en la fila de la olla común.
             </p>
             <p class="text-white/60 leading-relaxed">
-              Desde un parlante viejo y un micrófono prestado, nació El Arca: sin plata, sin auspicios, con la fuerza de la comunidad organizada. En cada rincón de La Goya, el Jano sembró la semilla de la organización popular.
+              Ese es el mandato que nos dejaron: <strong class="text-white">continuar la lucha, resistir en el territorio, y retomar con urgencia el trabajo de masas con nuestras infancias</strong>, porque allí está la semilla de la dignidad.
             </p>
-            <p class="text-white/60 leading-relaxed">
-              Talleres de música, comunicación popular, Navidad para las infancias —nada de eso fue caridad. Fue pedagogía de la liberación hecha barrio.
-            </p>
-            <a href="relatos/jano.html" class="btn-mir inline-block">Ver más</a>
+            <a href="legado.html" class="btn-mir inline-block">Conoce el legado completo</a>
           </div>
           <div class="card-mir">
-            <img src="images/FB_IMG_1782701605358.jpg" alt="El Cabezón Jano" class="w-full border border-[rgba(229,9,20,0.3)]">
-            <p class="text-white/40 text-xs italic mt-3">"El Jano nos enseñó que la cultura no era un lujo, era una trinchera."</p>
+            <div class="mb-6">
+              <img src="images/victor.jpeg" alt="Víctor Jara" class="w-full border border-[rgba(229,9,20,0.3)]">
+            </div>
+            <div class="mb-6">
+              <img src="images/che.jpg" alt="Ernesto Che Guevara" class="w-full border border-[rgba(229,9,20,0.3)]">
+            </div>
+            <blockquote class="text-2xl md:text-3xl font-light italic text-white/90 text-center">
+              "Un revolucionario verdadero es guiado por grandes sentimientos de amor."
+            </blockquote>
+            <p class="text-mir mt-3 text-sm tracking-widest text-center">— Ernesto "Che" Guevara</p>
           </div>
         </div>
       </div>
@@ -169,7 +175,7 @@
         <div class="divider-mir"></div>
         <div class="max-w-4xl mx-auto mt-10 card-mir">
           <div class="relative w-full aspect-video border border-[rgba(229,9,20,0.4)]">
-            <iframe class="w-full h-full" src="https://www.youtube.com/embed/tNz15U2EZcw" title="Radio Libre y Comunitaria El Arca" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            <iframe width="100%" height="400" src="https://www.youtube.com/embed/tNz15U2EZcw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
           </div>
         </div>
       </div>
@@ -221,6 +227,7 @@
     <script>
     (function () {
       'use strict';
+      var API_BASE = window.API_BASE || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3000' : '');
       var formArchivo = document.getElementById('form-archivo');
       if (!formArchivo) return;
       var fileInput = document.getElementById('archivo');
@@ -251,7 +258,7 @@
         var messages = document.getElementById('form-messages');
         var fd = new FormData(formArchivo);
         btn.textContent = 'Enviando\u2026'; btn.disabled = true; messages.classList.add('hidden');
-        fetch('https://elarcamemoriaviva-backend.vercel.app/api/subir', { method: 'POST', body: fd })
+        fetch(API_BASE + '/api/subir', { method: 'POST', body: fd })
           .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
           .then(function () {
             messages.textContent = '\u00a1Gracias por compartir tu recuerdo!';
