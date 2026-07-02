@@ -1,0 +1,31 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/elarca
+    username: postgres
+    password: postgres
+    hikari:
+      maximum-pool-size: 5
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+
+elarca:
+  jwt:
+    secret: DESARROLLO_LOCAL_JWT_SECRET_2026_CAMBIAR
+  cors:
+    allowed-origins: http://localhost:5173,http://localhost:3000,http://localhost:8080
+
+logging:
+  level:
+    com.elarca: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG

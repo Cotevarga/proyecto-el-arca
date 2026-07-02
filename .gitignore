@@ -1,0 +1,33 @@
+### Maven ###
+target/
+*.jar
+*.war
+
+### IDE ###
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Logs ###
+logs/
+*.log
+
+### Uploads ###
+uploads/
+!uploads/.gitkeep
+
+### Environment ###
+.env
+.env.local
+.env.production
+
+### Temp ###
+tmp/
+temp/

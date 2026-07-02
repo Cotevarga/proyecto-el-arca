@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memoria de El Arca — Pedro "Cabezón Jano" González</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    :root {
+      --color-mir: #E50914;
+      --color-resistencia-700: #b91c1c;
+      --color-noche: #111111;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000000 !important; color: #ffffff !important; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+
+    .heading-mir {
+      font-family: Arial, Helvetica, sans-serif !important;
+      color: var(--color-mir) !important;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .text-mir { color: var(--color-mir) !important; }
+    .border-mir { border-color: var(--color-mir) !important; }
+    .bg-mir { background-color: var(--color-mir) !important; }
+    .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229, 9, 20, 0.4) !important; padding: 1.5rem; }
+    .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+
+    .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
+    .btn-mir {
+      background-color: var(--color-mir) !important;
+      color: white !important;
+      font-weight: bold;
+      padding: 0.75rem 2rem;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.875rem;
+      border: 2px solid var(--color-mir);
+    }
+    .btn-mir:hover {
+      background-color: black !important;
+      color: var(--color-mir) !important;
+    }
+
+    .btn-outline-mir {
+      background-color: transparent !important;
+      color: white !important;
+      font-weight: bold;
+      padding: 0.75rem 2rem;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.875rem;
+      border: 2px solid var(--color-mir);
+    }
+    .btn-outline-mir:hover {
+      background-color: var(--color-mir) !important;
+    }
+  </style>
+  <script src="/audio-player.js" defer></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✊</text></svg>">
+    <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-0M3Q8DQ3QF');
+  </script>
+</head>
+<body class="bg-black text-white antialiased">
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-b-[rgba(229,9,20,0.3)]">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div id="nav-player" class="flex items-center gap-1 md:gap-2 mx-1 md:mx-3"></div>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="text-mir border-b-2 border-mir pb-1">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+      </div>
+      <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-t-[rgba(229,9,20,0.3)] px-4 py-4">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="text-mir">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition">Galería</a>
+        <a href="/videos.html" class="hover:text-mir transition">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition">Archivo</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== CONTENIDO ===== -->
+  <main id="main-content">
+
+    <!-- ===== HERO ===== -->
+    <header class="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <div class="absolute inset-0">
+        <img src="images/FB_IMG_1782701655071.jpg" alt="Espacio físico El Arca" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/50"></div>
+      </div>
+      <div class="relative z-10 text-center px-4 max-w-4xl mx-auto animate-fade-in-up">
+        <div class="inline-block mb-6 px-4 py-1 border border-mir bg-black/60 text-mir text-xs font-bold tracking-widest uppercase">Población Francisco de Goya — La Pintana</div>
+        <h1 class="text-5xl md:text-8xl font-black text-white leading-tight mb-6 uppercase" style="font-family: 'Impact', 'Arial Black', sans-serif; letter-spacing: 0.08em;">
+          MEMORIA VIVA<br>
+          <span class="text-mir" style="letter-spacing: 0.12em;">EL ARCA</span>
+        </h1>
+        <p class="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-8 leading-relaxed font-light">
+          Pedro Alejandro González Reyes<br>
+          <span class="text-mir font-bold text-xl md:text-2xl">"El Cabezón Jano"</span>
+          <span class="block text-sm md:text-base text-white/60 mt-3">1972 — 2006 · Su sueño vive en cada vecino, en cada niñez, en cada lucha.</span>
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/subir.html" class="btn-mir">Comparte tu recuerdo</a>
+          <a href="/legado.html" class="btn-outline-mir">Conoce el legado</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== EL LEGADO QUE NOS MUEVE ===== -->
+    <section id="legado" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
+      <div class="max-w-6xl mx-auto px-4">
+        <span class="text-mir font-bold text-xs tracking-widest uppercase">La Mística de la Lucha</span>
+        <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">El Legado que Nos Mueve</h2>
+        <div class="divider-mir"></div>
+
+        <div class="flex flex-col md:flex-row gap-10 mt-12 items-stretch">
+          <div class="flex-1 flex flex-col">
+            <p class="text-white/80 text-lg leading-relaxed">
+              "Ese es el mandato que nos dejaron: continuar la lucha, resistir en el territorio, y retomar con urgencia el trabajo de masas con nuestras infancias, porque allí está la semilla de la dignidad. No hay camino más corto hacia la liberación que el que se construye hombro con hombro, codo con codo, amando al pueblo como se ama la vida misma."
+            </p>
+            <a href="/legado.html" class="btn-mir inline-block self-start mt-6">VER MÁS</a>
+          </div>
+          <div class="md:w-[400px] flex-shrink-0 border-2 border-[var(--color-mir)] p-5 flex flex-col items-center">
+            <img src="images/victor.jpeg" alt="Víctor Jara" class="w-[350px] h-auto">
+            <p class="text-white/60 text-sm mt-4 text-center leading-relaxed">
+              Víctor Jara — Cantautor Chileno torturado y asesinado en la dictadura de Pinochet.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== MÍSTICA DE LA LUCHA ===== -->
+    <section id="mistica" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
+      <div class="max-w-6xl mx-auto px-4">
+        <span class="text-mir font-bold text-xs tracking-widest uppercase">Iconos</span>
+        <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">Mística de la Lucha</h2>
+        <div class="divider-mir"></div>
+
+        <div class="grid md:grid-cols-2 gap-8 mt-12">
+          <div class="flex flex-col">
+            <div class="border-2 border-[var(--color-mir)] p-5 flex flex-col items-center">
+              <img src="images/che.jpg" alt="Che Guevara" class="w-full h-auto">
+              <p class="text-white/70 text-center text-base mt-4 leading-relaxed">
+                "Un revolucionario verdadero es guiado por grandes sentimientos de amor."<br>
+                <span class="text-white/50">— Ernesto "Che" Guevara</span>
+              </p>
+            </div>
+            <a href="/galeria.html" class="btn-mir text-center mt-4">VER GALERÍA HISTÓRICA</a>
+          </div>
+          <div class="flex flex-col">
+            <div class="border-2 border-[var(--color-mir)] p-5 flex flex-col items-center">
+              <img src="images/FB_IMG_1782701826979.jpg" alt="Actividad de El Arca" class="w-full h-auto">
+              <p class="text-white/60 text-center text-sm mt-4 leading-relaxed">
+                La música, el arte, la comunicación: cada actividad era una semilla plantada en tierra fértil. De aquellos niños, algunos hoy son dirigentes sociales, comunicadores, educadores populares. La siembra dio frutos.
+              </p>
+            </div>
+            <a href="/relatos.html" class="btn-mir text-center mt-4">RELATOS</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== RADIO LIBRE ===== -->
+    <section id="comunicacion" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
+      <div class="max-w-6xl mx-auto px-4">
+        <span class="text-mir font-bold text-xs tracking-widest uppercase">Comunicaciones</span>
+        <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">RADIO LIBRE 90.1 / 100.5 FM</h2>
+        <p class="text-white/60 mb-4">Programas y registros de la radio comunitaria.</p>
+        <div class="divider-mir"></div>
+        <div class="max-w-4xl mx-auto mt-10 card-mir">
+          <div class="relative w-full aspect-video border border-[rgba(229,9,20,0.4)]">
+            <iframe width="100%" height="400" src="https://www.youtube.com/embed/tNz15U2EZcw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== MAPA ===== -->
+    <section id="mapa" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
+      <div class="max-w-5xl mx-auto px-4">
+        <span class="text-mir font-bold text-xs tracking-widest uppercase">Territorio</span>
+        <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">La Goya en el Mapa</h2>
+        <div class="divider-mir"></div>
+        <p class="text-white/60 mb-8">Población Francisco de Goya, Paradero 30 y medio de Santa Rosa, La Pintana. Aquí latía El Arca.</p>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d831.1842985780471!2d-70.63583763042466!3d-33.56020388078404!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662da10473c2ee5%3A0xadc28b4e04e0fada!2sBurdeos%20%26%20Pasaje%20la%20Carta%2C%20La%20Pintana%2C%20Regi%C3%B3n%20Metropolitana!5e0!3m2!1ses!2scl!4v1782853793133!5m2!1ses!2scl" width="600" height="450" style="border:0; max-width:100%;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      </div>
+    </section>
+
+    <!-- ===== ARCHIVO COMUNITARIO ===== -->
+    <section id="archivo" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
+      <div class="max-w-3xl mx-auto px-4">
+        <span class="text-mir font-bold text-xs tracking-widest uppercase">Participa</span>
+        <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">Archivo Comunitario</h2>
+        <div class="divider-mir"></div>
+        <form id="form-archivo" class="space-y-6 card-mir mt-6" enctype="multipart/form-data">
+          <div>
+            <label for="nombre" class="block text-sm font-bold text-white/80 mb-1 uppercase">Nombre o Pseudónimo</label>
+            <input type="text" id="nombre" name="nombre" required class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
+          </div>
+          <div>
+            <label for="anio" class="block text-sm font-bold text-white/80 mb-1 uppercase">Año estimado del material</label>
+            <input type="number" id="anio" name="anio" min="1990" max="2026" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
+          </div>
+          <div>
+            <label for="archivo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Foto o Audio</label>
+            <input type="file" id="archivo" name="archivo" accept=".jpg,.jpeg,.png,.mp3,.wav,.mp4" class="block w-full text-sm text-white/50 border border-white/20 p-2 bg-black">
+            <div id="file-error" class="text-mir text-sm mt-1 hidden"></div>
+            <div id="file-info" class="text-white/50 text-sm mt-1 hidden"></div>
+            <p class="text-white/40 text-xs mt-2">Formatos: JPG, PNG, MP3, WAV, MP4 &middot; Máx 50 MB.</p>
+          </div>
+          <div>
+            <label for="mensaje" class="block text-sm font-bold text-white/80 mb-1 uppercase">Mensaje (opcional)</label>
+            <textarea id="mensaje" name="mensaje" rows="3" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-none"></textarea>
+          </div>
+          <button type="submit" id="btn-enviar" class="btn-mir w-full">Subir y compartir recuerdo</button>
+          <div id="form-messages" class="text-center text-sm font-medium hidden"></div>
+        </form>
+      </div>
+    </section>
+
+    <script>
+    (function () {
+      'use strict';
+      var API_BASE = window.API_BASE || '';
+      var formArchivo = document.getElementById('form-archivo');
+      if (!formArchivo) return;
+      var fileInput = document.getElementById('archivo');
+      var fileError = document.getElementById('file-error');
+      var fileInfo = document.getElementById('file-info');
+      if (fileInput) {
+        fileInput.addEventListener('change', function () {
+          var file = fileInput.files[0];
+          if (!file) { fileError.classList.add('hidden'); fileInfo.classList.add('hidden'); return; }
+          var valids = ['image/jpeg', 'image/png', 'audio/mpeg', 'audio/wav', 'video/mp4'];
+          if (valids.indexOf(file.type) === -1) {
+            fileError.textContent = 'Formato no v\u00e1lido. Sube JPG, PNG, MP3, WAV o MP4.';
+            fileError.classList.remove('hidden'); fileInfo.classList.add('hidden'); fileInput.value = ''; return;
+          }
+          fileError.classList.add('hidden');
+          if (file.size > 50 * 1024 * 1024) {
+            fileError.textContent = 'El archivo supera los 50 MB.';
+            fileError.classList.remove('hidden'); fileInfo.classList.add('hidden'); fileInput.value = ''; return;
+          }
+          fileError.classList.add('hidden');
+          fileInfo.textContent = 'Archivo: ' + file.name + ' (' + (file.size / 1024 / 1024).toFixed(1) + ' MB)';
+          fileInfo.classList.remove('hidden');
+        });
+      }
+      formArchivo.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var btn = document.getElementById('btn-enviar');
+        var messages = document.getElementById('form-messages');
+        var fd = new FormData(formArchivo);
+        btn.textContent = 'Enviando\u2026'; btn.disabled = true; messages.classList.add('hidden');
+        fetch(API_BASE + '/api/v1/subir', { method: 'POST', body: fd })
+          .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+          .then(function () {
+            messages.textContent = '\u00a1Gracias por compartir tu recuerdo!';
+            messages.className = 'text-center text-sm font-medium text-green-400'; messages.classList.remove('hidden');
+            formArchivo.reset(); if (fileInfo) fileInfo.classList.add('hidden');
+          })
+          .catch(function () {
+            messages.textContent = 'Hubo un error al enviar. Intenta de nuevo o escribe a contacto@elarca.cl';
+            messages.className = 'text-center text-sm font-medium text-mir'; messages.classList.remove('hidden');
+          })
+          .finally(function () { btn.textContent = 'Subir y compartir recuerdo'; btn.disabled = false; });
+      });
+    })();
+    </script>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="bg-black text-white/50 py-12 border-t border-t-[rgba(229,9,20,0.2)]">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var menuToggle = document.getElementById('menu-toggle');
+      var mobileMenu = document.getElementById('mobile-menu');
+      if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', function() {
+          mobileMenu.classList.toggle('hidden');
+        });
+        var mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(function(link) {
+          link.addEventListener('click', function() {
+            mobileMenu.classList.add('hidden');
+          });
+        });
+      }
+    });
+  </script>
+
+  <script src="/app.js"></script>
+</body>
+</html>

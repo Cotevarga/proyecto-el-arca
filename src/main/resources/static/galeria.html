@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galería — Memoria de El Arca</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+  <style>
+    :root { --color-mir: #E50914; --color-noche: #111111; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000 !important; color: #fff !important; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+    .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
+    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: white !important; text-transform: uppercase; letter-spacing: 0.05em; }
+    .text-mir { color: var(--color-mir) !important; }
+    .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
+    .border-mir\/40 { border-color: rgba(229,9,20,0.4) !important; }
+    .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
+    .bg-mir { background-color: var(--color-mir) !important; }
+    .hover\:text-mir:hover { color: var(--color-mir) !important; }
+    .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
+    .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
+    .bg-noche { background-color: var(--color-noche) !important; }
+    .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
+
+    /* ─── Gallery Layout ─── */
+    #gallery-layout {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      min-height: 65vh;
+    }
+    #thumb-col {
+      width: 120px;
+      flex-shrink: 0;
+      max-height: 70vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 8px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(229,9,20,0.3) transparent;
+    }
+    #thumb-col::-webkit-scrollbar { width: 4px; }
+    #thumb-col::-webkit-scrollbar-thumb { background: rgba(229,9,20,0.3); border-radius: 2px; }
+    .gallery-thumb {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    .gallery-thumb:hover { opacity: 0.8; }
+    .gallery-thumb.active { opacity: 1; border-color: var(--color-mir); }
+
+    #viewer-col {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-noche);
+      border: 1px solid rgba(229,9,20,0.15);
+      border-radius: 8px;
+      min-height: 60vh;
+      position: relative;
+      overflow: hidden;
+    }
+    #main-viewer-img {
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      transition: opacity 0.3s ease;
+      cursor: zoom-in;
+    }
+    #viewer-loader {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 40px; height: 40px;
+      margin: -20px 0 0 -20px;
+      border: 3px solid rgba(255,255,255,0.05);
+      border-top-color: var(--color-mir);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .viewer-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+      background: rgba(0,0,0,0.5);
+      color: rgba(255,255,255,0.6);
+      border: none;
+      font-size: 28px;
+      padding: 20px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      line-height: 1;
+      border-radius: 4px;
+    }
+    .viewer-arrow:hover { background: rgba(229,9,20,0.4); color: #fff; }
+    .viewer-arrow-left { left: 8px; }
+    .viewer-arrow-right { right: 8px; }
+
+    .galeria-grid img {
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .galeria-grid img:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 30px rgba(229,9,20,0.15);
+    }
+  </style>
+  <script src="/audio-player.js" defer></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0M3Q8DQ3QF');
+  </script>
+</head>
+<body class="bg-black text-white antialiased">
+
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div id="nav-player" class="flex items-center gap-1 md:gap-2 mx-1 md:mx-3"></div>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
+        <a href="/galeria.html" class="text-mir border-b-2 border-mir pb-1">Galería</a>
+        <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+      </div>
+      <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-mir/30 px-4 py-4">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition">Inicio</a>
+        <a href="/galeria.html" class="text-mir">Galería</a>
+        <a href="/videos.html" class="hover:text-mir transition">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition">Archivo</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content">
+    <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
+      <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
+        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Memoria Visual</span>
+        <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Galería Histórica</h1>
+        <div class="divider-mir mx-auto"></div>
+        <p class="text-white/60 text-lg max-w-2xl mx-auto">Imágenes que preservan la memoria de El Arca, el Jano y la lucha popular en La Goya.</p>
+      </div>
+    </header>
+
+    <section class="py-8" style="background-color:#111111">
+      <div class="max-w-6xl mx-auto px-4">
+        <div id="gallery-layout">
+          <div id="thumb-col">
+            <div id="thumb-loader" style="text-align:center;padding:24px;">
+              <div style="display:inline-block;width:24px;height:24px;border:2px solid rgba(255,255,255,0.05);border-top-color:#E50914;border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+            </div>
+          </div>
+          <div id="viewer-col">
+            <div id="viewer-loader" style="display:none;"></div>
+            <button id="viewer-prev" class="viewer-arrow viewer-arrow-left" title="Anterior">&#10094;</button>
+            <img id="main-viewer-img" src="" alt="Galería El Arca" style="opacity:0;">
+            <button id="viewer-next" class="viewer-arrow viewer-arrow-right" title="Siguiente">&#10095;</button>
+            <p id="viewer-empty" class="text-white/20 text-sm">Selecciona una imagen</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ─── LIGHTBOX (full-screen overlay) ─── -->
+  <div id="arca-lightbox">
+    <button class="lb-close" id="lb-close">&times;</button>
+    <button class="lb-prev" id="lb-prev">&#10094;</button>
+    <button class="lb-next" id="lb-next">&#10095;</button>
+    <div class="lb-img-wrapper">
+      <div class="lb-loader" id="lb-loader" style="display:none;"></div>
+      <img class="lb-main-img" id="lb-main-img" src="" alt="Galería El Arca">
+    </div>
+  </div>
+
+  <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('menu-toggle').addEventListener('click', function () {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+    document.querySelectorAll('#mobile-menu a').forEach(function (l) {
+      l.addEventListener('click', function () { document.getElementById('mobile-menu').classList.add('hidden'); });
+    });
+  </script>
+
+  <style>
+    #arca-lightbox {
+      position:fixed;z-index:99999;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.96);display:none;align-items:center;justify-content:center;
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity 0.3s ease;
+    }
+    #arca-lightbox.open{display:flex;opacity:1}
+    #arca-lightbox .lb-close{position:absolute;top:20px;right:24px;color:rgba(255,255,255,0.5);font-size:32px;cursor:pointer;z-index:10;transition:color 0.2s;line-height:1;background:none;border:none}
+    #arca-lightbox .lb-close:hover{color:var(--color-mir)}
+    #arca-lightbox .lb-prev,#arca-lightbox .lb-next{position:absolute;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);font-size:36px;cursor:pointer;z-index:10;padding:16px 12px;transition:all 0.2s;background:rgba(0,0,0,0.3);border-radius:8px;border:none;line-height:1}
+    #arca-lightbox .lb-prev:hover,#arca-lightbox .lb-next:hover{color:#fff;background:rgba(229,9,20,0.3)}
+    #arca-lightbox .lb-prev{left:12px}
+    #arca-lightbox .lb-next{right:12px}
+    #arca-lightbox .lb-img-wrapper{position:relative;max-width:85vw;max-height:80vh;display:flex;align-items:center;justify-content:center}
+    #arca-lightbox .lb-main-img{max-width:100%;max-height:80vh;object-fit:contain;border-radius:4px;box-shadow:0 0 60px rgba(229,9,20,0.08);transition:transform 0.3s ease;transform:scale(0.95)}
+    #arca-lightbox.open .lb-main-img{transform:scale(1)}
+    .lb-loader{width:40px;height:40px;border:3px solid rgba(255,255,255,0.05);border-top-color:var(--color-mir);border-radius:50%;animation:lb-spin 0.7s linear infinite;position:absolute;top:50%;left:50%;margin:-20px 0 0 -20px}
+    @keyframes lb-spin{to{transform:rotate(360deg)}}
+  </style>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var API_BASE = window.API_BASE || '';
+
+    var imagenes = [];
+    var currentIndex = 0;
+
+    // Viewer
+    var thumbCol = document.getElementById('thumb-col');
+    var viewerImg = document.getElementById('main-viewer-img');
+    var viewerEmpty = document.getElementById('viewer-empty');
+    var viewerLoader = document.getElementById('viewer-loader');
+    var thumbLoader = document.getElementById('thumb-loader');
+
+    // Lightbox
+    var lb = document.getElementById('arca-lightbox');
+    var lbImg = document.getElementById('lb-main-img');
+    var lbClose = document.getElementById('lb-close');
+    var lbPrev = document.getElementById('lb-prev');
+    var lbNext = document.getElementById('lb-next');
+    var lbLoader = document.getElementById('lb-loader');
+
+    // ─── Cargar desde API con timeout de 5s ───
+    var API_URL = '/api/v1/galeria';
+    var controller = new AbortController();
+    var timeout = setTimeout(function () { controller.abort(); }, 5000);
+
+    fetch(API_URL, { signal: controller.signal })
+      .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function (data) {
+        clearTimeout(timeout);
+        if (Array.isArray(data) && data.length > 0) {
+          imagenes = data;
+          renderThumbs();
+          showImage(0);
+        }
+      })
+      .catch(function () {
+        clearTimeout(timeout);
+        loadFallback();
+      });
+
+    function loadFallback() {
+      imagenes = [
+        { url: '/images/FB_IMG_1782701605358.jpg' },
+        { url: '/images/FB_IMG_1782701655071.jpg' },
+        { url: '/images/FB_IMG_1782701775498.jpg' },
+        { url: '/images/FB_IMG_1782701859802.jpg' },
+        { url: '/images/FB_IMG_1782701766075.jpg' },
+        { url: '/images/FB_IMG_1782701826979.jpg' },
+        { url: '/images/jano_inicio.jpg' },
+        { url: '/images/navidad_popular.jpg' },
+        { url: '/images/companeros_melon.jpg' },
+        { url: '/images/radio_libre.jpg' },
+        { url: '/images/antupeñi.jpeg' }
+      ];
+      renderThumbs();
+      showImage(0);
+    }
+
+    function renderThumbs() {
+      if (thumbLoader) thumbLoader.remove();
+      thumbCol.innerHTML = '';
+      imagenes.forEach(function (img, idx) {
+        var thumb = document.createElement('img');
+        thumb.className = 'gallery-thumb' + (idx === 0 ? ' active' : '');
+        thumb.src = img.url;
+        thumb.loading = 'lazy';
+        thumb.addEventListener('click', function () {
+          showImage(idx);
+        });
+        thumbCol.appendChild(thumb);
+      });
+    }
+
+    function showImage(idx) {
+      if (!imagenes[idx]) return;
+      currentIndex = idx;
+      viewerLoader.style.display = 'block';
+      viewerImg.style.opacity = '0';
+      if (viewerEmpty) viewerEmpty.style.display = 'none';
+
+      var img = new Image();
+      img.onload = function () {
+        viewerImg.src = imagenes[idx].url;
+        viewerImg.style.opacity = '1';
+        viewerLoader.style.display = 'none';
+      };
+      img.onerror = function () {
+        viewerImg.src = imagenes[idx].url;
+        viewerImg.style.opacity = '1';
+        viewerLoader.style.display = 'none';
+      };
+      img.src = imagenes[idx].url;
+
+      // Update thumb active state
+      var thumbs = thumbCol.querySelectorAll('.gallery-thumb');
+      thumbs.forEach(function (t, i) {
+        t.classList.toggle('active', i === idx);
+        if (i === idx) t.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    }
+
+    // ─── Lightbox ───
+    function openLightbox(idx) {
+      currentIndex = idx;
+      mostrarLb(idx);
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarLb() {
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function mostrarLb(idx) {
+      if (!imagenes[idx]) return;
+      lbLoader.style.display = 'block';
+      lbImg.style.opacity = '0';
+      var img = new Image();
+      img.onload = function () {
+        lbImg.src = imagenes[idx].url;
+        lbImg.style.opacity = '1';
+        lbLoader.style.display = 'none';
+      };
+      img.onerror = function () {
+        lbImg.src = imagenes[idx].url;
+        lbImg.style.opacity = '1';
+        lbLoader.style.display = 'none';
+      };
+      img.src = imagenes[idx].url;
+    }
+
+    function prevLb() {
+      currentIndex = (currentIndex - 1 + imagenes.length) % imagenes.length;
+      mostrarLb(currentIndex);
+    }
+
+    function nextLb() {
+      currentIndex = (currentIndex + 1) % imagenes.length;
+      mostrarLb(currentIndex);
+    }
+
+    // Click main image → open lightbox
+    viewerImg.addEventListener('click', function () {
+      if (imagenes.length > 0) openLightbox(currentIndex);
+    });
+
+    // ─── Viewer arrow navigation ───
+    document.getElementById('viewer-prev').addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (imagenes.length === 0) return;
+      currentIndex = (currentIndex - 1 + imagenes.length) % imagenes.length;
+      showImage(currentIndex);
+    });
+    document.getElementById('viewer-next').addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (imagenes.length === 0) return;
+      currentIndex = (currentIndex + 1) % imagenes.length;
+      showImage(currentIndex);
+    });
+
+    // ─── Lightbox events ───
+    lbClose.addEventListener('click', cerrarLb);
+    lb.addEventListener('click', function (e) { if (e.target === lb) cerrarLb(); });
+    lbPrev.addEventListener('click', function (e) { e.stopPropagation(); prevLb(); });
+    lbNext.addEventListener('click', function (e) { e.stopPropagation(); nextLb(); });
+
+    document.addEventListener('keydown', function (e) {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') cerrarLb();
+      if (e.key === 'ArrowLeft') prevLb();
+      if (e.key === 'ArrowRight') nextLb();
+    });
+
+    // ─── Touch support ───
+    var touchStartX = 0;
+    lb.addEventListener('touchstart', function (e) {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    lb.addEventListener('touchend', function (e) {
+      var diff = touchStartX - e.changedTouches[0].screenX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) nextLb(); else prevLb();
+      }
+    }, { passive: true });
+
+  })();
+  </script>
+  <script src="/app.js"></script>
+</body>
+</html>
