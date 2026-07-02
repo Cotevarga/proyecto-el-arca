@@ -640,6 +640,7 @@ app.get('/relatos/jano', (_req, res) => res.sendFile(path.join(__dirname, '../fr
 app.get('/relatos/arca', (_req, res) => res.sendFile(path.join(__dirname, '../frontend/relatos/arca.html')));
 app.get('/relatos/organizaciones', (_req, res) => res.sendFile(path.join(__dirname, '../frontend/relatos/organizaciones.html')));
 app.get('/relatos/anecdotas', (_req, res) => res.sendFile(path.join(__dirname, '../frontend/relatos/anecdotas.html')));
+app.get('/relatos/jano-arca', (_req, res) => res.sendFile(path.join(__dirname, '../frontend/relatos/jano-arca.html')));
 
 // ─── Catch-all ───────────────────────────────────────────────
 app.get(/.*/, (_req, res) => res.sendFile(path.join(__dirname, '../frontend/index.html')));
