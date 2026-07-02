@@ -6,8 +6,8 @@
     { "src": "frontend/images/*", "use": "@vercel/static" },
     { "src": "frontend/musica/*", "use": "@vercel/static" }
   ],
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "backend/server.js" },
-    { "source": "/(.*)", "destination": "frontend/$1" }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "backend/server.js" },
+    { "src": "/(.*)", "dest": "frontend/$1" }
   ]
 }
