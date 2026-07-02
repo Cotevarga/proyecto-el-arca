@@ -102,7 +102,7 @@
     if (!document.getElementById('arca-heartbeat-style')) {
       var style = document.createElement('style');
       style.id = 'arca-heartbeat-style';
-      style.textContent = '@keyframes arcaHeartbeat { 0%,100%{opacity:0.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.08)} } .arca-heartbeat{animation:arcaHeartbeat 2s ease-in-out infinite;display:inline-block}';
+      style.textContent = '@keyframes arcaHeartbeat { 0%,100%{opacity:0.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.08)} } .arca-heartbeat{animation:arcaHeartbeat 2s ease-in-out infinite;display:inline-block} #arca-track-info{color:#ffffff;font-weight:800;text-shadow:0 0 10px #ff0000,0 0 20px #ff0000;letter-spacing:1px}';
       document.head.appendChild(style);
     }
 

@@ -134,46 +134,57 @@
       </div>
     </header>
 
-    <!-- ===== LEGADO ===== -->
+    <!-- ===== EL LEGADO QUE NOS MUEVE ===== -->
     <section id="legado" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
       <div class="max-w-6xl mx-auto px-4">
         <span class="text-mir font-bold text-xs tracking-widest uppercase">La Mística de la Lucha</span>
         <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">El Legado que Nos Mueve</h2>
         <div class="divider-mir"></div>
 
-        <!-- Víctor Jara: texto izquierda, foto derecha -->
-        <div class="flex flex-col md:flex-row items-center gap-8 mt-12 mx-auto max-w-4xl">
-          <div class="flex-1 text-center md:text-left">
+        <div class="flex flex-col md:flex-row gap-10 mt-12 items-stretch">
+          <div class="flex-1 flex flex-col">
             <p class="text-white/80 text-lg leading-relaxed">
-              "La cultura no es algo que se adquiere, es algo que se crea. Y se crea en la lucha, en el trabajo, en la vida misma."
+              "Ese es el mandato que nos dejaron: continuar la lucha, resistir en el territorio, y retomar con urgencia el trabajo de masas con nuestras infancias, porque allí está la semilla de la dignidad. No hay camino más corto hacia la liberación que el que se construye hombro con hombro, codo con codo, amando al pueblo como se ama la vida misma."
             </p>
-            <p class="text-white/50 text-sm mt-4 italic">Víctor Jara — Cantautor Chileno torturado y asesinado en la dictadura de Pinochet.</p>
+            <a href="/legado.html" class="btn-mir inline-block self-start mt-6">VER MÁS</a>
           </div>
-          <div class="flex-shrink-0">
-            <img src="images/victor.jpeg" alt="Víctor Jara" class="w-[300px] h-auto border border-[rgba(229,9,20,0.4)]">
+          <div class="md:w-[400px] flex-shrink-0 border-2 border-[var(--color-mir)] p-5 flex flex-col items-center">
+            <img src="images/victor.jpeg" alt="Víctor Jara" class="w-[350px] h-auto">
+            <p class="text-white/60 text-sm mt-4 text-center leading-relaxed">
+              Víctor Jara — Cantautor Chileno torturado y asesinado en la dictadura de Pinochet.
+            </p>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- Che Guevara: foto centrada, texto abajo -->
-        <div class="flex flex-col items-center gap-6 mt-16 mx-auto max-w-4xl">
-          <img src="images/che.jpg" alt="Che Guevara" class="w-[300px] h-auto border border-[rgba(229,9,20,0.4)]">
-          <p class="text-white/70 text-center text-lg max-w-xl leading-relaxed">
-            "Un revolucionario verdadero es guiado por grandes sentimientos de amor."<br>
-            <span class="text-white/50 text-base">— Ernesto "Che" Guevara</span>
-          </p>
-        </div>
+    <!-- ===== MÍSTICA DE LA LUCHA ===== -->
+    <section id="mistica" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
+      <div class="max-w-6xl mx-auto px-4">
+        <span class="text-mir font-bold text-xs tracking-widest uppercase">Iconos</span>
+        <h2 class="heading-mir text-4xl md:text-6xl mt-2 mb-4">Mística de la Lucha</h2>
+        <div class="divider-mir"></div>
 
-        <!-- Botón PLAY -->
-        <div class="text-center mt-12">
-          <button id="arca-play-big" class="btn-mir text-lg px-8 py-4" style="text-shadow: 0 0 10px #ff0000; color: #ffffff; font-weight: bold;">
-            Mejora tu Experiencia — PLAY
-          </button>
-        </div>
-
-        <!-- Grid relatos y galería -->
-        <div class="grid md:grid-cols-2 gap-8 mt-16 max-w-4xl mx-auto">
-          <a href="/galeria.html" class="btn-mir text-center">VER GALERÍA HISTÓRICA</a>
-          <a href="/relatos.html" class="btn-mir text-center">RELATOS</a>
+        <div class="grid md:grid-cols-2 gap-8 mt-12">
+          <div class="flex flex-col">
+            <div class="border-2 border-[var(--color-mir)] p-5 flex flex-col items-center">
+              <img src="images/che.jpg" alt="Che Guevara" class="w-full h-auto">
+              <p class="text-white/70 text-center text-base mt-4 leading-relaxed">
+                "Un revolucionario verdadero es guiado por grandes sentimientos de amor."<br>
+                <span class="text-white/50">— Ernesto "Che" Guevara</span>
+              </p>
+            </div>
+            <a href="/galeria.html" class="btn-mir text-center mt-4">VER GALERÍA HISTÓRICA</a>
+          </div>
+          <div class="flex flex-col">
+            <div class="border-2 border-[var(--color-mir)] p-5 flex flex-col items-center">
+              <img src="images/FB_IMG_1782701826979.jpg" alt="Actividad de El Arca" class="w-full h-auto">
+              <p class="text-white/60 text-center text-sm mt-4 leading-relaxed">
+                La música, el arte, la comunicación: cada actividad era una semilla plantada en tierra fértil. De aquellos niños, algunos hoy son dirigentes sociales, comunicadores, educadores populares. La siembra dio frutos.
+              </p>
+            </div>
+            <a href="/relatos.html" class="btn-mir text-center mt-4">RELATOS</a>
+          </div>
         </div>
       </div>
     </section>
@@ -315,13 +326,6 @@
     });
   </script>
 
-  <script>
-    document.addEventListener('click', function (e) {
-      if (e.target.id === 'arca-play-big' && window.__arcaPlayer) {
-        window.__arcaPlayer.toggle();
-      }
-    });
-  </script>
   <script src="/app.js"></script>
 </body>
 </html>
