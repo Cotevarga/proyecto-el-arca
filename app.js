@@ -21,9 +21,10 @@ window.API_BASE = '';
   // ─── Estilos persistentes para SPA ───
   var persistentStyles = document.createElement('style');
   persistentStyles.textContent =
-    'h1, h2, h3 { text-align: center !important; } ' +
-    'footer { text-align: center !important; } ' +
-    'p, article, .texto-justificado { text-align: justify !important; }';
+    'h1, h2, h3, h4, h5, h6, footer, p { text-align: center !important; } ' +
+    '.card-mir p, article p { text-align: justify !important; } ' +
+    '#legado .text-mir, #mistica .text-mir, #comunicacion .text-mir { text-align: left !important; } ' +
+    '#legado h2, #mistica h2, #comunicacion h2 { text-align: left !important; }';
   persistentStyles.id = 'arca-persistent-styles';
   document.head.appendChild(persistentStyles);
 
