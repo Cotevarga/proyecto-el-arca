@@ -63,6 +63,18 @@ CREATE TABLE IF NOT EXISTS public.galeria (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- ─── Tabla de auditoría de rechazos ───
+CREATE TABLE IF NOT EXISTS public.rechazos (
+    id BIGSERIAL PRIMARY KEY,
+    recuerdo_id BIGINT,
+    razon VARCHAR(255) NOT NULL,
+    detalle TEXT,
+    revisado_por VARCHAR(255),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_rechazos_created_at ON public.rechazos(created_at DESC);
+
 -- ─── INDEXES ───
 CREATE INDEX IF NOT EXISTS idx_recuerdos_aprobado ON public.recuerdos(aprobado);
 CREATE INDEX IF NOT EXISTS idx_recuerdos_seccion ON public.recuerdos(seccion);
@@ -148,6 +160,17 @@ CREATE POLICY "musica_update_admin_policy" ON public.musica_reproductor
 DROP POLICY IF EXISTS "musica_delete_admin_policy" ON public.musica_reproductor;
 CREATE POLICY "musica_delete_admin_policy" ON public.musica_reproductor
     FOR DELETE USING (auth.role() = 'authenticated');
+
+-- ─── rechazos ───
+ALTER TABLE public.rechazos ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "rechazos_insert_admin_policy" ON public.rechazos;
+CREATE POLICY "rechazos_insert_admin_policy" ON public.rechazos
+    FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "rechazos_select_admin_policy" ON public.rechazos;
+CREATE POLICY "rechazos_select_admin_policy" ON public.rechazos
+    FOR SELECT USING (auth.role() = 'authenticated');
 
 -- ─── galeria ───
 ALTER TABLE public.galeria ENABLE ROW LEVEL SECURITY;

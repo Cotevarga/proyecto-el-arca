@@ -1,184 +1,188 @@
 # Informe de Proyecto: Archivo Comunitario "El Arca"
 
----
-
-## 1. Resumen Ejecutivo
-
-**Nombre del Proyecto:** Archivo Comunitario "El Arca" — Memoria Viva de la Población Francisco de Goya
-
-**Misión:** Salvaguardar, digitalizar y poner en valor la memoria colectiva de la Población Francisco de Goya (Paradero 30½ de Santa Rosa, La Pintana, Región Metropolitana) mediante un archivo digital comunitario, participativo y curatorialmente supervisado.
-
-**Visión a 20 años:** Consolidar un acervo digital autosustentable con más de 10.000 registros (fotografías, relatos orales escritos, audios y videos) que sirva como fuente primaria para investigaciones históricas, proyectos educativos y procesos de recuperación de identidad territorial.
-
-**Público objetivo:** Vecinos y ex-vecinos de la Población Francisco de Goya, investigadores de memoria social, estudiantes de educación básica y media de La Pintana, y organizaciones culturales comunitarias.
-
-**Postulación a:** Fondos de Cultura (FNDR 8% Cultura / Fondart Regional / Programa de Apoyo a Organizaciones Culturales Colaboradoras) y fondos internacionales de memoria histórica (UNESCO Memory of the World / National Endowment for the Humanities).
+**Memoria Viva de la Población Francisco de Goya — La Pintana, Región Metropolitana, Chile**
 
 ---
 
-## 2. Taxonomía del Archivo
+## a) El Problema: Riesgo de Pérdida de Memoria Inmaterial Local en la Era Digital
 
-El archivo se organiza en seis categorías (secciones) que reflejan la estructura narrativa de la memoria territorial:
+La Población Francisco de Goya (Paradero 30½ de Santa Rosa, La Pintana) es un territorio de fuerte organización comunitaria que, desde la década de 1980, ha sido cuna de movimientos sociales, culturales y políticos. Figuras como Pedro Jano González y organizaciones como el centro cultural "El Arca" constituyen un patrimonio inmaterial de alto valor, pero enfrentan tres amenazas críticas:
 
-| Sección | Descripción | Tipo de contenido |
-|----------|-------------|-------------------|
-| **Galería** | Imágenes históricas de la población, sus habitantes, actividades y transformación urbana. | Fotografías (JPEG) |
-| **Videos y Audios** | Registros audiovisuales y sonoros: entrevistas, testimonios, eventos comunitarios. | Video MP4 / Audio MP3 |
-| **Relatos: El Jano** | Historias y memorias en torno a la figura de Pedro Jano González, fundador y líder comunitario. | Texto, audio, fotografía |
-| **Relatos: El Arca** | Experiencias vinculadas al centro cultural "El Arca" como espacio de resistencia y creación. | Texto, audio, fotografía |
-| **Relatos: Otras organizaciones** | Memorias de agrupaciones políticas, sociales, deportivas y culturales del territorio. | Texto, audio, fotografía |
-| **El Legado** | Reflexiones, análisis y proyecciones sobre el significado patrimonial de la población. | Texto, audio, fotografía |
+1. **Envejecimiento de portadores:** Los testigos directos de la historia del territorio —dirigentes sociales, pobladores fundadores, activistas— tienen en promedio más de 65 años. Cada año que pasa sin registro sistemático, una parte irrecuperable de la memoria colectiva se pierde.
+2. **Fragmentación del archivo:** Las fotografías, documentos y registros existentes están dispersos en hogares particulares, sin condiciones de conservación adecuadas (humedad, luz solar, deterioro físico). No existe un catálogo central ni un estándar de metadatos que permita su recuperación.
+3. **Brecha digital territorial:** La Pintana es una de las comunas con menor índice de desarrollo socioeconómico del Gran Santiago. Las plataformas comerciales de archivo (Google Fotos, Facebook, Instagram) no están diseñadas para la preservación a largo plazo ni para la curaduría comunitaria, y sus términos de servicio no garantizan la soberanía de la comunidad sobre su propia memoria.
 
-### Metadatos por registro
-
-- `id`: Identificador único (BIGSERIAL)
-- `nombre`: Nombre o pseudónimo del contribuyente
-- `anio`: Año estimado del material
-- `mensaje`: Descripción breve
-- `mensaje_largo`: Relato o texto extenso
-- `url_archivo`: URL pública del archivo en Storage
-- `storage_path`: Ruta interna en el bucket
-- `tipo_archivo`: MIME type
-- `nombre_original`: Nombre del archivo al momento de la subida
-- `tamanio_bytes`: Tamaño en bytes
-- `seccion`: Clasificación taxonómica
-- `aprobado`: Estado del flujo curatorial
-- `created_at`: Timestamp de ingreso
-- `geolocalizacion`: Ubicación geográfica del contenido (opcional)
-- `tags`: Arreglo de etiquetas para búsqueda facetada (text[])
-- `fecha_creacion_archivo`: Fecha original del material (date, opcional)
-- `hash_sha256`: Hash SHA-256 del archivo para verificación de integridad
+**Sin intervención, en menos de 10 años habremos perdido la mayor parte de la memoria viva de este territorio.**
 
 ---
 
-## 3. Infraestructura Tecnológica
+## b) La Solución: Modelo Híbrido Participativo + Curatorial
 
-### Arquitectura actual
+"El Arca" implementa un **Sistema de Gestión Patrimonial** que combina la apertura participativa con la supervisión curatorial profesional:
+
+### Arquitectura del sistema
 
 ```
-[Usuario] → Navegador Web → HTML/CSS/JS (Frontend estático)
-                              ↓
-                         Supabase (Backend as a Service)
-                              ↓
-                    ┌─────────┴─────────┐
-                    ▼                   ▼
-             PostgreSQL (datos)    Storage S3 (archivos)
+[Comunidad] → Formulario público (subida abierta, sin registro)
+           → Inserción en base de datos con estado "pendiente"
+           → Notificación Realtime al panel de curaduría
+           → Curador revisa, edita metadatos, aprueba o rechaza
+           → Si aprueba: publicación automática con licencia CC BY-NC-SA 4.0
+           → Si rechaza: registro de auditoría con causal documentada
 ```
 
-### Componentes
+### Componentes del modelo
 
-| Componente | Tecnología | Función |
-|------------|-----------|---------|
-| Frontend | HTML5 + Tailwind CSS + JavaScript vanilla | Interfaz de usuario SPA (Single Page Application) |
-| Backend | Supabase (PostgreSQL + REST API + Realtime) | Lógica de negocio, autenticación, base de datos |
-| Storage | Supabase Storage (S3-compatible) | Almacenamiento de archivos multimedia |
-| Autenticación | Supabase Auth (JWT) | Acceso al panel de administración |
-| Realtime | Supabase Realtime (WebSockets) | Sincronización en vivo de cola de pendientes y reproductor musical |
-| Hosting | Servidor estático (Apache/Nginx/GitHub Pages) | Entrega del frontend |
+| Dimensión | Mecanismo |
+|-----------|-----------|
+| **Participación** | Formulario público anónimo. Sin registro. Sin costo. Sin intermediarios. |
+| **Curaduría** | Panel de administración con flujo de aprobación/rechazo, edición de metadatos, selección de taxonomía. |
+| **Licenciamiento** | CC BY-NC-SA 4.0 obligatorio. Checkbox de autorización legal. Atribución protegida. |
+| **Preservación** | Supabase Storage + backups externos + hash SHA-256 por archivo. |
+| **Acceso** | Frontend web gratuito, sin autenticación para lectura. SPA con navegación por secciones. |
+| **Trazabilidad** | Cada decisión curatorial queda registrada en tabla `rechazos` con razón, detalle y responsable. |
 
-### Especificaciones técnicas de la base de datos
+### Innovación del modelo
 
-- Motor: PostgreSQL 15+
-- Tablas principales: `recuerdos` (acervo documental), `musica_reproductor` (parrilla musical), `galeria` (galería de imágenes), `admin_users` (administradores)
-- Row Level Security (RLS) activo para todas las tablas
-- Índices en columnas de búsqueda frecuente: `aprobado`, `seccion`, `created_at`
+A diferencia de plataformas comerciales (Google Fotos, Flickr) o repositorios institucionales cerrados, "El Arca" ofrece:
 
-### Escalabilidad
-
-- Supabase escala horizontalmente de forma automática (hasta 500 conexiones simultáneas en el plan gratuito, escalable a planes superiores).
-- El frontend estático puede servirse desde un CDN global sin límite de usuarios concurrentes.
-- El Storage de Supabase acepta hasta 100 GB por proyecto en plan gratuito, con capacidad de expansión mediante planes de pago.
+- **Soberanía comunitaria:** Los datos pertenecen a la comunidad, no a una corporación.
+- **Código abierto:** Cualquier comunidad puede replicar el software (ver `CONTRIBUTING.md`).
+- **Costo casi cero:** Opera con el nivel gratuito de Supabase + hosting estático.
+- **Sin publicidad ni extracción de datos:** No se monetiza la memoria.
 
 ---
 
-## 4. Sostenibilidad
+## c) Indicadores de Impacto (KPIs)
 
-### Modelo de participación ciudadana (Crowdsourcing curado)
+### Línea base (Julio 2026)
 
-El Archivo opera bajo un modelo híbrido que combina la apertura participativa con la supervisión curatorial:
+| Indicador | Valor actual | Meta 12 meses | Meta 5 años |
+|-----------|-------------|---------------|-------------|
+| Recuerdos totales en base de datos | — | 500+ | 5.000+ |
+| Recuerdos aprobados y publicados | — | 350+ | 3.500+ |
+| Tasa de aprobación | — | > 70% | > 75% |
+| Participantes únicos (nombres distintos) | — | 100+ | 500+ |
+| Volumen de archivo preservado | — | 5+ GB | 50+ GB |
+| Etiquetas (tags) aplicadas | — | 50+ categorías | 200+ |
+| Cobertura geográfica (ubicaciones) | — | 10+ puntos | 50+ puntos |
+| Visitas al sitio | — | 5.000+ | 50.000+ |
+| Comunidades reutilizando el software | — | 1 | 5+ |
 
-1. **Apertura total:** Cualquier persona puede contribuir fotografías, audios, videos o relatos sin costo ni registro previo (solo requiere nombre o pseudónimo).
-2. **Curaduría responsable:** Cada contribución pasa por una revisión del administrador antes de ser publicada. Este proceso garantiza:
-   - Pertinencia histórica y coherencia con la misión del archivo.
-   - Calidad técnica mínima del material.
-   - Cumplimiento de la licencia CC BY-NC-SA 4.0.
-   - Respeto a derechos de autor y privacidad.
-3. **Transparencia:** El estado de cada contribución (pendiente / publicada) es visible de forma inmediata para el administrador mediante el panel en tiempo real.
+### Método de medición
 
-### Flujo de contribución
-
-```
-Usuario → Completa formulario (nombre + archivo + relato + autorización legal)
-       → Inserción en `recuerdos` con `aprobado = false`
-       → Notificación Realtime al panel de administración
-       → Administrador revisa, edita texto y aprueba o rechaza
-       → Si aprueba: `aprobado = true`, el contenido se vuelve visible en el sitio
-       → Si rechaza: el registro se elimina de la BD y del Storage
-```
-
-### Indicadores de medición de impacto
-
-| Indicador | Cómo se mide | Meta a 5 años |
-|-----------|-------------|----------------|
-| Recuerdos totales | Conteo de registros en `recuerdos` | 5.000+ |
-| Tasa de aprobación | (aprobados / total) × 100 | > 70% |
-| Participantes únicos | Conteo de valores distintos en `nombre` | 500+ |
-| Visitas al sitio | Google Analytics / contador | 50.000+ |
-| Descargas de archivos | Logs de Storage | 10.000+ |
-| Sesiones del administrador | Logs de autenticación | Semanal |
+- Todos los KPIs se calculan automáticamente desde la base de datos PostgreSQL mediante consultas SQL.
+- El dashboard de administración (`admin.html`) muestra en tiempo real: total de recuerdos, vecinos participantes únicos (distinct normalizado) y GB preservados.
+- La tabla `rechazos` permite auditar la tasa y causales de rechazo.
+- El plan de gestión (`plan-gestion.html`) documenta la estrategia de monitoreo continuo.
 
 ---
 
-## 5. Impacto Social
+## d) Plan de Sostenibilidad a Largo Plazo (2026–2046)
 
-### Dimensión territorial
+### Infraestructura
 
-La Población Francisco de Goya es un sector históricamente postergado de La Pintana, una de las comunas con menor índice de desarrollo socioeconómico del Gran Santiago. La memoria de sus organizaciones comunitarias —especialmente "El Arca" como centro cultural y político— constituye un patrimonio inmaterial en riesgo de desaparición por el envejecimiento de sus portadores originales y la falta de registro sistemático.
+| Recurso | Proveedor actual | Costo | Plan de continuidad |
+|---------|------------------|-------|---------------------|
+| Base de datos | Supabase PostgreSQL | Gratuito (500 MB) | Migración a plan escalable ($25/mes) si se supera el límite |
+| Almacenamiento | Supabase Storage (S3) | Gratuito (1 GB) | Migración a Backblaze B2 ($0.006/GB/mes) + Cloudflare |
+| Hosting frontend | Apache/GitHub Pages | Gratuito | Sin cambios previstos |
+| Backups diarios | Supabase automático | Incluido | Exportación mensual a Google Drive + disco externo cifrado |
+| Backups semestrales | Amazon S3 Glacier | ~$1/mes por 10 GB | Aumento de capacidad según crecimiento |
 
-### Beneficios esperados
+### Migración de formatos
 
-1. **Identidad y pertenencia:** Fortalecer el vínculo de las nuevas generaciones con la historia local, contrarrestando el desarraigo y la estigmatización territorial.
-2. **Investigación y educación:** Proveer fuentes primarias accesibles para investigadores y establecimientos educacionales de la comuna.
-3. **Reparación simbólica:** Visibilizar las luchas y resistencias populares que han sido sistemáticamente excluidas de la historia oficial.
-4. **Transferencia intergeneracional:** Facilitar el diálogo entre portadores de memoria (adultos mayores) y jóvenes mediante plataformas digitales accesibles.
-5. **Modelo replicable:** Documentar la metodología de archivo comunitario para que otras poblaciones y organizaciones territoriales puedan adoptarla.
+| Formato actual | Riesgo de obsolescencia | Plan de migración |
+|----------------|------------------------|-------------------|
+| JPEG | Bajo a 10 años | Convertir a JPEG XL si el estándar se consolida |
+| MP3 | Medio a 15 años | Migrar a Opus/AAC con script automatizado |
+| MP4 (H.264) | Medio a 10 años | Migrar a AV1 si el soporte en navegadores se generaliza |
+| Texto plano (HTML) | Sin riesgo | No requiere migración |
 
-### Sostenibilidad económica
+### Rol curatorial
 
-- Sin fines de lucro. El Archivo opera con costos mínimos de infraestructura (hosting + Supabase).
-- Postulación a fondos concursables estatales e internacionales para cubrir costos operativos, digitalización de material físico y contratación de un curador dedicado.
-- Convenios con universidades (prácticas profesionales en archivística digital) y liceos de la comuna.
+El proyecto requiere un curador dedicado con las siguientes responsabilidades:
+- Revisión y aprobación de contribuciones (estimado: 2 horas/semana por cada 100 contribuciones).
+- Digitalización de material físico (escaneo, grabación de testimonios).
+- Mantenimiento de infraestructura técnica.
+- Postulación a fondos concursables.
+- Capacitación de nuevos administradores.
+
+### Presupuesto operativo anual estimado
+
+| Ítem | Costo actual | Costo con crecimiento |
+|------|-------------|----------------------|
+| Supabase Pro | $0 | $300/año |
+| Storage adicional | $0 | $120/año |
+| Dominio | $0 (subdominio) | $15/año |
+| Backups externos | $0 (Google Drive) | $60/año (S3 Glacier) |
+| Digitalización | $0 (equipo propio) | $500/año (escáner + micrófono) |
+| **Total** | **~$0** | **~$995/año** |
 
 ---
 
-## 6. Cumplimiento Legal y Ético
+## e) Gobernanza: Protocolo de Curaduría
 
-- **Licencia:** Creative Commons Reconocimiento-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0).
-- **Términos y Condiciones:** Publicados en `/terminos.html`, incluyen cláusulas de propiedad intelectual del usuario, uso legítimo, responsabilidad del administrador y protección de datos (Ley 19.628).
-- **Permisos:** Cada contribuyente autoriza expresamente el resguardo, digitalización y publicación de su aporte mediante un checkbox obligatorio en el formulario de subida.
-- **Privacidad:** No se solicitan datos sensibles. El nombre es un campo libre donde el usuario puede usar un pseudónimo.
+### ¿Quién decide qué se archiva?
+
+La decisión final de aprobación o rechazo recae en él o la **Administradora del Archivo**, rol actualmente ejercido por María José Vargas. Las decisiones se rigen por el siguiente protocolo documentado:
+
+### Criterios de aprobación
+
+Un recuerdo es aprobado si cumple **todos** estos criterios:
+
+1. **Pertinencia territorial:** El contenido está directamente relacionado con la Población Francisco de Goya, sus habitantes, organizaciones o historia.
+2. **Valor patrimonial:** Aporta información única sobre la memoria colectiva del territorio (no es duplicado ni trivial).
+3. **Calidad técnica mínima:** La imagen/audio/video es legible o audible. No se requiere calidad profesional.
+4. **Autorización legal:** El checkbox de aceptación de términos está marcado.
+5. **No ofensivo:** El contenido no promueve discursos de odio, violencia explícita ni viola derechos de terceros.
+
+### Criterios de rechazo
+
+| Causal | Ejemplo | Acción |
+|--------|---------|--------|
+| Falta de valor patrimonial | Foto genérica sin contexto territorial | Rechazo + registro en log |
+| Contenido ofensivo | Discurso de odio, violencia gráfica | Rechazo + registro en log |
+| Calidad técnica insuficiente | Imagen ilegible, audio sin contenido | Rechazo + registro en log |
+| Otro | Error en la subida, duplicado | Rechazo + registro en log |
+
+### Transparencia
+
+- Cada rechazo queda registrado en la tabla `rechazos` con: `recuerdo_id`, `razón`, `detalle` opcional, `revisado_por` y `timestamp`.
+- No existe obligación de notificar al contribuyente, aunque el administrador puede hacerlo a su criterio.
+- El protocolo de curaduría se revisa anualmente y se actualiza en este documento.
+
+### Principios rectores
+
+1. **No censura ideológica:** No se rechazarán contenidos por su posición política, social o religiosa.
+2. **Pluralidad:** El archivo busca representar la diversidad de voces del territorio, no una narrativa única.
+3. **Preservación del sentido:** El curador puede editar ortografía o claridad del texto, pero no alterar el significado ni el contexto del relato original.
+4. **Reversibilidad:** Un recuerdo aprobado puede ser retirado posteriormente si se descubre que infringe derechos de terceros o si el contribuyente lo solicita formalmente.
 
 ---
 
-## 7. Plan de Implementación (Próximos 12 Meses)
+## Ficha del proyecto
 
-| Mes | Hito |
-|-----|------|
-| 1–2 | Campaña de difusión comunitaria (volantes, redes sociales, reuniones con juntas de vecinos) |
-| 3–4 | Jornadas de digitalización: escaneo de fotografía impresa y grabación de testimonios orales |
-| 5–6 | Carga masiva de material digitalizado al archivo |
-| 7–8 | Evaluación de impacto temprana y ajustes al flujo curatorial |
-| 9–10 | Postulación a fondos concursables (Fondart Regional / FNDR 8% Cultura) |
-| 11–12 | Publicación de informe de resultados y planificación del año 2 |
+| Campo | Valor |
+|-------|-------|
+| **Nombre** | Archivo Comunitario "El Arca" |
+| **Territorio** | Población Francisco de Goya, La Pintana, Región Metropolitana, Chile |
+| **Misión** | Salvaguardar, digitalizar y poner en valor la memoria colectiva del territorio |
+| **Visión** | 10.000+ registros digitales para 2046, accesibles globalmente |
+| **Público** | Vecinos, investigadores, estudiantes, organizaciones culturales |
+| **Tecnología** | Supabase (PostgreSQL + Storage + Realtime) + Frontend HTML/CSS/JS |
+| **Licencia** | MIT (software) / CC BY-NC-SA 4.0 (contenido) |
+| **Postulación a** | Fondart Regional, FNDR 8% Cultura, UNESCO Memory of the World, National Endowment for the Humanities, Europa Creativa |
 
 ---
 
-## 8. Contacto
+## Contacto
 
 - **Correo electrónico:** contacto@elarca.cl
-- **Sitio web:** https://elarca.cl (o dominio actual de publicación)
+- **Sitio web:** https://elarca.cl
+- **Repositorio:** https://github.com/elarca/archivo
 - **Administradora:** María José Vargas
 
 ---
 
-*Documento generado en Julio 2026. Este informe sigue la estructura estándar de postulación a Fondos de Cultura del Ministerio de las Culturas, las Artes y el Patrimonio de Chile.*
+*Documento generado en Julio 2026 · Versión 3.0 — Estructura alineada con estándares UNESCO Memory of the World y Europa Creativa.*

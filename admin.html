@@ -746,7 +746,7 @@
               <form id="admin-upload-form">
                 <div class="form-group">
                   <label>Sección / Subsección</label>
-                  <select id="admin-upload-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+                  <select id="admin-upload-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" aria-label="Seleccionar sección del archivo">
                     <option value="galeria">Galería</option>
                     <option value="videos">Videos y Audios</option>
                     <option value="relatos_jano">Relatos: El Jano</option>
@@ -807,7 +807,7 @@
       <p style="font-size:12px;color:#888;margin:0 0 20px 0;">Asigna una categoría y edita el texto antes de publicar.</p>
       <div class="form-group">
         <label>Sección / Categoría</label>
-        <select id="approval-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+        <select id="approval-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" aria-label="Seleccionar sección del archivo">
           <option value="galeria">Galería</option>
           <option value="videos">Videos y Audios</option>
           <option value="relatos_jano">Relatos: El Jano</option>
@@ -834,6 +834,31 @@
       <div id="review-text" style="font-size:14px;color:#ccc;line-height:1.7;white-space:pre-wrap;word-break:break-word;"></div>
       <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
         <button class="btn-secondary" id="btn-review-close" aria-label="Cerrar ventana de revisión detallada">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Rejection Modal ─── -->
+  <div id="rejection-modal" style="display:none;position:fixed;z-index:99997;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
+    <div style="background:#121212;border:1px solid rgba(229,9,20,0.2);border-radius:16px;padding:32px;max-width:480px;width:90%;">
+      <h3 style="font-size:18px;font-weight:700;color:white;margin:0 0 4px 0;">Eliminar recuerdo</h3>
+      <p style="font-size:12px;color:#888;margin:0 0 20px 0;">Esta acción es irreversible. Selecciona el motivo del rechazo para el registro de auditoría.</p>
+      <div class="form-group">
+        <label>Razón del Rechazo</label>
+        <select id="rejection-razon" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" aria-label="Seleccionar motivo de rechazo">
+          <option value="Falta de valor patrimonial">Falta de valor patrimonial</option>
+          <option value="Contenido ofensivo">Contenido ofensivo</option>
+          <option value="Calidad técnica insuficiente">Calidad técnica insuficiente</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Detalle (opcional)</label>
+        <textarea id="rejection-detalle" rows="3" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Comentarios adicionales..." aria-label="Detalle opcional sobre el rechazo"></textarea>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
+        <button class="btn-secondary" id="btn-rejection-cancel" aria-label="Cancelar y volver">Cancelar</button>
+        <button class="btn-primary" id="btn-rejection-confirm" style="background:#c50812;" aria-label="Confirmar eliminación del recuerdo">✕ ELIMINAR</button>
       </div>
     </div>
   </div>
@@ -1559,22 +1584,78 @@
       });
     }
 
-    window.rejectRecuerdo = async function(id) {
-      if (!confirm('¿Eliminar este recuerdo permanentemente?')) return;
-      try {
-        var s = getSupabaseClient();
-        if (!s) throw new Error('Cliente Supabase no disponible');
-        var { error } = await s.from('recuerdos').delete().eq('id', id);
-        if (error) throw error;
-        showToast('Recuerdo eliminado', 'info');
-        loadPending();
-        loadApproved();
-        loadDashboard();
-      } catch (err) {
-        console.error('[Rechazar] Error:', err);
-        if (err.message !== 'Sesión expirada') showToast('Error al eliminar', 'error');
-      }
+    // ─── Modal de rechazo ───
+    var _rejectionTargetId = null;
+    var rejectionModal = document.getElementById('rejection-modal');
+    var rejectionRazon = document.getElementById('rejection-razon');
+    var rejectionDetalle = document.getElementById('rejection-detalle');
+    var btnRejectionCancel = document.getElementById('btn-rejection-cancel');
+    var btnRejectionConfirm = document.getElementById('btn-rejection-confirm');
+
+    window.rejectRecuerdo = function(id) {
+      _rejectionTargetId = id;
+      if (rejectionModal) rejectionModal.style.display = 'flex';
     };
+
+    function closeRejectionModal() {
+      _rejectionTargetId = null;
+      if (rejectionModal) rejectionModal.style.display = 'none';
+    }
+
+    if (btnRejectionCancel) btnRejectionCancel.addEventListener('click', closeRejectionModal);
+
+    if (rejectionModal) {
+      rejectionModal.addEventListener('click', function (e) {
+        if (e.target === rejectionModal) closeRejectionModal();
+      });
+    }
+
+    if (btnRejectionConfirm) {
+      btnRejectionConfirm.addEventListener('click', async function () {
+        var id = _rejectionTargetId;
+        if (!id) { closeRejectionModal(); return; }
+
+        var razon = rejectionRazon ? rejectionRazon.value : 'Otro';
+        var detalle = rejectionDetalle ? rejectionDetalle.value.trim() : '';
+
+        btnRejectionConfirm.textContent = 'Eliminando...';
+        btnRejectionConfirm.disabled = true;
+
+        try {
+          var s = getSupabaseClient();
+          if (!s) throw new Error('Cliente Supabase no disponible');
+
+          // Registrar en log de auditoría
+          var { error: logError } = await s
+            .from('rechazos')
+            .insert({
+              recuerdo_id: Number(id),
+              razon: razon,
+              detalle: detalle || null,
+              revisado_por: (userData && userData.email) || 'admin'
+            });
+          if (logError) console.warn('[Rechazo] No se pudo registrar log:', logError.message);
+
+          // Eliminar el registro
+          var { error: deleteError } = await s.from('recuerdos').delete().eq('id', id);
+          if (deleteError) throw deleteError;
+
+          showToast('Recuerdo eliminado (motivo: ' + razon + ')', 'info');
+          closeRejectionModal();
+          loadPending();
+          loadApproved();
+          loadDashboard();
+        } catch (err) {
+          console.error('[Rechazar] Error:', err);
+          if (err.message !== 'Sesión expirada') showToast('Error al eliminar', 'error');
+        } finally {
+          btnRejectionConfirm.textContent = '✕ ELIMINAR';
+          btnRejectionConfirm.disabled = false;
+        }
+      });
+    }
+
+    window.rejectRecuerdoDirecto = window.rejectRecuerdo;
 
     // ─── Música: Reproductor de previsualización ───
     var _musicPreviewAudio = null;
