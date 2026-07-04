@@ -17,7 +17,7 @@ Deno.serve(async (req: Request) => {
     const anio = formData.get("anio") as string ?? null;
     const mensaje = formData.get("mensaje") as string ?? null;
     const mensaje_largo = formData.get("mensaje_largo") as string ?? null;
-    const categoria = formData.get("tipo_contenido") as string || "foto";
+    const categoria = formData.get("categoria") as string || "galeria";
     const seccion = (formData.get("seccion") as string) || "general";
     const texto = formData.get("texto") as string ?? null;
 

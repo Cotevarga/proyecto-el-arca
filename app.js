@@ -21,7 +21,8 @@ window.API_BASE = '';
   // ─── Estilos persistentes para SPA ───
   var persistentStyles = document.createElement('style');
   persistentStyles.textContent =
-    'h1, h2, h3, h4, h5, h6 { text-align: center !important; } ' +
+    'h1, h2, h3 { text-align: center !important; } ' +
+    'footer { text-align: center !important; } ' +
     'p, article, .texto-justificado { text-align: justify !important; }';
   persistentStyles.id = 'arca-persistent-styles';
   document.head.appendChild(persistentStyles);
@@ -239,7 +240,7 @@ window.API_BASE = '';
     }
   };
 
-  function initGaleria() {
+  function cargarGaleria() {
     var thumbCol = document.getElementById('thumb-col');
     var thumbLoader = document.getElementById('thumb-loader');
     var viewerImg = document.getElementById('main-viewer-img');
@@ -288,22 +289,20 @@ window.API_BASE = '';
   function cambiarVista(url) {
     var targetPath = new URL(url, window.location.origin).pathname;
     if (targetPath.indexOf('galeria') !== -1) {
-      setTimeout(initGaleria, 50);
+      setTimeout(cargarGaleria, 50);
     }
     try { if (typeof gtag === 'function') gtag('config', 'G-0M3Q8DQ3QF', { 'page_path': targetPath }); } catch (e) {}
   }
 
-  window.initGaleria = initGaleria;
+  window.cargarGaleria = cargarGaleria;
   window.cambiarVista = cambiarVista;
-  // backward compatibility
-  window.cargarGaleria = initGaleria;
 
   // ─── Inicializar galería si estamos en esa página ───
   if (window.location.pathname.indexOf('galeria') !== -1) {
     var esperarSb = setInterval(function () {
       if (window._supabase) {
         clearInterval(esperarSb);
-        initGaleria();
+        cargarGaleria();
       }
     }, 100);
     setTimeout(function () { clearInterval(esperarSb); }, 8000);

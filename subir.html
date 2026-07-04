@@ -10,7 +10,8 @@
     :root { --color-mir: #E50914; --color-noche: #111111; }
     html { scroll-behavior: smooth; }
     body { font-family: 'Inter', system-ui, sans-serif; background-color: #000 !important; color: #fff !important; }
-    h1, h2, h3, h4, h5, h6 { text-align: center !important; }
+    h1, h2, h3 { text-align: center !important; }
+    footer { text-align: center !important; }
     p { text-align: justify !important; }
     .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
     .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -94,8 +95,8 @@
             <input type="number" id="anio" name="anio" min="1990" max="2026" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
           </div>
           <div>
-            <label for="tipo_contenido" class="block text-sm font-bold text-white/80 mb-1 uppercase">Tipo de contenido</label>
-            <select id="tipo_contenido" name="tipo_contenido" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
+            <label for="categoria" class="block text-sm font-bold text-white/80 mb-1 uppercase">Categoría</label>
+            <select id="categoria" name="categoria" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
               <option value="galeria">Galería</option>
               <option value="relato">Relato</option>
               <option value="entrevista">Entrevista</option>
@@ -111,7 +112,7 @@
           </div>
           <div>
             <label for="mensaje_largo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Relato o descripción completa</label>
-            <textarea id="mensaje_largo" name="mensaje_largo" rows="10" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-y" placeholder="Escribe aquí tu relato, entrevista o descripción completa..."></textarea>
+            <textarea id="mensaje_largo" name="mensaje_largo" rows="15" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-y" placeholder="Escribe aquí tu relato, entrevista o descripción completa..."></textarea>
           </div>
           <button type="submit" id="btn-enviar" class="btn-mir w-full">Subir y compartir recuerdo</button>
           <div id="form-messages" class="text-center text-sm font-medium hidden"></div>
@@ -134,7 +135,7 @@
       var API_BASE = window.API_BASE || '';
       var formArchivo = document.getElementById('form-archivo');
       if (!formArchivo) return;
-      var tipoSelect = document.getElementById('tipo_contenido');
+      var tipoSelect = document.getElementById('categoria');
       var fileInput = document.getElementById('archivo');
       var fileError = document.getElementById('file-error');
       var fileInfo = document.getElementById('file-info');
