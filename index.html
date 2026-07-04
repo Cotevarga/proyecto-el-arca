@@ -251,11 +251,11 @@
           var cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
           var { data, error } = await supabaseClient
             .from('recuerdos')
-            .select('id, titulo_relato, mensaje, mensaje_largo, url_archivo, tipo_archivo, seccion, created_at, es_efimero')
+            .select('id, titulo_relato, mensaje, mensaje_largo, url_archivo, tipo_archivo, seccion, created_at, es_efimero, fecha_subida')
             .eq('aprobado', true)
             .eq('destacado', true)
-            .or('es_efimero.is.false,and(es_efimero.is.true,created_at.gt.' + cutoff + ')')
-            .order('created_at', { ascending: false })
+            .or('es_efimero.is.false,and(es_efimero.is.true,fecha_subida.gt.' + cutoff + ')')
+            .order('fecha_subida', { ascending: false })
             .limit(6);
 
           if (error) throw error;

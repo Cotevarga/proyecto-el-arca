@@ -1036,7 +1036,11 @@
         await fn();
         mostrarToastExito('Subido correctamente');
       } catch (err) {
-        console.error('[procesarSubida]', err);
+        console.error('[procesarSubida] Error completo:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
+        console.error('[procesarSubida] Mensaje:', err.message);
+        console.error('[procesarSubida] Detalle:', err.details || '(sin detalle)');
+        console.error('[procesarSubida] Código:', err.code || '(sin código)');
+        console.error('[procesarSubida] Sugerencia:', err.hint || '(sin sugerencia)');
         mostrarToastError(err.message || 'Error desconocido');
       } finally {
         btn.textContent = textoOriginal;
@@ -1067,7 +1071,7 @@
         fecha_creacion_archivo: extraData.fecha_creacion_archivo || null
       };
 
-      console.log('[subirArchivo] Insertando registro previo:', insertData);
+      console.log('[subirArchivo] Insertando registro previo:', JSON.stringify(insertData));
 
       var { data: inserted, error: insertError } = await s
         .from('recuerdos')
@@ -1076,8 +1080,11 @@
         .single();
 
       if (insertError) {
-        console.error('[subirArchivo] Error insert:', insertError);
-        throw new Error('Error al guardar registro: ' + insertError.message);
+        console.error('[subirArchivo] Error insert detallado:', JSON.stringify(insertError, Object.getOwnPropertyNames(insertError)));
+        console.error('[subirArchivo] Código:', insertError.code);
+        console.error('[subirArchivo] Detalle:', insertError.details);
+        console.error('[subirArchivo] Sugerencia:', insertError.hint);
+        throw new Error(insertError.message + (insertError.details ? ' — ' + insertError.details : ''));
       }
 
       var recordId = inserted.id;
@@ -1126,8 +1133,8 @@
         .eq('id', recordId);
 
       if (updateError) {
-        console.error('[subirArchivo] Error update:', updateError);
-        throw new Error('Error al vincular archivo: ' + updateError.message);
+        console.error('[subirArchivo] Error update detallado:', JSON.stringify(updateError, Object.getOwnPropertyNames(updateError)));
+        throw new Error('Error al vincular archivo: ' + updateError.message + (updateError.details ? ' — ' + updateError.details : ''));
       }
 
       inserted.url_archivo = publicUrl;
@@ -1641,7 +1648,10 @@
             .update(updateData)
             .eq('id', id);
 
-          if (updateError) throw updateError;
+          if (updateError) {
+            console.error('[Aprobar] Error update:', JSON.stringify(updateError, Object.getOwnPropertyNames(updateError)));
+            throw updateError;
+          }
 
           showToast('Recuerdo aprobado y publicado en ' + (NOMBRES_SECCION[seccion] || seccion), 'success');
           closeApprovalModal();
@@ -2164,8 +2174,12 @@
             tags: extraData.tags || null,
             fecha_creacion_archivo: extraData.fecha_creacion_archivo || null
           };
+          console.log('[submit] InsertData sin archivo:', JSON.stringify(insertData));
           var { error: insertError } = await s.from('recuerdos').insert(insertData);
-          if (insertError) throw insertError;
+          if (insertError) {
+            console.error('[submit] Error insert sin archivo:', insertError);
+            throw insertError;
+          }
         }
 
         document.getElementById('admin-upload-form').reset();
