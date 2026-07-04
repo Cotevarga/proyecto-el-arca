@@ -725,13 +725,12 @@
             <div>
               <h3 class="section-title">Canciones actuales</h3>
               <div style="background:var(--color-carbono);border:1px solid rgba(229,9,20,0.12);border-radius:12px;padding:24px;">
-                <div id="music-list">
+                <div id="contenedor-canciones">
                   <div class="empty-state">
                     <div class="icon">🎶</div>
                     <div class="text">No hay canciones subidas</div>
                   </div>
                 </div>
-                <div id="contenedor-canciones" class="mt-4"></div>
               </div>
             </div>
           </div>
@@ -908,7 +907,7 @@
         sectionTitle.textContent = titles[section] || 'Dashboard';
         if (section === 'pending') loadPending();
         if (section === 'approved') loadApproved();
-        if (section === 'music') { renderizarListadoMusica(); iniciarRealtimeMusica(); }
+        if (section === 'music') { actualizarListadoMusica(); iniciarRealtimeMusica(); }
         if (section === 'dashboard') loadDashboard();
       });
     });
@@ -1310,7 +1309,7 @@
         try { s.removeChannel(_realtimeChannel); } catch(e) {}
       }
 
-      console.log('[Realtime] Suscribiendo a cambios en recuerdos y musica_reproductor...');
+      console.log('[Realtime] Suscribiendo a cambios en recuerdos...');
 
       _realtimeChannel = s.channel('db-changes')
         .on('postgres_changes',
@@ -1319,15 +1318,6 @@
             console.log('[Realtime] Cambio en recuerdos:', payload.eventType);
             refrescarContadores();
             renderRecentRecuerdos();
-          }
-        )
-        .on('postgres_changes',
-          { event: '*', schema: 'public', table: 'musica_reproductor' },
-          function(payload) {
-            console.log('[Realtime] Cambio en musica_reproductor:', payload.eventType);
-            renderizarListadoMusica();
-            refrescarContadores();
-            cargarAhoraSuena();
           }
         )
         .subscribe(function(status) {
@@ -1368,6 +1358,8 @@
           function(payload) {
             console.log('[Realtime] Cambio en musica_reproductor:', payload.eventType);
             actualizarListadoMusica();
+            refrescarContadores();
+            cargarAhoraSuena();
           }
         )
         .subscribe(function(status) {
@@ -1676,7 +1668,9 @@
       a.src = '';
     }
 
-    // ─── Canciones actuales (listado simple) ───
+    // ─── Listado único de canciones (con PLAY + ELIMINAR) ───
+    var _cancionesRenderizadas = {};
+
     async function actualizarListadoMusica() {
       try {
         var s = getSupabaseClient();
@@ -1695,12 +1689,19 @@
 
         if (canciones.length === 0) {
           contenedor.innerHTML = '<div class="empty-state" style="padding:20px 0;"><div class="icon">🎶</div><div class="text">No hay canciones subidas</div></div>';
+          _cancionesRenderizadas = {};
           return;
         }
 
+        var added = {};
         canciones.forEach(function(c) {
+          var id = String(c.id);
+          if (added[id]) return;
+          added[id] = true;
+
           var card = document.createElement('div');
           card.className = 'song-item';
+          card.dataset.id = id;
           var badgeHtml = c.activo
             ? '<span class="badge badge-approved" style="font-size:10px;margin-left:8px;">AL AIRE</span>'
             : '';
@@ -1710,52 +1711,12 @@
               '<div class="song-artist">' + escapeHtml(c.artista || 'El Arca') + '</div>' +
             '</div>' +
             '<div class="song-actions">' +
-              '<button class="btn-sm btn-sm-reject" onclick="window.eliminarCancion(\'' + c.id + '\')" aria-label="Eliminar canción ' + escapeHtml(c.titulo) + '">✕ ELIMINAR</button>' +
+              '<button class="btn-sm btn-sm-approve" onclick="window.previsualizarMusica(\'' + escapeHtml(c.url_mp3) + '\')" title="Previsualizar" aria-label="Reproducir previsualización de ' + escapeHtml(c.titulo) + '">▶ PLAY</button> ' +
+              '<button class="btn-sm btn-sm-reject" onclick="window.eliminarCancion(\'' + id + '\')" aria-label="Eliminar canción ' + escapeHtml(c.titulo) + '">✕ ELIMINAR</button>' +
             '</div>';
           contenedor.appendChild(card);
         });
-      } catch (err) {
-        if (err.message !== 'Sesión expirada') showToast('Error al cargar canciones', 'error');
-      }
-    }
-
-    // ─── Música: Listado completo con PLAY ───
-    async function renderizarListadoMusica() {
-      try {
-        var s = getSupabaseClient();
-        if (!s) return;
-        var { data, error } = await s
-          .from('musica_reproductor')
-          .select('*')
-          .order('created_at', { ascending: false });
-        if (error) throw error;
-        var canciones = data || [];
-
-        var musicList = document.getElementById('music-list');
-        if (!musicList) return;
-        if (canciones.length === 0) {
-          musicList.innerHTML = '<div class="empty-state"><div class="icon">🎶</div><div class="text">No hay canciones subidas</div></div>';
-        } else {
-          var html = '';
-          canciones.forEach(function(c) {
-            var badgeHtml = c.activo
-              ? '<span class="badge badge-approved" style="font-size:10px;">AL AIRE</span>'
-              : '';
-            html += '<div class="song-item">' +
-              '<div class="song-info">' +
-                '<div class="song-title">' + escapeHtml(c.titulo) + ' ' + badgeHtml + '</div>' +
-                '<div class="song-artist">' + escapeHtml(c.artista || 'El Arca') + '</div>' +
-              '</div>' +
-              '<div class="song-actions">' +
-                '<button class="btn-sm btn-sm-approve" onclick="window.previsualizarMusica(\'' + escapeHtml(c.url_mp3) + '\')" title="Previsualizar" aria-label="Reproducir previsualización de ' + escapeHtml(c.titulo) + '">▶ PLAY</button> ' +
-                '<button class="btn-sm btn-sm-reject" onclick="window.eliminarCancion(\'' + c.id + '\')" aria-label="Eliminar canción ' + escapeHtml(c.titulo) + '">✕ ELIMINAR</button>' +
-              '</div></div>';
-          });
-          musicList.innerHTML = html;
-        }
-
-        // También refrescar listado simple
-        actualizarListadoMusica();
+        _cancionesRenderizadas = added;
       } catch (err) {
         if (err.message !== 'Sesión expirada') showToast('Error al cargar canciones', 'error');
       }
@@ -1804,7 +1765,7 @@
 
         detenerPreview();
         showToast('Canción eliminada', 'info');
-        renderizarListadoMusica();
+        actualizarListadoMusica();
         refrescarContadores();
         cargarAhoraSuena();
       } catch (err) {
@@ -1883,7 +1844,7 @@
         document.getElementById('music-upload-form').reset();
         musicFileInfo.textContent = '';
         musicUploadText.textContent = 'Haz clic para seleccionar archivo MP3';
-        renderizarListadoMusica();
+        actualizarListadoMusica();
         loadDashboard();
       });
     });
