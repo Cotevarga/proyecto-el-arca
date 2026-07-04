@@ -102,7 +102,7 @@ window.API_BASE = '';
               return;
             }
             mainContent.innerHTML = nuevo.innerHTML;
-            reejecutarScripts(mainContent);
+            setTimeout(function () { reejecutarScripts(mainContent); }, 100);
             mergeStyles(doc);
             if (doc.title) document.title = doc.title;
             history.pushState(null, '', url);
@@ -262,9 +262,16 @@ window.API_BASE = '';
     window._galeriaCurrentIndex = 0;
 
     var sb = window._supabase;
-    if (!sb) {
-      console.warn('[Galeria] Supabase no disponible');
-      return;
+    if (!sb || typeof sb === 'undefined') {
+      console.error("[Galeria] Supabase no cargado, intentando re-inicializar...");
+      if (typeof window.inicializarSupabase === 'function') {
+        window.inicializarSupabase();
+        sb = window._supabase;
+      }
+      if (!sb) {
+        console.warn('[Galeria] Supabase sigue no disponible');
+        return;
+      }
     }
 
     sb.from('galeria')

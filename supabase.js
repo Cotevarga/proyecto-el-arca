@@ -5,6 +5,24 @@ window.EDGE_FUNCTIONS_URL = window.EDGE_FUNCTIONS_URL || '';
 (function () {
   'use strict';
 
+  window.inicializarSupabase = function () {
+    if (typeof supabase === 'undefined') {
+      console.warn('[Supabase] SDK no disponible');
+      return false;
+    }
+    var url = window.SUPABASE_URL;
+    var key = window.SUPABASE_ANON_KEY;
+    if (!url || !key) {
+      console.warn('[Supabase] URL o ANON_KEY no definidos');
+      return false;
+    }
+    window._supabase = supabase.createClient(url, key, {
+      auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true },
+    });
+    console.log('[Supabase] Cliente inicializado');
+    return true;
+  };
+
   if (window.__supabaseLoaded) return;
   window.__supabaseLoaded = true;
 
@@ -12,38 +30,19 @@ window.EDGE_FUNCTIONS_URL = window.EDGE_FUNCTIONS_URL || '';
   script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js';
   script.onload = function () {
     if (typeof supabase === 'undefined') {
-      console.warn('Supabase SDK no cargó correctamente');
+      console.warn('[Supabase] SDK no cargó');
       return;
     }
-
-    var url = window.SUPABASE_URL;
-    var key = window.SUPABASE_ANON_KEY;
-
-    if (!url || !key) {
-      console.warn('SUPABASE_URL y SUPABASE_ANON_KEY deben estar definidos');
-      return;
-    }
-
-    window._supabase = supabase.createClient(url, key, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true,
-      },
-    });
+    window.inicializarSupabase();
   };
   document.head.appendChild(script);
 
-  // ─── Helper: Edge Function URL builder ───
   window.fnUrl = function (name) {
-    var base = window.EDGE_FUNCTIONS_URL;
-    return base + '/' + name;
+    return window.EDGE_FUNCTIONS_URL + '/' + name;
   };
 
-  // ─── Helper: auth header for admin calls ───
   window.authHeaders = function () {
-    var token = localStorage.getItem('admin_token');
-    if (!token) return {};
-    return { Authorization: 'Bearer ' + token };
+    var t = localStorage.getItem('admin_token');
+    return t ? { Authorization: 'Bearer ' + t } : {};
   };
 })();
