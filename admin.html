@@ -849,7 +849,7 @@
         sectionTitle.textContent = titles[section] || 'Dashboard';
         if (section === 'pending') loadPending();
         if (section === 'approved') loadApproved();
-        if (section === 'music') { loadMusic(); renderizarCanciones(); }
+        if (section === 'music') { renderizarListadoMusica(); }
         if (section === 'dashboard') loadDashboard();
       });
     });
@@ -1212,6 +1212,7 @@
           { event: '*', schema: 'public', table: 'musica_reproductor' },
           function(payload) {
             console.log('[Realtime] Cambio en musica_reproductor:', payload.eventType);
+            renderizarListadoMusica();
             refrescarContadores();
             cargarAhoraSuena();
           }
@@ -1459,68 +1460,109 @@
       }
     };
 
-    // ─── Music ───
-    async function loadMusic() {
+    // ─── Música: Reproductor de previsualización ───
+    var _musicPreviewAudio = null;
+
+    function getMusicPreviewAudio() {
+      if (!_musicPreviewAudio) {
+        _musicPreviewAudio = new Audio();
+        _musicPreviewAudio.style.display = 'none';
+        document.body.appendChild(_musicPreviewAudio);
+      }
+      return _musicPreviewAudio;
+    }
+
+    function detenerPreview() {
+      var a = getMusicPreviewAudio();
+      a.pause();
+      a.currentTime = 0;
+      a.src = '';
+    }
+
+    // ─── Música: Listado en tiempo real ───
+    async function renderizarListadoMusica() {
       try {
         var s = getSupabaseClient();
         if (!s) return;
-        var { data } = await s.from('musica_reproductor').select('*').order('orden', { ascending: true });
-        var musica = data || [];
-        var list = document.getElementById('music-list');
-        if (musica.length === 0) {
-          list.innerHTML = '<div class="empty-state"><div class="icon">🎶</div><div class="text">No hay canciones subidas</div></div>';
-          return;
+        var { data, error } = await s
+          .from('musica_reproductor')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        var canciones = data || [];
+
+        // Music management list
+        var musicList = document.getElementById('music-list');
+        if (!musicList) return;
+        if (canciones.length === 0) {
+          musicList.innerHTML = '<div class="empty-state"><div class="icon">🎶</div><div class="text">No hay canciones subidas</div></div>';
+        } else {
+          var html = '';
+          canciones.forEach(function(c) {
+            var badgeHtml = c.activo
+              ? '<span class="badge badge-approved" style="font-size:10px;">AL AIRE</span>'
+              : '';
+            html += '<div class="song-item">' +
+              '<div class="song-info">' +
+                '<div class="song-title">' + escapeHtml(c.titulo) + ' ' + badgeHtml + '</div>' +
+                '<div class="song-artist">' + escapeHtml(c.artista || 'El Arca') + '</div>' +
+              '</div>' +
+              '<div class="song-actions">' +
+                '<button class="btn-sm btn-sm-approve" onclick="window.previsualizarMusica(\'' + escapeHtml(c.url_mp3) + '\')" title="Previsualizar">▶ PLAY</button> ' +
+                '<button class="btn-sm btn-sm-reject" onclick="window.deleteMusic(\'' + c.id + '\')">✕ ELIMINAR</button>' +
+              '</div></div>';
+          });
+          musicList.innerHTML = html;
         }
-        var html = '';
-        musica.forEach(function(m) {
-          var activeClass = m.activo ? 'on' : 'off';
-          var activeLabel = m.activo ? 'Activo' : 'Inactivo';
-          html += '<div class="song-item">' +
-            '<div class="song-info">' +
-              '<div class="song-title">' + escapeHtml(m.titulo) + '</div>' +
-              '<div class="song-artist">' + escapeHtml(m.artista || 'El Arca') + ' · ' + activeLabel + '</div>' +
-            '</div>' +
-            '<div class="song-actions">' +
-              '<button class="toggle-active ' + activeClass + '" onclick="window.toggleMusic(\'' + m.id + '\', ' + !m.activo + ')" title="Cambiar estado"></button>' +
-              '<button class="btn-sm btn-sm-danger" onclick="window.deleteMusic(\'' + m.id + '\')">✕</button>' +
-            '</div></div>';
-        });
-        list.innerHTML = html;
+
+        // Canciones actuales (simple list)
+        var cancionesList = document.getElementById('canciones-list');
+        if (cancionesList) {
+          if (canciones.length === 0) {
+            cancionesList.innerHTML = '<li style="color:#666;padding:8px 0;">No hay canciones</li>';
+          } else {
+            var listHtml = '';
+            canciones.forEach(function(c) {
+              var estado = c.activo ? '🟢' : '⚪';
+              listHtml += '<li style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;color:#ccc;">' +
+                estado + ' ' + escapeHtml(c.titulo) + ' — ' + escapeHtml(c.artista || 'El Arca') +
+                '</li>';
+            });
+            cancionesList.innerHTML = listHtml;
+          }
+        }
       } catch (err) {
-        if (err.message !== 'Sesión expirada') showToast('Error al cargar música', 'error');
+        if (err.message !== 'Sesión expirada') showToast('Error al cargar canciones', 'error');
       }
     }
 
-    async function renderizarCanciones() {
-      try {
-        var s = getSupabaseClient();
-        if (!s) return;
-        var { data, error } = await s.from('musica_reproductor').select('*').order('orden', { ascending: true });
-        if (error) throw error;
-        var lista = document.getElementById('canciones-list');
-        if (!lista) return;
-        var canciones = data || [];
-        if (canciones.length === 0) {
-          lista.innerHTML = '<li style="color:#666;padding:8px 0;">No hay canciones</li>';
-          return;
-        }
-        var html = '';
-        canciones.forEach(function(c) {
-          var estado = c.activo ? '🟢' : '⚪';
-          html += '<li style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;color:#ccc;">' +
-            estado + ' ' + escapeHtml(c.titulo) + ' — ' + escapeHtml(c.artista || 'El Arca') +
-            '</li>';
-        });
-        lista.innerHTML = html;
-      } catch (err) {
-        console.error('[renderizarCanciones] Error:', err);
+    window.previsualizarMusica = function(url) {
+      if (!url) { showToast('URL de audio no disponible', 'error'); return; }
+      var a = getMusicPreviewAudio();
+      if (a.src === url && !a.paused) {
+        a.pause();
+        showToast('Previsualización detenida', 'info');
+        return;
       }
-    }
+      a.src = url;
+      a.play().then(function() {
+        showToast('Reproduciendo previsualización', 'success');
+      }).catch(function(err) {
+        console.error('[Preview] Error al reproducir:', err);
+        showToast('Error al reproducir audio', 'error');
+      });
+    };
 
     window.toggleMusic = async function(id, activo) {
       try {
-        var data = await adminFetch('musica/' + id, { method: 'PUT', body: { activo: activo } });
-        if (data.success) { showToast('Estado actualizado', 'success'); loadMusic(); renderizarCanciones(); loadDashboard(); }
+        var s = getSupabaseClient();
+        if (!s) throw new Error('Cliente Supabase no disponible');
+        var { error } = await s.from('musica_reproductor').update({ activo: activo }).eq('id', id);
+        if (error) throw error;
+        showToast('Estado actualizado', 'success');
+        renderizarListadoMusica();
+        refrescarContadores();
+        cargarAhoraSuena();
       } catch (err) {
         if (err.message !== 'Sesión expirada') showToast('Error al actualizar', 'error');
       }
@@ -1529,8 +1571,31 @@
     window.deleteMusic = async function(id) {
       if (!confirm('¿Eliminar esta canción permanentemente?')) return;
       try {
-        var data = await adminFetch('musica/' + id, { method: 'DELETE' });
-        if (data.success) { showToast('Canción eliminada', 'info'); loadMusic(); renderizarCanciones(); loadDashboard(); }
+        var s = getSupabaseClient();
+        if (!s) throw new Error('Cliente Supabase no disponible');
+
+        var { data: cancion, error: fetchError } = await s
+          .from('musica_reproductor')
+          .select('storage_path')
+          .eq('id', id)
+          .single();
+        if (fetchError) throw fetchError;
+
+        if (cancion && cancion.storage_path) {
+          var { error: storageError } = await s.storage
+            .from('elarca-uploads')
+            .remove([cancion.storage_path]);
+          if (storageError) console.error('[DeleteMusic] Error al eliminar de Storage:', storageError);
+        }
+
+        var { error: deleteError } = await s.from('musica_reproductor').delete().eq('id', id);
+        if (deleteError) throw deleteError;
+
+        detenerPreview();
+        showToast('Canción eliminada', 'info');
+        renderizarListadoMusica();
+        refrescarContadores();
+        cargarAhoraSuena();
       } catch (err) {
         if (err.message !== 'Sesión expirada') showToast('Error al eliminar', 'error');
       }
@@ -1591,8 +1656,7 @@
         document.getElementById('music-upload-form').reset();
         musicFileInfo.textContent = '';
         musicUploadText.textContent = 'Haz clic para seleccionar archivo MP3';
-        loadMusic();
-        renderizarCanciones();
+        renderizarListadoMusica();
         loadDashboard();
       });
     });
