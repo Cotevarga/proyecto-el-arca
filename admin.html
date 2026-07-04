@@ -458,6 +458,40 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ─── Now Playing ─── */
+    .now-playing {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 0;
+    }
+    .now-playing .eq-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 28px;
+    }
+    .now-playing .eq-bars span {
+      display: block;
+      width: 4px;
+      background: var(--color-mir);
+      border-radius: 2px;
+      animation: eqAnim 0.8s ease-in-out infinite alternate;
+    }
+    .now-playing .eq-bars span:nth-child(1) { height: 10px; animation-delay: 0s; }
+    .now-playing .eq-bars span:nth-child(2) { height: 18px; animation-delay: 0.2s; }
+    .now-playing .eq-bars span:nth-child(3) { height: 24px; animation-delay: 0.4s; }
+    .now-playing .eq-bars span:nth-child(4) { height: 14px; animation-delay: 0.1s; }
+    .now-playing .eq-bars span:nth-child(5) { height: 20px; animation-delay: 0.3s; }
+    @keyframes eqAnim {
+      0% { opacity: 0.3; transform: scaleY(0.5); }
+      100% { opacity: 1; transform: scaleY(1); }
+    }
+    .now-playing .np-info { flex: 1; min-width: 0; }
+    .now-playing .np-title { font-size: 15px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .now-playing .np-artist { font-size: 12px; color: #888; }
+    .now-playing .np-empty { color: #555; font-size: 13px; font-style: italic; }
+
     .section-title {
       font-size: 16px;
       font-weight: 700;
@@ -570,7 +604,7 @@
 
         <!-- DASHBOARD -->
         <div class="content-section active" id="section-dashboard">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
             <div class="stat-card">
               <div class="stat-value" id="stat-pending">—</div>
               <div class="stat-label">Pendientes de revisión</div>
@@ -583,10 +617,23 @@
               <div class="stat-value" id="stat-music">—</div>
               <div class="stat-label">Canciones activas</div>
             </div>
+            <div class="stat-card" id="now-playing-card">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#777;margin-bottom:4px;">REPRODUCIÉNDOSE AHORA</div>
+              <div class="now-playing" id="now-playing-content">
+                <div class="eq-bars">
+                  <span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="np-info">
+                  <div class="np-title" id="np-title">—</div>
+                  <div class="np-artist" id="np-artist">Esperando canción...</div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="table-container">
             <div class="table-header">
               <h3>Últimos recuerdos recibidos</h3>
+              <span style="font-size:11px;color:#555;">Tiempo real activo <span id="realtime-badge" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#4caf50;margin-left:6px;vertical-align:middle;"></span></span>
             </div>
             <div id="recent-recuerdos-list">
               <div class="empty-state">
@@ -842,6 +889,7 @@
 
     btnLogout.addEventListener('click', function(e) {
       e.preventDefault();
+      detenerRealtime();
       token = null;
       userData = null;
       localStorage.removeItem('admin_token');
@@ -871,6 +919,7 @@
     }
 
     function handleUnauthorized() {
+      detenerRealtime();
       token = null;
       localStorage.removeItem('admin_token');
       localStorage.removeItem('admin_user');
@@ -969,45 +1018,180 @@
       return inserted;
     }
 
-    // ─── Dashboard ───
-    async function loadDashboard() {
+    // ═══════════════════════════════════════════════
+    // CONTADORES
+    // ═══════════════════════════════════════════════
+
+    async function contarPendientes() {
+      var s = getSupabaseClient();
+      if (!s) return 0;
+      var { count, error } = await s.from('recuerdos').select('*', { count: 'exact', head: true }).eq('aprobado', false);
+      if (error) { console.error('[contarPendientes]', error); return 0; }
+      return count ?? 0;
+    }
+
+    async function contarAprobados() {
+      var s = getSupabaseClient();
+      if (!s) return 0;
+      var { count, error } = await s.from('recuerdos').select('*', { count: 'exact', head: true }).eq('aprobado', true);
+      if (error) { console.error('[contarAprobados]', error); return 0; }
+      return count ?? 0;
+    }
+
+    async function contarCancionesActivas() {
+      var s = getSupabaseClient();
+      if (!s) return 0;
+      var { count, error } = await s.from('musica_reproductor').select('*', { count: 'exact', head: true }).eq('activo', true);
+      if (error) { console.error('[contarCancionesActivas]', error); return 0; }
+      return count ?? 0;
+    }
+
+    async function refrescarContadores() {
+      var [pend, aprob, music] = await Promise.all([
+        contarPendientes(),
+        contarAprobados(),
+        contarCancionesActivas()
+      ]);
+      var elPend = document.getElementById('stat-pending');
+      var elAprob = document.getElementById('stat-approved');
+      var elMusic = document.getElementById('stat-music');
+      if (elPend) elPend.textContent = pend;
+      if (elAprob) elAprob.textContent = aprob;
+      if (elMusic) elMusic.textContent = music;
+    }
+
+    // ═══════════════════════════════════════════════
+    // REPRODUCIÉNDOSE AHORA
+    // ═══════════════════════════════════════════════
+
+    async function cargarAhoraSuena() {
       try {
         var s = getSupabaseClient();
         if (!s) return;
+        var { data, error } = await s.from('musica_reproductor').select('*').eq('activo', true).order('orden', { ascending: true }).limit(1);
+        if (error) throw error;
+        var titleEl = document.getElementById('np-title');
+        var artistEl = document.getElementById('np-artist');
+        if (!titleEl || !artistEl) return;
+        if (data && data.length > 0) {
+          titleEl.textContent = data[0].titulo || '—';
+          artistEl.textContent = data[0].artista || 'El Arca';
+        } else {
+          titleEl.textContent = '—';
+          artistEl.textContent = 'Ninguna canción activa';
+        }
+      } catch (err) {
+        console.error('[AhoraSuena] Error:', err);
+      }
+    }
 
-        var [countPend, countAprob, countMus, recRes] = await Promise.all([
-          s.from('recuerdos').select('*', { count: 'exact', head: true }).eq('aprobado', false),
-          s.from('recuerdos').select('*', { count: 'exact', head: true }).eq('aprobado', true),
-          s.from('musica_reproductor').select('*', { count: 'exact', head: true }).eq('activo', true),
-          s.from('recuerdos').select('*').eq('aprobado', false).order('created_at', { ascending: false })
-        ]);
+    // ═══════════════════════════════════════════════
+    // DASHBOARD — listado + contadores
+    // ═══════════════════════════════════════════════
 
-        document.getElementById('stat-pending').textContent = countPend.count ?? 0;
-        document.getElementById('stat-approved').textContent = countAprob.count ?? 0;
-        document.getElementById('stat-music').textContent = countMus.count ?? 0;
-
-        var recuerdos = recRes.data || [];
+    async function renderRecentRecuerdos() {
+      try {
+        var s = getSupabaseClient();
+        if (!s) return;
+        var { data, error } = await s.from('recuerdos').select('*').order('created_at', { ascending: false }).limit(20);
+        if (error) throw error;
+        var recuerdos = data || [];
         var recentList = document.getElementById('recent-recuerdos-list');
-        var recent = recuerdos.slice(0, 5);
-        if (recent.length === 0) {
-          recentList.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div class="text">No hay recuerdos pendientes</div></div>';
+        if (!recentList) return;
+
+        if (recuerdos.length === 0) {
+          recentList.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div class="text">No hay recuerdos aún</div></div>';
           return;
         }
-        var html = '<table><thead><tr><th>Nombre</th><th class="hide-mobile">Tipo</th><th class="hide-mobile">Sección</th><th class="hide-mobile">Fecha</th></tr></thead><tbody>';
-        recent.forEach(function(r) {
-          var tipoClass = 'badge-image';
-          var tipoLabel = 'Imagen';
-          if (r.tipo_archivo && r.tipo_archivo.indexOf('audio') !== -1) { tipoClass = 'badge-audio'; tipoLabel = 'Audio'; }
-          else if (r.tipo_archivo && r.tipo_archivo.indexOf('video') !== -1) { tipoClass = 'badge-video'; tipoLabel = 'Video'; }
-          var seccionLabel = r.seccion ? r.seccion.charAt(0).toUpperCase() + r.seccion.slice(1) : '—';
+
+        var html = '<table><thead><tr><th>Fecha</th><th>Pseudónimo</th><th>Sección</th><th>Estado</th><th class="hide-mobile">Acción</th></tr></thead><tbody>';
+        recuerdos.forEach(function(r) {
           var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL') : '—';
-          html += '<tr><td class="truncate">' + escapeHtml(r.nombre) + '</td><td class="hide-mobile"><span class="badge ' + tipoClass + '">' + tipoLabel + '</span></td><td class="hide-mobile">' + seccionLabel + '</td><td class="hide-mobile">' + fecha + '</td></tr>';
+          var nombre = escapeHtml(r.nombre || 'Anónimo');
+          var seccionLabel = r.seccion ? r.seccion.charAt(0).toUpperCase() + r.seccion.slice(1) : 'General';
+
+          var estadoBadge = '';
+          var acciones = '';
+          if (r.aprobado) {
+            estadoBadge = '<span class="badge badge-approved">Publicado</span>';
+            acciones = '<button class="btn-sm btn-sm-danger" onclick="window.rejectRecuerdo(\'' + r.id + '\')">✕ Eliminar</button>';
+          } else {
+            estadoBadge = '<span class="badge badge-pending">Pendiente</span>';
+            acciones =
+              '<button class="btn-sm btn-sm-approve" onclick="window.approveRecuerdo(\'' + r.id + '\')" style="margin-right:4px;">✓ Aprobar</button>' +
+              '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')">✕ Eliminar</button>';
+          }
+
+          html += '<tr>' +
+            '<td style="white-space:nowrap;">' + fecha + '</td>' +
+            '<td class="truncate">' + nombre + '</td>' +
+            '<td>' + seccionLabel + '</td>' +
+            '<td>' + estadoBadge + '</td>' +
+            '<td class="hide-mobile" style="white-space:nowrap;">' + acciones + '</td>' +
+            '</tr>';
         });
         html += '</tbody></table>';
         recentList.innerHTML = html;
       } catch (err) {
-        console.error('[Dashboard] Error:', err);
-        if (err.message !== 'Sesión expirada') showToast('Error al cargar dashboard', 'error');
+        console.error('[renderRecentRecuerdos] Error:', err);
+      }
+    }
+
+    async function loadDashboard() {
+      await Promise.all([
+        refrescarContadores(),
+        cargarAhoraSuena(),
+        renderRecentRecuerdos()
+      ]);
+    }
+
+    // ═══════════════════════════════════════════════
+    // SUPABASE REALTIME
+    // ═══════════════════════════════════════════════
+
+    var _realtimeChannel = null;
+
+    function iniciarRealtime() {
+      var s = getSupabaseClient();
+      if (!s) { console.warn('[Realtime] Cliente no disponible'); return; }
+
+      if (_realtimeChannel) {
+        try { s.removeChannel(_realtimeChannel); } catch(e) {}
+      }
+
+      console.log('[Realtime] Suscribiendo a cambios en recuerdos y musica_reproductor...');
+
+      _realtimeChannel = s.channel('db-changes')
+        .on('postgres_changes',
+          { event: '*', schema: 'public', table: 'recuerdos' },
+          function(payload) {
+            console.log('[Realtime] Cambio en recuerdos:', payload.eventType);
+            refrescarContadores();
+            renderRecentRecuerdos();
+          }
+        )
+        .on('postgres_changes',
+          { event: '*', schema: 'public', table: 'musica_reproductor' },
+          function(payload) {
+            console.log('[Realtime] Cambio en musica_reproductor:', payload.eventType);
+            refrescarContadores();
+            cargarAhoraSuena();
+          }
+        )
+        .subscribe(function(status) {
+          console.log('[Realtime] Estado:', status);
+          var badge = document.getElementById('realtime-badge');
+          if (badge) {
+            badge.style.background = status === 'SUBSCRIBED' ? '#4caf50' : '#f44336';
+          }
+        });
+    }
+
+    function detenerRealtime() {
+      var s = getSupabaseClient();
+      if (s && _realtimeChannel) {
+        s.removeChannel(_realtimeChannel);
+        _realtimeChannel = null;
       }
     }
 
@@ -1441,6 +1625,7 @@
         userAvatar.textContent = userData.nombre.charAt(0).toUpperCase();
       }
       loadDashboard();
+      setTimeout(iniciarRealtime, 500);
     }
 
     function init() {
