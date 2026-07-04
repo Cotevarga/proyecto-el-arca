@@ -70,7 +70,7 @@
     </div>
   </nav>
 
-  <main id="main-content">
+    <main id="main-content">
     <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
       <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
         <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Crónica Popular</span>
@@ -80,31 +80,11 @@
       </div>
     </header>
 
-    <section class="py-20 bg-noche">
-      <div class="max-w-6xl mx-auto px-4">
-        <div class="grid md:grid-cols-3 gap-8">
-
-          <a href="relatos/jano.html" class="cat-card card-mir flex flex-col items-center text-center min-h-[320px] justify-center">
-            <div class="text-6xl mb-6">🔥</div>
-            <h2 class="text-mir font-title text-2xl uppercase mb-3">El Jano</h2>
-            <p class="text-white/50 text-sm leading-relaxed">Historia personal, sueños y testimonios de Pedro Alejandro González Reyes, "El Cabezón Jano".</p>
-            <span class="text-mir/60 text-xs mt-4 uppercase tracking-widest">Leer crónicas →</span>
-          </a>
-
-          <a href="relatos/arca.html" class="cat-card card-mir flex flex-col items-center text-center min-h-[320px] justify-center">
-            <div class="text-6xl mb-6">🏛️</div>
-            <h2 class="text-mir font-title text-2xl uppercase mb-3">El Arca</h2>
-            <p class="text-white/50 text-sm leading-relaxed">Historia institucional, trabajo territorial, La Goya en las Calles y el legado que camina.</p>
-            <span class="text-mir/60 text-xs mt-4 uppercase tracking-widest">Leer crónicas →</span>
-          </a>
-
-          <a href="relatos/organizaciones.html" class="cat-card card-mir flex flex-col items-center text-center min-h-[320px] justify-center">
-            <div class="text-6xl mb-6">✊</div>
-            <h2 class="text-mir font-title text-2xl uppercase mb-3">Otras Organizaciones</h2>
-            <p class="text-white/50 text-sm leading-relaxed">Memorias de organización social.</p>
-            <span class="text-mir/60 text-xs mt-4 uppercase tracking-widest">Explorar →</span>
-          </a>
-
+    <section class="py-16 bg-noche" style="min-height:500px;">
+      <div id="relatos-container" class="max-w-6xl mx-auto px-4">
+        <div style="text-align:center;padding:80px 20px;color:#666;">
+          <div class="loading-spinner" style="width:32px;height:32px;border-width:3px;margin:0 auto 16px;"></div>
+          Cargando relatos...
         </div>
       </div>
     </section>
@@ -135,20 +115,237 @@
   <style>
     .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
     .hover\:bg-resistencia-700:hover { background-color: #b91c1c !important; }
+
+    /* ─── Índice / Navegación de relatos ─── */
+    .relato-index-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 14px 20px;
+      background: transparent;
+      border: none;
+      border-left: 3px solid transparent;
+      color: #ccc;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      line-height: 1.4;
+    }
+    .relato-index-item:hover {
+      background: rgba(229,9,20,0.06);
+      color: white;
+      border-left-color: var(--color-mir);
+    }
+    .relato-index-item.active {
+      color: var(--color-mir);
+      border-left-color: var(--color-mir);
+      background: rgba(229,9,20,0.08);
+    }
+    .relato-body h2 {
+      font-family: Arial, Helvetica, sans-serif !important;
+      color: var(--color-mir) !important;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: left !important;
+    }
+    .relato-body p {
+      text-align: justify !important;
+      line-height: 1.8;
+      color: #ddd;
+    }
+    .relato-body b, .relato-body strong { color: white; }
+    .relato-body i, .relato-body em { color: #ddd; }
+    .relato-body u { text-decoration: underline; }
+    @media (max-width: 768px) {
+      .relato-layout {
+        flex-direction: column !important;
+      }
+      .relato-index {
+        width: 100% !important;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(229,9,20,0.15);
+        max-height: 200px !important;
+        overflow-y: auto !important;
+      }
+    }
   </style>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
   <script>
-    var menuToggle = document.getElementById('menu-toggle');
-    if (menuToggle) {
-      menuToggle.addEventListener('click', function() {
-        document.getElementById('mobile-menu').classList.toggle('hidden');
+    window.miSupabase = supabase.createClient(
+      'https://ukpoprkdgezgxlkjjuve.supabase.co',
+      'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi'
+    );
+  </script>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var menuToggle = document.getElementById('menu-toggle');
+      if (menuToggle) {
+        menuToggle.addEventListener('click', function() {
+          document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+      }
+      document.querySelectorAll('#mobile-menu a').forEach(function(l) {
+        l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
       });
-    } else {
-      console.warn('[Nav] menu-toggle no encontrado');
-    }
-    document.querySelectorAll('#mobile-menu a').forEach(function(l) {
-      l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
-    });
+
+      var supabase = window.miSupabase;
+
+      async function cargarRelatos() {
+        var container = document.getElementById('relatos-container');
+        if (!container) return;
+
+        container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#666;">Cargando relatos...</div>';
+
+        try {
+          var { data, error } = await supabase
+            .from('recuerdos')
+            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, seccion')
+            .eq('aprobado', true)
+            .in('seccion', ['relatos', 'entrevista'])
+            .not('titulo_relato', 'is', null)
+            .neq('titulo_relato', '')
+            .order('created_at', { ascending: false });
+
+          if (error) throw error;
+
+          var relatos = data || [];
+
+          if (relatos.length === 0) {
+            container.innerHTML =
+              '<div style="text-align:center;padding:60px 20px;">' +
+                '<div style="font-size:48px;opacity:0.3;margin-bottom:12px;">📖</div>' +
+                '<p style="color:#666;">No hay relatos publicados aún. Vuelve pronto.</p>' +
+              '</div>';
+            return;
+          }
+
+          // Build layout
+          var html =
+            '<div class="relato-layout" style="display:flex;gap:0;max-width:1200px;margin:0 auto;">' +
+              '<div class="relato-index" style="width:300px;flex-shrink:0;border-right:1px solid rgba(229,9,20,0.15);max-height:600px;overflow-y:auto;">' +
+                '<div style="padding:16px 20px;border-bottom:1px solid rgba(229,9,20,0.1);">' +
+                  '<h3 style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin:0;font-weight:700;font-family:Arial,Helvetica,sans-serif;">Índice de relatos</h3>' +
+                  '<span style="font-size:10px;color:#555;">' + relatos.length + ' relatos</span>' +
+                '</div>';
+
+          relatos.forEach(function(r, idx) {
+            var titulo = r.titulo_relato || 'Sin título';
+            var seccionLabel = r.seccion === 'entrevista' ? 'Entrevista' : 'Relato';
+            html +=
+              '<button class="relato-index-item' + (idx === 0 ? ' active' : '') + '" data-id="' + r.id + '" data-index="' + idx + '">' +
+                '<div style="font-size:11px;color:' + (r.seccion === 'entrevista' ? '#42a5f5' : 'var(--color-mir)') + ';margin-bottom:2px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">' + seccionLabel + '</div>' +
+                '<span style="font-weight:600;">' + escapeHtml(titulo) + '</span>' +
+                '<div style="font-size:11px;color:#666;margin-top:3px;">por ' + escapeHtml(r.nombre || 'Anónimo') + '</div>' +
+              '</button>';
+          });
+
+          html += '</div>';
+
+          // Main content area
+          html += '<div class="relato-body" style="flex:1;padding:32px 40px;min-height:500px;overflow-y:auto;">';
+
+          // Render first relato by default
+          var first = relatos[0];
+          html += renderRelatoBody(first);
+
+          html += '</div></div>';
+
+          container.innerHTML = html;
+
+          // Add click handlers
+          container.querySelectorAll('.relato-index-item').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              var id = this.getAttribute('data-id');
+              var idx = parseInt(this.getAttribute('data-index'), 10);
+              var relato = relatos[idx];
+              if (!relato) return;
+
+              // Update active state
+              container.querySelectorAll('.relato-index-item').forEach(function(b) {
+                b.classList.remove('active');
+              });
+              this.classList.add('active');
+
+              // Update body
+              var bodyEl = container.querySelector('.relato-body');
+              if (bodyEl) {
+                bodyEl.innerHTML = renderRelatoBody(relato);
+                bodyEl.scrollTop = 0;
+              }
+            });
+          });
+
+        } catch (err) {
+          console.error('[Relatos] Error:', err);
+          container.innerHTML =
+            '<div style="text-align:center;padding:60px 20px;">' +
+              '<p style="color:var(--color-mir);">Error al cargar los relatos. Intenta de nuevo más tarde.</p>' +
+            '</div>';
+        }
+      }
+
+      function renderRelatoBody(r) {
+        var titulo = r.titulo_relato || 'Sin título';
+        var cuerpoHTML = r.mensaje_largo || r.mensaje || '';
+        var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+
+        // Sanitize: remove potentially dangerous HTML but keep <b>, <i>, <u>
+        cuerpoHTML = sanitizeRelatoHTML(cuerpoHTML);
+
+        return '' +
+          '<h2 style="font-family:Arial,Helvetica,sans-serif;color:var(--color-mir);text-transform:uppercase;letter-spacing:0.05em;font-size:28px;margin:0 0 8px 0;text-align:left !important;">' + escapeHtml(titulo) + '</h2>' +
+          '<div style="display:flex;gap:12px;font-size:12px;color:#666;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(229,9,20,0.1);">' +
+            (fecha ? '<span>' + fecha + '</span>' : '') +
+            '<span>por ' + escapeHtml(r.nombre || 'Anónimo') + '</span>' +
+            '<span style="text-transform:uppercase;letter-spacing:0.05em;color:' + (r.seccion === 'entrevista' ? '#42a5f5' : 'var(--color-mir)') + ';">' + (r.seccion === 'entrevista' ? 'Entrevista' : 'Relato') + '</span>' +
+          '</div>' +
+          '<div style="font-size:15px;line-height:1.8;color:#ddd;">' +
+            (cuerpoHTML || '<em style="color:#666;">Sin contenido</em>') +
+          '</div>';
+      }
+
+      function sanitizeRelatoHTML(html) {
+        if (!html) return '';
+        // Only allow <b>, <i>, <u>, <br>, <p>, <div>, <span> tags
+        return html
+          .replace(/<script[^>]*>.*?<\/script>/gi, '')
+          .replace(/on\w+=["'][^"']*["']/gi, '')
+          .replace(/<[^>]*>/g, function(match) {
+            var allowed = ['<b>', '</b>', '<i>', '</i>', '<u>', '</u>', '<br>', '<br/>', '<br />', '<p>', '</p>', '<div>', '</div>', '<span>', '</span>', '<strong>', '</strong>', '<em>', '</em>'];
+            if (allowed.indexOf(match.toLowerCase()) !== -1) return match;
+            // Allow self-closing br variations
+            if (/^<br\s*\/?>$/i.test(match)) return '<br>';
+            // Allow <p>, </p>, <div>, </div>, <span>, </span>
+            if (/^<\/?(p|div|span)>$/i.test(match)) return match.toLowerCase();
+            // Allow attributes on p, div, span only if they don't contain event handlers
+            if (/^<(p|div|span)\s+[^>]*>$/i.test(match)) {
+              var safe = match.replace(/on\w+=["'][^"']*["']/gi, '');
+              return safe;
+            }
+            return '';
+          });
+      }
+
+      function escapeHtml(text) {
+        if (!text) return '';
+        var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return String(text).replace(/[&<>"']/g, function(c) { return map[c]; });
+      }
+
+      // Load relatos when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', cargarRelatos);
+      } else {
+        cargarRelatos();
+      }
+
+    })();
   </script>
   <script src="/app.js"></script>
 </body>
