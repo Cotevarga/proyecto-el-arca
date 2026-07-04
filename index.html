@@ -150,15 +150,9 @@
           <a href="/relatos.html" class="btn-outline-mir text-sm py-2 px-6" style="font-size:12px;">Ver todos los relatos</a>
         </div>
         <div class="divider-mir"></div>
-        <div id="vitrina-grid" class="grid md:grid-cols-3 gap-8 mt-10">
-          <div style="text-align:center;padding:60px 20px;color:#555;grid-column:1/-1;">
-            <div style="width:32px;height:32px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--color-mir);border-radius:50%;animation:spin 0.6s linear infinite;margin:0 auto 16px;"></div>
-            Cargando vitrina...
-          </div>
-        </div>
+        <div id="vitrina-grid" class="grid md:grid-cols-3 gap-8 mt-10"></div>
       </div>
       <style>
-        @keyframes spin { to { transform: rotate(360deg); } }
         .vitrina-card {
           background: var(--color-noche);
           border: 1px solid rgba(229,9,20,0.25);
@@ -215,16 +209,33 @@
       </style>
     </section>
 
+    <style>
+      #vitrina { display: none; }
+    </style>
     <script>
     (function() {
       var vitrinaCargada = false;
+      var SECCION_URLS = {
+        galeria: '/galeria.html',
+        videos: '/videos.html',
+        relatos_jano: '/relatos.html',
+        relatos_arca: '/relatos.html',
+        relatos_organizaciones: '/relatos.html'
+      };
+      var NOMBRES_SECCION = {
+        galeria: 'Galería',
+        videos: 'Videos y Audios',
+        relatos_jano: 'Relatos: El Jano',
+        relatos_arca: 'Relatos: El Arca',
+        relatos_organizaciones: 'Relatos: Otras organizaciones'
+      };
 
       async function cargarVitrina() {
         if (vitrinaCargada) return;
         var grid = document.getElementById('vitrina-grid');
-        if (!grid) return;
+        var section = document.getElementById('vitrina');
+        if (!grid || !section) return;
 
-        // Wait for window.miSupabase (loaded at bottom of page)
         var supabaseClient = window.miSupabase;
         if (!supabaseClient) {
           var tries = 0;
@@ -233,49 +244,34 @@
             tries++;
           }
           supabaseClient = window.miSupabase;
-          if (!supabaseClient) {
-            grid.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-mir);grid-column:1/-1;">Error de conexión. Recarga la página.</div>';
-            return;
-          }
+          if (!supabaseClient) return;
         }
 
         try {
-
+          var cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
           var { data, error } = await supabaseClient
             .from('recuerdos')
             .select('id, titulo_relato, mensaje, mensaje_largo, url_archivo, tipo_archivo, seccion, created_at, es_efimero')
             .eq('aprobado', true)
             .eq('destacado', true)
+            .or('es_efimero.is.false,and(es_efimero.is.true,created_at.gt.' + cutoff + ')')
             .order('created_at', { ascending: false })
-            .limit(20);
+            .limit(6);
 
           if (error) throw error;
 
-          var items = (data || []).filter(function(item) {
-            if (!item.es_efimero) return true;
-            var edad = Date.now() - new Date(item.created_at).getTime();
-            return edad < 48 * 60 * 60 * 1000;
-          }).slice(0, 6);
-          if (items.length === 0) {
-            var vitrinaSection = document.getElementById('vitrina');
-            if (vitrinaSection) vitrinaSection.style.display = 'none';
-            return;
-          }
-
-          var NOMBRES = {
-            galeria: 'Galería',
-            videos: 'Videos y Audios',
-            relatos_jano: 'Relatos: El Jano',
-            relatos_arca: 'Relatos: El Arca',
-            relatos_organizaciones: 'Relatos: Otras organizaciones'
-          };
+          var items = data || [];
+          if (items.length === 0) return;
 
           var html = '';
           items.forEach(function(item) {
             var titulo = item.titulo_relato || 'Sin título';
-            var descripcion = item.mensaje || (item.mensaje_largo ? item.mensaje_largo.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : '');
+            var rawDesc = item.mensaje || item.mensaje_largo || '';
+            var descripcion = rawDesc.replace(/<[^>]*>/g, '').substring(0, 200);
+            var needsLink = rawDesc.replace(/<[^>]*>/g, '').length > 200;
             var imgSrc = item.url_archivo && item.tipo_archivo && item.tipo_archivo.indexOf('image') === 0 ? item.url_archivo : '';
-            var seccionLabel = NOMBRES[item.seccion] || item.seccion || 'General';
+            var seccionLabel = NOMBRES_SECCION[item.seccion] || item.seccion || 'General';
+            var seccionUrl = SECCION_URLS[item.seccion] || '/relatos.html';
             var fecha = item.created_at ? new Date(item.created_at).toLocaleDateString('es-CL') : '';
 
             html += '<div class="vitrina-card">';
@@ -286,8 +282,11 @@
             }
             html += '<div class="vitrina-body">' +
               '<h3>' + titulo.replace(/</g, '&lt;') + '</h3>' +
-              '<p>' + descripcion.replace(/</g, '&lt;') + '</p>' +
-            '</div>';
+              '<p>' + descripcion.replace(/</g, '&lt;') + '</p>';
+            if (needsLink) {
+              html += '<a href="' + seccionUrl + '" class="text-mir hover:underline" style="font-size:12px;font-weight:600;display:inline-block;margin-top:8px;">Leer relato completo →</a>';
+            }
+            html += '</div>';
             html += '<div class="vitrina-footer">' +
               '<span class="badge-seccion">' + seccionLabel + '</span>' +
               (fecha ? '<span>' + fecha + '</span>' : '') +
@@ -295,10 +294,10 @@
           });
 
           grid.innerHTML = html;
+          section.style.display = 'block';
           vitrinaCargada = true;
         } catch (err) {
           console.error('[Vitrina] Error:', err);
-          grid.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-mir);grid-column:1/-1;">Error al cargar vitrina.</div>';
         }
       }
 
