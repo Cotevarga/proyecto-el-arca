@@ -1068,7 +1068,7 @@
     window.toggleMusic = async function(id, activo) {
       try {
         var data = await adminFetch('musica/' + id, { method: 'PUT', body: { activo: activo } });
-        if (data.success) { showToast('Estado actualizado', 'success'); loadMusic(); loadDashboard(); }
+        if (data.success) { showToast('Estado actualizado', 'success'); loadMusic(); renderizarCanciones(); loadDashboard(); }
       } catch (err) {
         if (err.message !== 'Sesión expirada') showToast('Error al actualizar', 'error');
       }
@@ -1078,7 +1078,7 @@
       if (!confirm('¿Eliminar esta canción permanentemente?')) return;
       try {
         var data = await adminFetch('musica/' + id, { method: 'DELETE' });
-        if (data.success) { showToast('Canción eliminada', 'info'); loadMusic(); loadDashboard(); }
+        if (data.success) { showToast('Canción eliminada', 'info'); loadMusic(); renderizarCanciones(); loadDashboard(); }
       } catch (err) {
         if (err.message !== 'Sesión expirada') showToast('Error al eliminar', 'error');
       }
@@ -1143,6 +1143,7 @@
         musicFileInfo.textContent = '';
         musicUploadText.textContent = 'Haz clic para seleccionar archivo MP3';
         loadMusic();
+        renderizarCanciones();
         loadDashboard();
       } catch (err) {
         if (err.message !== 'Sesión expirada') showToast(err.message, 'error');

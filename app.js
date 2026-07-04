@@ -99,11 +99,7 @@ window.API_BASE = '';
             notificarGA();
             window.showArcaError(false);
 
-            // Inicializar galería si navegamos a esa vista
-            var targetPath = new URL(url, window.location.origin).pathname;
-            if (targetPath.indexOf('galeria') !== -1 && typeof window.cargarGaleria === 'function') {
-              setTimeout(window.cargarGaleria, 50);
-            }
+            cambiarVista(url);
           } catch (innerErr) {
             window.location.href = url;
           }
@@ -235,7 +231,7 @@ window.API_BASE = '';
     }
   };
 
-  function cargarGaleria() {
+  function initGaleria() {
     var thumbCol = document.getElementById('thumb-col');
     var thumbLoader = document.getElementById('thumb-loader');
     var viewerImg = document.getElementById('main-viewer-img');
@@ -243,7 +239,7 @@ window.API_BASE = '';
 
     if (!thumbCol) return;
 
-    // Clean container
+    // Clean container to avoid duplicates
     thumbCol.innerHTML = '';
     if (thumbLoader) thumbLoader.remove();
     if (viewerImg) { viewerImg.src = ''; viewerImg.style.opacity = '0'; }
@@ -281,14 +277,24 @@ window.API_BASE = '';
       });
   }
 
-  window.cargarGaleria = cargarGaleria;
+  function cambiarVista(url) {
+    var targetPath = new URL(url, window.location.origin).pathname;
+    if (targetPath.indexOf('galeria') !== -1) {
+      setTimeout(initGaleria, 50);
+    }
+  }
+
+  window.initGaleria = initGaleria;
+  window.cambiarVista = cambiarVista;
+  // backward compatibility
+  window.cargarGaleria = initGaleria;
 
   // ─── Inicializar galería si estamos en esa página ───
   if (window.location.pathname.indexOf('galeria') !== -1) {
     var esperarSb = setInterval(function () {
       if (window._supabase) {
         clearInterval(esperarSb);
-        cargarGaleria();
+        initGaleria();
       }
     }, 100);
     setTimeout(function () { clearInterval(esperarSb); }, 8000);
