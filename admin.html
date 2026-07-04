@@ -673,13 +673,13 @@
 
         <!-- SUBIDA MANUAL -->
         <div class="content-section" id="section-upload">
-          <div style="max-width:600px;">
-            <h3 class="section-title">Subir archivo manualmente</h3>
-            <p style="font-size:13px;color:#888;margin-bottom:20px;">El archivo se publica automáticamente con <strong style="color:#66bb6a;">aprobado=true</strong> y se asigna a una sección.</p>
+          <div style="max-width:700px;">
+            <h3 class="section-title">Subir contenido manualmente</h3>
+            <p style="font-size:13px;color:#888;margin-bottom:20px;">Se publica automáticamente con <strong style="color:#66bb6a;">aprobado=true</strong>. Si incluyes archivo se sube al bucket <strong style="color:#42a5f5;">elarca-uploads</strong>.</p>
             <div style="background:var(--color-carbono);border:1px solid rgba(229,9,20,0.12);border-radius:12px;padding:24px;">
               <form id="admin-upload-form">
                 <div class="form-group">
-                  <label>Sección</label>
+                  <label>Sección / Subsección</label>
                   <select id="admin-upload-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
                     <option value="general">General</option>
                     <option value="relatos">Relatos</option>
@@ -687,28 +687,65 @@
                     <option value="jano">Jano</option>
                     <option value="arca">Arca</option>
                     <option value="organizaciones">Organizaciones</option>
+                    <option value="entrevista">Entrevista</option>
+                    <option value="historia">Historia</option>
+                    <option value="poesia">Poesía</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label>Texto o descripción</label>
-                  <input type="text" id="admin-upload-texto" placeholder="Breve descripción del archivo">
+                  <label>Descripción breve</label>
+                  <input type="text" id="admin-upload-descripcion" placeholder="Breve descripción del contenido">
                 </div>
                 <div class="form-group">
-                  <label>Archivo (imagen o video)</label>
+                  <label>Texto largo (entrevistas / relatos)</label>
+                  <textarea id="admin-upload-textolargo" rows="8" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Pega aquí el contenido completo de la entrevista o relato..."></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Archivo (imagen, video o audio)</label>
                   <div class="upload-area" id="admin-upload-area">
                     <div class="icon">📁</div>
                     <div class="text" id="admin-upload-text">Haz clic para seleccionar archivo</div>
-                    <div class="hint">JPG, PNG, MP4 · Máximo 50 MB</div>
-                    <input type="file" id="admin-upload-file" accept=".jpg,.jpeg,.png,.mp4" style="display:none">
+                    <div class="hint">JPG, PNG, MP4, MP3, WAV · Máximo 50 MB</div>
+                    <input type="file" id="admin-upload-file" accept=".jpg,.jpeg,.png,.webp,.mp4,.mp3,.wav" style="display:none">
                   </div>
                   <div class="file-info" id="admin-upload-file-info"></div>
                 </div>
-                <button type="submit" class="btn-primary" id="btn-admin-upload">Publicar archivo</button>
+                <button type="submit" class="btn-primary" id="btn-admin-upload">Publicar</button>
               </form>
             </div>
           </div>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Approval Modal ─── -->
+  <div id="approval-modal" style="display:none;position:fixed;z-index:99998;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
+    <div style="background:#121212;border:1px solid rgba(229,9,20,0.2);border-radius:16px;padding:32px;max-width:560px;width:90%;max-height:90vh;overflow-y:auto;">
+      <h3 style="font-size:18px;font-weight:700;color:white;margin:0 0 4px 0;">Aprobar recuerdo</h3>
+      <p style="font-size:12px;color:#888;margin:0 0 20px 0;">Edita el texto largo y confirma la sección antes de publicar.</p>
+      <div class="form-group">
+        <label>Sección / Subsección</label>
+        <select id="approval-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+          <option value="general">General</option>
+          <option value="relatos">Relatos</option>
+          <option value="legado">Legado</option>
+          <option value="jano">Jano</option>
+          <option value="arca">Arca</option>
+          <option value="organizaciones">Organizaciones</option>
+          <option value="entrevista">Entrevista</option>
+          <option value="historia">Historia</option>
+          <option value="poesia">Poesía</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Texto largo</label>
+        <textarea id="approval-textolargo" rows="10" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Contenido de la entrevista o relato..."></textarea>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
+        <button class="btn-secondary" id="btn-modal-cancel">Cancelar</button>
+        <button class="btn-primary" id="btn-modal-save">✓ Publicar</button>
       </div>
     </div>
   </div>
@@ -774,7 +811,7 @@
       btnLogin.disabled = true;
 
       try {
-        var s = sb();
+        var s = getSupabaseClient();
         if (!s) throw new Error('Cliente Supabase no disponible');
 
         var { data: authData, error: authError } = await s.auth.signInWithPassword({
@@ -842,17 +879,107 @@
       showToast('Sesión expirada. Ingresa nuevamente.', 'error');
     }
 
+    // ─── Cliente Supabase unificado ───
+    function getSupabaseClient() {
+      return window.miSupabase || window._supabase;
+    }
+
+    // ─── Subir archivo a Storage + insertar en recuerdos ───
+    async function subirArchivo(file, seccion, extraData) {
+      var s = getSupabaseClient();
+      if (!s) throw new Error('Cliente Supabase no disponible');
+
+      var bucket = 'elarca-uploads';
+
+      // ─── Determinar carpeta según sección ───
+      var folderMap = {
+        'musica': 'musica',
+        'cancion': 'musica',
+        'general': 'recuerdos',
+        'relatos': 'relatos',
+        'legado': 'legado',
+        'jano': 'jano',
+        'arca': 'arca',
+        'organizaciones': 'organizaciones',
+        'entrevista': 'entrevistas',
+        'historia': 'historias',
+        'poesia': 'poesia',
+        'images': 'images'
+      };
+      var folder = folderMap[seccion] || 'recuerdos';
+
+      // ─── Sanitizar nombre ───
+      var sanitize = function (name) {
+        return name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.\./g, '.');
+      };
+      var ext = file.name.lastIndexOf('.') !== -1 ? file.name.slice(file.name.lastIndexOf('.')) : '';
+      var baseName = file.name.replace(/\.[^/.]+$/, '').substring(0, 40);
+      var storagePath = folder + '/' + Date.now() + '_' + sanitize(baseName) + ext;
+
+      console.log('[subirArchivo] Subiendo a:', storagePath, 'tamaño:', file.size);
+
+      // ─── Upload ───
+      var { error: uploadError } = await s.storage
+        .from(bucket)
+        .upload(storagePath, file, { contentType: file.type, upsert: false });
+
+      if (uploadError) {
+        console.error('[subirArchivo] Error upload:', uploadError);
+        throw new Error('Error al subir archivo: ' + uploadError.message);
+      }
+
+      console.log('[subirArchivo] Upload exitoso');
+
+      // ─── URL pública ───
+      var { data: { publicUrl } } = s.storage
+        .from(bucket)
+        .getPublicUrl(storagePath);
+
+      console.log('[subirArchivo] URL pública:', publicUrl);
+
+      // ─── Insertar en recuerdos ───
+      var insertData = {
+        nombre: extraData.nombre || 'Admin',
+        mensaje: extraData.descripcion || null,
+        mensaje_largo: extraData.texto_largo || null,
+        url_archivo: publicUrl,
+        storage_path: storagePath,
+        tipo_archivo: file.type,
+        nombre_original: file.name,
+        tamanio_bytes: file.size,
+        seccion: seccion,
+        aprobado: true,
+        categoria: extraData.categoria || seccion
+      };
+
+      console.log('[subirArchivo] Insertando en recuerdos:', insertData);
+
+      var { data: inserted, error: insertError } = await s
+        .from('recuerdos')
+        .insert(insertData)
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('[subirArchivo] Error insert:', insertError);
+        throw new Error('Error al guardar registro: ' + insertError.message);
+      }
+
+      console.log('[subirArchivo] Registro creado ID:', inserted.id);
+      return inserted;
+    }
+
     // ─── Dashboard ───
     async function loadDashboard() {
       try {
-        var s = sb();
+        var s = getSupabaseClient();
         if (!s) return;
 
         var [countPend, countAprob, countMus, recRes] = await Promise.all([
           s.from('recuerdos').select('*', { count: 'exact', head: true }).eq('aprobado', false),
           s.from('recuerdos').select('*', { count: 'exact', head: true }).eq('aprobado', true),
           s.from('musica_reproductor').select('*', { count: 'exact', head: true }).eq('activo', true),
-          s.from('recuerdos').select('*').order('created_at', { ascending: false })
+          s.from('recuerdos').select('*').eq('aprobado', false).order('created_at', { ascending: false })
         ]);
 
         document.getElementById('stat-pending').textContent = countPend.count ?? 0;
@@ -863,19 +990,18 @@
         var recentList = document.getElementById('recent-recuerdos-list');
         var recent = recuerdos.slice(0, 5);
         if (recent.length === 0) {
-          recentList.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div class="text">No hay recuerdos aún</div></div>';
+          recentList.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div class="text">No hay recuerdos pendientes</div></div>';
           return;
         }
-        var html = '<table><thead><tr><th>Nombre</th><th class="hide-mobile">Tipo</th><th>Estado</th><th class="hide-mobile">Fecha</th></tr></thead><tbody>';
+        var html = '<table><thead><tr><th>Nombre</th><th class="hide-mobile">Tipo</th><th class="hide-mobile">Sección</th><th class="hide-mobile">Fecha</th></tr></thead><tbody>';
         recent.forEach(function(r) {
           var tipoClass = 'badge-image';
           var tipoLabel = 'Imagen';
           if (r.tipo_archivo && r.tipo_archivo.indexOf('audio') !== -1) { tipoClass = 'badge-audio'; tipoLabel = 'Audio'; }
           else if (r.tipo_archivo && r.tipo_archivo.indexOf('video') !== -1) { tipoClass = 'badge-video'; tipoLabel = 'Video'; }
-          var estadoClass = r.aprobado ? 'badge-approved' : 'badge-pending';
-          var estadoLabel = r.aprobado ? 'Aprobado' : 'Pendiente';
+          var seccionLabel = r.seccion ? r.seccion.charAt(0).toUpperCase() + r.seccion.slice(1) : '—';
           var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL') : '—';
-          html += '<tr><td class="truncate">' + escapeHtml(r.nombre) + '</td><td class="hide-mobile"><span class="badge ' + tipoClass + '">' + tipoLabel + '</span></td><td><span class="badge ' + estadoClass + '">' + estadoLabel + '</span></td><td class="hide-mobile">' + fecha + '</td></tr>';
+          html += '<tr><td class="truncate">' + escapeHtml(r.nombre) + '</td><td class="hide-mobile"><span class="badge ' + tipoClass + '">' + tipoLabel + '</span></td><td class="hide-mobile">' + seccionLabel + '</td><td class="hide-mobile">' + fecha + '</td></tr>';
         });
         html += '</tbody></table>';
         recentList.innerHTML = html;
@@ -888,7 +1014,7 @@
     // ─── Pending ───
     async function loadPending() {
       try {
-        var s = sb();
+        var s = getSupabaseClient();
         if (!s) return;
         var { data, error } = await s.from('recuerdos').select('*').eq('aprobado', false).order('created_at', { ascending: false });
         if (error) throw error;
@@ -930,6 +1056,9 @@
                 '<option value="jano">Jano</option>' +
                 '<option value="arca">Arca</option>' +
                 '<option value="organizaciones">Organizaciones</option>' +
+                '<option value="entrevista">Entrevista</option>' +
+                '<option value="historia">Historia</option>' +
+                '<option value="poesia">Poesía</option>' +
               '</select>' +
               '<button class="btn-sm btn-sm-approve" onclick="window.approveRecuerdo(\'' + r.id + '\')">✓ Aprobar</button> ' +
               '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')">✕ Rechazar</button>' +
@@ -945,7 +1074,7 @@
     // ─── Approved ───
     async function loadApproved() {
       try {
-        var s = sb();
+        var s = getSupabaseClient();
         if (!s) return;
         var { data } = await s.from('recuerdos').select('*').eq('aprobado', true).order('created_at', { ascending: false });
         var approved = data || [];
@@ -970,39 +1099,103 @@
       }
     }
 
-    // ─── Actions ───
-    window.approveRecuerdo = async function(id) {
-      try {
-        var seccionSelect = document.getElementById('seccion-' + id);
-        var seccion = seccionSelect ? seccionSelect.value : 'general';
-        var textareaEl = document.getElementById('texto-' + id);
-        var body = { seccion: seccion };
-        if (textareaEl) body.mensaje_largo = textareaEl.value;
-        var data = await adminFetch('recuerdos/' + id + '/aprobar', {
-          method: 'PUT',
-          body: body
-        });
-        if (data.success) {
+    // ─── Modal de aprobación ───
+    var _approvalTargetId = null;
+    var approvalModal = document.getElementById('approval-modal');
+    var approvalSeccion = document.getElementById('approval-seccion');
+    var approvalTextoLargo = document.getElementById('approval-textolargo');
+    var btnModalCancel = document.getElementById('btn-modal-cancel');
+    var btnModalSave = document.getElementById('btn-modal-save');
+
+    function openApprovalModal(id, currentSeccion, currentTextoLargo) {
+      _approvalTargetId = id;
+      if (approvalSeccion) approvalSeccion.value = currentSeccion || 'general';
+      if (approvalTextoLargo) approvalTextoLargo.value = currentTextoLargo || '';
+      if (approvalModal) approvalModal.style.display = 'flex';
+    }
+
+    function closeApprovalModal() {
+      _approvalTargetId = null;
+      if (approvalModal) approvalModal.style.display = 'none';
+    }
+
+    if (btnModalCancel) {
+      btnModalCancel.addEventListener('click', closeApprovalModal);
+    }
+
+    if (approvalModal) {
+      approvalModal.addEventListener('click', function (e) {
+        if (e.target === approvalModal) closeApprovalModal();
+      });
+    }
+
+    if (btnModalSave) {
+      btnModalSave.addEventListener('click', async function () {
+        var id = _approvalTargetId;
+        if (!id) { closeApprovalModal(); return; }
+
+        var seccion = approvalSeccion ? approvalSeccion.value : 'general';
+        var textoLargo = approvalTextoLargo ? approvalTextoLargo.value.trim() : '';
+
+        btnModalSave.textContent = 'Publicando...';
+        btnModalSave.disabled = true;
+
+        try {
+          var s = getSupabaseClient();
+          if (!s) throw new Error('Cliente Supabase no disponible');
+
+          var updateData = {
+            aprobado: true,
+            seccion: seccion,
+            mensaje_largo: textoLargo || null
+          };
+
+          console.log('[Aprobar] Actualizando recuerdo', id, 'con:', updateData);
+
+          var { error: updateError } = await s
+            .from('recuerdos')
+            .update(updateData)
+            .eq('id', id);
+
+          if (updateError) throw updateError;
+
           showToast('Recuerdo aprobado y publicado en ' + seccion, 'success');
+          closeApprovalModal();
           loadPending();
           loadDashboard();
+          loadApproved();
+        } catch (err) {
+          console.error('[Aprobar] Error:', err);
+          showToast('Error al aprobar: ' + (err.message || 'desconocido'), 'error');
+        } finally {
+          btnModalSave.textContent = '✓ Publicar';
+          btnModalSave.disabled = false;
         }
-      } catch (err) {
-        if (err.message !== 'Sesión expirada') showToast('Error al aprobar', 'error');
-      }
+      });
+    }
+
+    // ─── Actions ───
+    window.approveRecuerdo = function(id) {
+      var seccionSelect = document.getElementById('seccion-' + id);
+      var currentSeccion = seccionSelect ? seccionSelect.value : 'general';
+      var textareaEl = document.getElementById('texto-' + id);
+      var currentTextoLargo = textareaEl ? textareaEl.value : '';
+      openApprovalModal(id, currentSeccion, currentTextoLargo);
     };
 
     window.rejectRecuerdo = async function(id) {
       if (!confirm('¿Eliminar este recuerdo permanentemente?')) return;
       try {
-        var data = await adminFetch('recuerdos/' + id, { method: 'DELETE' });
-        if (data.success) {
-          showToast('Recuerdo eliminado', 'info');
-          loadPending();
-          loadApproved();
-          loadDashboard();
-        }
+        var s = getSupabaseClient();
+        if (!s) throw new Error('Cliente Supabase no disponible');
+        var { error } = await s.from('recuerdos').delete().eq('id', id);
+        if (error) throw error;
+        showToast('Recuerdo eliminado', 'info');
+        loadPending();
+        loadApproved();
+        loadDashboard();
       } catch (err) {
+        console.error('[Rechazar] Error:', err);
         if (err.message !== 'Sesión expirada') showToast('Error al eliminar', 'error');
       }
     };
@@ -1010,7 +1203,7 @@
     // ─── Music ───
     async function loadMusic() {
       try {
-        var s = sb();
+        var s = getSupabaseClient();
         if (!s) return;
         var { data } = await s.from('musica_reproductor').select('*').order('orden', { ascending: true });
         var musica = data || [];
@@ -1041,7 +1234,7 @@
 
     async function renderizarCanciones() {
       try {
-        var s = sb();
+        var s = getSupabaseClient();
         if (!s) return;
         var { data, error } = await s.from('musica_reproductor').select('*').order('orden', { ascending: true });
         if (error) throw error;
@@ -1179,39 +1372,55 @@
 
     document.getElementById('admin-upload-form').addEventListener('submit', async function(e) {
       e.preventDefault();
+
       var seccion = document.getElementById('admin-upload-seccion').value;
-      var texto = document.getElementById('admin-upload-texto').value.trim();
+      var descripcion = document.getElementById('admin-upload-descripcion').value.trim();
+      var textoLargo = document.getElementById('admin-upload-textolargo').value.trim();
       var file = adminUploadFile.files[0];
-      if (!file) { showToast('Selecciona un archivo', 'error'); return; }
+      var s = getSupabaseClient();
+
+      if (!s) { showToast('Cliente Supabase no disponible', 'error'); return; }
+      if (!file && !textoLargo) { showToast('Agrega un archivo o texto largo', 'error'); return; }
 
       var btn = document.getElementById('btn-admin-upload');
       btn.textContent = 'Publicando...';
       btn.disabled = true;
 
       try {
-        var fd = new FormData();
-        fd.append('archivo', file);
-        fd.append('texto', texto);
-        fd.append('seccion', seccion);
+        if (file && file.size > 0) {
+          console.log('[Upload] Subiendo archivo con subirArchivo...');
+          await subirArchivo(file, seccion, {
+            nombre: 'Admin',
+            descripcion: descripcion,
+            texto_largo: textoLargo,
+            categoria: seccion
+          });
+          console.log('[Upload] subirArchivo completado');
+        } else {
+          console.log('[Upload] Solo texto, insertando directamente...');
+          var insertData = {
+            nombre: 'Admin',
+            mensaje: descripcion || null,
+            mensaje_largo: textoLargo || null,
+            seccion: seccion,
+            aprobado: true,
+            categoria: seccion
+          };
+          var { error: insertError } = await s.from('recuerdos').insert(insertData);
+          if (insertError) throw insertError;
+        }
 
-        var uploadUrl = window.fnUrl ? window.fnUrl('upload') : (API_BASE + '/api/v1/admin/subir');
-        var res = await fetch(uploadUrl, {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + token },
-          body: fd
-        });
-        var data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Error al publicar');
-        showToast('Archivo publicado en ' + seccion, 'success');
+        showToast('Contenido publicado en ' + seccion, 'success');
         document.getElementById('admin-upload-form').reset();
-        if (adminUploadFileInfo) adminUploadFileInfo.textContent = '';
-        if (adminUploadText) adminUploadText.textContent = 'Haz clic para seleccionar archivo';
-        if (loadApproved) loadApproved();
-        if (loadDashboard) loadDashboard();
+        if (adminUploadFileInfo) { adminUploadFileInfo.textContent = ''; }
+        if (adminUploadText) { adminUploadText.textContent = 'Haz clic para seleccionar archivo'; }
+        if (typeof loadApproved === 'function') loadApproved();
+        if (typeof loadDashboard === 'function') loadDashboard();
       } catch (err) {
-        if (err.message !== 'Sesión expirada') showToast(err.message, 'error');
+        console.error('[Upload] Error:', err);
+        showToast(err.message || 'Error al publicar', 'error');
       } finally {
-        btn.textContent = 'Publicar archivo';
+        btn.textContent = 'Publicar';
         btn.disabled = false;
       }
     });
