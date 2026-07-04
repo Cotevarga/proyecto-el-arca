@@ -389,6 +389,17 @@
     });
   </script>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
+  <script>
+    try {
+      window.miSupabase = supabase.createClient(
+        'https://ukpoprkdgezgxlkjjuve.supabase.co',
+        'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi'
+      );
+    } catch (e) {
+      console.warn('[Supabase] Error al crear cliente persistente:', e);
+    }
+  </script>
   <script src="/app.js"></script>
 </body>
 </html>

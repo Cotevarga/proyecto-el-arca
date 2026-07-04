@@ -16,9 +16,11 @@ window.EDGE_FUNCTIONS_URL = window.EDGE_FUNCTIONS_URL || '';
       console.warn('[Supabase] URL o ANON_KEY no definidos');
       return false;
     }
-    window._supabase = supabase.createClient(url, key, {
+    var client = supabase.createClient(url, key, {
       auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true },
     });
+    window._supabase = client;
+    if (!window.miSupabase) window.miSupabase = client;
     console.log('[Supabase] Cliente inicializado');
     return true;
   };
