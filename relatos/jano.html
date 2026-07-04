@@ -196,9 +196,14 @@
 
 
   <script>
-    document.getElementById('menu-toggle').addEventListener('click', function() {
-      document.getElementById('mobile-menu').classList.toggle('hidden');
-    });
+    var menuToggle = document.getElementById('menu-toggle');
+    if (menuToggle) {
+      menuToggle.addEventListener('click', function() {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+      });
+    } else {
+      console.warn('[Nav] menu-toggle no encontrado');
+    }
     document.querySelectorAll('#mobile-menu a').forEach(function(l) {
       l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
     });

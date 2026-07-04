@@ -268,13 +268,35 @@ window.API_BASE = '';
 
   // ─── 2. Función de carga de galería con reintento y validación ───
   async function cargarGaleria() {
-    console.log("Iniciando carga de galer\u00eda...");
-    var client = await asegurarSupabase();
-
-    if (!client) {
-      console.warn("[Galeria] Supabase sigue no disponible");
-      return;
+    console.log("Iniciando carga de galería...");
+    
+    // 1. Inicialización local y segura
+    // Si usas el script de CDN, asegúrate de que 'supabase' esté definido
+    // Si usas módulos, aquí deberías hacer el import
+    if (typeof supabase === 'undefined') {
+        console.error("[Galeria] Supabase no está cargado en el navegador.");
+        return;
     }
+
+    // Inicializa el cliente dentro de la función si es necesario
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    const contenedor = document.getElementById('galeria-container');
+    if (!contenedor) return;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('recuerdos')
+            .select('*');
+            
+        if (error) throw error;
+        
+        contenedor.innerHTML = ''; // Limpiar
+        // ... tu lógica para pintar los datos ...
+    } catch (e) {
+        console.error("Error al cargar galería:", e);
+    }
+}
 
     // 3. Validación de existencia del DOM antes de manipular
     var galeriaContenedor = document.getElementById('galeria-container');
