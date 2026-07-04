@@ -569,7 +569,7 @@
         <input type="email" id="login-email" placeholder="admin@elarca.cl" required autocomplete="email">
         <label for="login-password">Contraseña</label>
         <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
-        <button type="submit" class="btn-login" id="btn-login">Acceder al Panel</button>
+        <button type="submit" class="btn-login" id="btn-login" aria-label="Iniciar sesión en el panel de administración">Acceder al Panel</button>
         <div class="login-error" id="login-error"></div>
       </form>
     </div>
@@ -629,6 +629,23 @@
                   <div class="np-title" id="np-title">—</div>
                   <div class="np-artist" id="np-artist">Esperando canción...</div>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div class="stat-card-memoria" style="background:var(--color-carbono);border:1px solid rgba(229,9,20,0.12);border-radius:12px;padding:20px;margin-bottom:24px;">
+            <h3 style="font-size:13px;font-weight:700;color:white;margin:0 0 16px 0;letter-spacing:0.05em;text-transform:uppercase;">📊 Estadísticas de Memoria</h3>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+              <div style="text-align:center;">
+                <div style="font-size:28px;font-weight:800;color:var(--color-mir);" id="stat-total-recuerdos">—</div>
+                <div style="font-size:11px;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:0.05em;">Total recuerdos</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:28px;font-weight:800;color:var(--color-mir);" id="stat-vecinos-unicos">—</div>
+                <div style="font-size:11px;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:0.05em;">Vecinos participantes</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:28px;font-weight:800;color:var(--color-mir);" id="stat-gb-preservados">—</div>
+                <div style="font-size:11px;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:0.05em;">GB preservados</div>
               </div>
             </div>
           </div>
@@ -701,7 +718,7 @@
                     </div>
                     <div class="file-info" id="music-file-info"></div>
                   </div>
-                  <button type="submit" class="btn-primary" id="btn-upload-music">Subir canción</button>
+                  <button type="submit" class="btn-primary" id="btn-upload-music" aria-label="Subir nueva canción a la plataforma">Subir canción</button>
                 </form>
               </div>
             </div>
@@ -756,7 +773,24 @@
                   </div>
                   <div class="file-info" id="admin-upload-file-info"></div>
                 </div>
-                <button type="submit" class="btn-primary" id="btn-admin-upload">Publicar</button>
+                <div style="padding:12px 16px;background:rgba(229,9,20,0.04);border:1px solid rgba(229,9,20,0.1);border-radius:8px;margin-bottom:20px;">
+                  <p style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:12px;">Metadatos adicionales (opcionales)</p>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label>Ubicación</label>
+                      <input type="text" id="admin-upload-geo" placeholder="Ej: La Pintana, Santiago">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label>Fecha del original</label>
+                      <input type="date" id="admin-upload-fecha" style="color-scheme:dark;">
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;margin-top:8px;">
+                    <label>Etiquetas (separadas por coma)</label>
+                    <input type="text" id="admin-upload-tags" placeholder="Ej: marcha, pobladores, años 90">
+                  </div>
+                </div>
+                <button type="submit" class="btn-primary" id="btn-admin-upload" aria-label="Publicar contenido en el archivo">Publicar</button>
               </form>
             </div>
           </div>
@@ -787,8 +821,8 @@
         <textarea id="approval-textolargo" rows="10" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Completa o edita el relato..."></textarea>
       </div>
       <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
-        <button class="btn-secondary" id="btn-approval-cancel">Cancelar</button>
-        <button class="btn-primary" id="btn-approval-confirm">✓ CONFIRMAR PUBLICACIÓN</button>
+        <button class="btn-secondary" id="btn-approval-cancel" aria-label="Cancelar aprobación y cerrar modal">Cancelar</button>
+        <button class="btn-primary" id="btn-approval-confirm" aria-label="Confirmar publicación del recuerdo">✓ CONFIRMAR PUBLICACIÓN</button>
       </div>
     </div>
   </div>
@@ -799,7 +833,7 @@
       <img id="review-img" src="" style="width:100%;max-height:400px;object-fit:contain;border-radius:8px;margin-bottom:20px;display:none;background:#000;" alt="Vista previa">
       <div id="review-text" style="font-size:14px;color:#ccc;line-height:1.7;white-space:pre-wrap;word-break:break-word;"></div>
       <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
-        <button class="btn-secondary" id="btn-review-close">Cerrar</button>
+        <button class="btn-secondary" id="btn-review-close" aria-label="Cerrar ventana de revisión detallada">Cerrar</button>
       </div>
     </div>
   </div>
@@ -1021,7 +1055,10 @@
         tamanio_bytes: file.size,
         seccion: seccion,
         aprobado: true,
-        categoria: extraData.categoria || seccion
+        categoria: extraData.categoria || seccion,
+        geolocalizacion: extraData.geolocalizacion || null,
+        tags: extraData.tags || null,
+        fecha_creacion_archivo: extraData.fecha_creacion_archivo || null
       };
 
       console.log('[subirArchivo] Insertando en recuerdos:', insertData);
@@ -1109,6 +1146,56 @@
     }
 
     // ═══════════════════════════════════════════════
+    // ESTADÍSTICAS DE MEMORIA
+    // ═══════════════════════════════════════════════
+
+    async function cargarEstadisticasMemoria() {
+      try {
+        var s = getSupabaseClient();
+        if (!s) return;
+
+        var [rTotal, rVecinos, rBytes] = await Promise.all([
+          s.from('recuerdos').select('*', { count: 'exact', head: true }),
+          s.from('recuerdos').select('nombre', { count: 'exact', head: true }).not('nombre', 'is', null).neq('nombre', ''),
+          s.from('recuerdos').select('tamanio_bytes').not('tamanio_bytes', 'is', null)
+        ]);
+
+        var elTotal = document.getElementById('stat-total-recuerdos');
+        var elVecinos = document.getElementById('stat-vecinos-unicos');
+        var elGb = document.getElementById('stat-gb-preservados');
+
+        if (elTotal) elTotal.textContent = (rTotal.count ?? 0).toLocaleString('es-CL');
+
+        if (elVecinos) {
+          try {
+            var { data: nombresData, error: nombresErr } = await s
+              .from('recuerdos')
+              .select('nombre')
+              .not('nombre', 'is', null)
+              .neq('nombre', '');
+            if (!nombresErr && nombresData) {
+              var unicos = {};
+              nombresData.forEach(function(r) { if (r.nombre) unicos[r.nombre.toLowerCase().trim()] = true; });
+              elVecinos.textContent = Object.keys(unicos).length.toLocaleString('es-CL');
+            }
+          } catch (e) {
+            elVecinos.textContent = '—';
+          }
+        }
+
+        if (elGb) {
+          var totalBytes = 0;
+          if (rBytes.data) {
+            rBytes.data.forEach(function(r) { totalBytes += Number(r.tamanio_bytes || 0); });
+          }
+          elGb.textContent = (totalBytes / (1024 * 1024 * 1024)).toFixed(2);
+        }
+      } catch (err) {
+        console.error('[Estadisticas] Error:', err);
+      }
+    }
+
+    // ═══════════════════════════════════════════════
     // DASHBOARD — listado + contadores
     // ═══════════════════════════════════════════════
 
@@ -1152,12 +1239,12 @@
           var acciones = '';
           if (r.aprobado) {
             estadoBadge = '<span class="badge badge-approved">Publicado</span>';
-            acciones = '<button class="btn-sm btn-sm-danger" onclick="window.rejectRecuerdo(\'' + r.id + '\')">✕ Eliminar</button>';
+            acciones = '<button class="btn-sm btn-sm-danger" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo de ' + escapeHtml(nombre) + '">✕ Eliminar</button>';
           } else {
             estadoBadge = '<span class="badge badge-pending">Pendiente</span>';
             acciones =
-              '<button class="btn-sm btn-sm-approve" onclick="window.approveRecuerdo(\'' + r.id + '\')" style="margin-right:4px;">✓ Aprobar</button>' +
-              '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')">✕ Eliminar</button>';
+              '<button class="btn-sm btn-sm-approve" onclick="window.approveRecuerdo(\'' + r.id + '\')" style="margin-right:4px;" aria-label="Abrir modal de aprobación para recuerdo de ' + escapeHtml(nombre) + '">✓ Aprobar</button>' +
+              '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo pendiente de ' + escapeHtml(nombre) + '">✕ Eliminar</button>';
           }
 
           html += '<tr>' +
@@ -1179,7 +1266,8 @@
       await Promise.all([
         refrescarContadores(),
         cargarAhoraSuena(),
-        renderRecentRecuerdos()
+        renderRecentRecuerdos(),
+        cargarEstadisticasMemoria()
       ]);
     }
 
@@ -1284,7 +1372,7 @@
         var html = '<table><thead><tr><th>Vista previa</th><th>Relato</th><th>Acción</th></tr></thead><tbody>';
         pending.forEach(function(r) {
           var imgHtml = r.url_archivo
-            ? '<img src="' + r.url_archivo + '" width="100" style="border-radius:8px;object-fit:cover;max-height:80px;" alt="Vista previa">'
+            ? '<img src="' + r.url_archivo + '" width="100" style="border-radius:8px;object-fit:cover;max-height:80px;" alt="Vista previa de ' + escapeHtml(r.nombre || 'recuerdo') + '">'
             : '<span style="color:#666;font-size:11px;">Archivo no disponible</span>';
 
           var textoRelato = r.mensaje_largo || r.mensaje || '';
@@ -1293,7 +1381,7 @@
             var textoTruncado = textoRelato.length > 200 ? textoRelato.substring(0, 200) + '...' : textoRelato;
             relatoHtml = '<div style="max-height:100px;overflow-y:auto;font-size:12px;color:#ccc;line-height:1.5;">' + escapeHtml(textoTruncado) + '</div>';
             if (textoRelato.length > 200) {
-              relatoHtml += '<button class="btn-ver-completo" onclick="window.verCompleto(\'' + r.id + '\')">VER COMPLETO</button>';
+              relatoHtml += '<button class="btn-ver-completo" onclick="window.verCompleto(\'' + r.id + '\')" aria-label="Ver texto completo del relato">VER COMPLETO</button>';
             }
           } else {
             relatoHtml = '<span style="color:#555;font-size:11px;">Sin relato</span>';
@@ -1303,8 +1391,8 @@
             '<td style="vertical-align:middle;">' + imgHtml + '</td>' +
             '<td style="vertical-align:middle;">' + relatoHtml + '</td>' +
             '<td style="vertical-align:middle;white-space:nowrap;">' +
-              '<button class="btn-sm btn-sm-approve" onclick="window.approveRecuerdo(\'' + r.id + '\')">✓ APROBAR</button> ' +
-              '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')">✕ ELIMINAR</button>' +
+              '<button class="btn-sm btn-sm-approve" onclick="window.approveRecuerdo(\'' + r.id + '\')" aria-label="Abrir modal de aprobación">✓ APROBAR</button> ' +
+              '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo permanentemente">✕ ELIMINAR</button>' +
             '</td></tr>';
         });
         html += '</tbody></table>';
@@ -1343,7 +1431,7 @@
           reviewImg.src = data.url_archivo || '';
           reviewImg.style.display = data.url_archivo ? 'block' : 'none';
           if (!data.url_archivo) {
-            reviewImg.alt = 'Archivo no disponible';
+          reviewImg.alt = data.nombre ? 'Imagen aportada por ' + data.nombre : 'Archivo no disponible';
           }
         }
         if (reviewText) {
@@ -1383,7 +1471,7 @@
             '<td class="truncate">' + escapeHtml(r.nombre) + '</td>' +
             '<td class="hide-mobile"><span class="badge badge-approved">' + (r.tipo_archivo && r.tipo_archivo.indexOf('audio') !== -1 ? 'Audio' : 'Imagen') + '</span></td>' +
             '<td class="hide-mobile">' + fecha + '</td>' +
-            '<td><button class="btn-sm btn-sm-danger" onclick="window.rejectRecuerdo(\'' + r.id + '\')">✕ Eliminar</button></td></tr>';
+            '<td><button class="btn-sm btn-sm-danger" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo aprobado de ' + escapeHtml(r.nombre) + '">✕ Eliminar</button></td></tr>';
         });
         html += '</tbody></table>';
         list.innerHTML = html;
@@ -1541,7 +1629,7 @@
               '<div class="song-artist">' + escapeHtml(c.artista || 'El Arca') + '</div>' +
             '</div>' +
             '<div class="song-actions">' +
-              '<button class="btn-sm btn-sm-reject" onclick="window.eliminarCancion(\'' + c.id + '\')">✕ ELIMINAR</button>' +
+              '<button class="btn-sm btn-sm-reject" onclick="window.eliminarCancion(\'' + c.id + '\')" aria-label="Eliminar canción ' + escapeHtml(c.titulo) + '">✕ ELIMINAR</button>' +
             '</div>';
           contenedor.appendChild(card);
         });
@@ -1578,8 +1666,8 @@
                 '<div class="song-artist">' + escapeHtml(c.artista || 'El Arca') + '</div>' +
               '</div>' +
               '<div class="song-actions">' +
-                '<button class="btn-sm btn-sm-approve" onclick="window.previsualizarMusica(\'' + escapeHtml(c.url_mp3) + '\')" title="Previsualizar">▶ PLAY</button> ' +
-                '<button class="btn-sm btn-sm-reject" onclick="window.eliminarCancion(\'' + c.id + '\')">✕ ELIMINAR</button>' +
+                '<button class="btn-sm btn-sm-approve" onclick="window.previsualizarMusica(\'' + escapeHtml(c.url_mp3) + '\')" title="Previsualizar" aria-label="Reproducir previsualización de ' + escapeHtml(c.titulo) + '">▶ PLAY</button> ' +
+                '<button class="btn-sm btn-sm-reject" onclick="window.eliminarCancion(\'' + c.id + '\')" aria-label="Eliminar canción ' + escapeHtml(c.titulo) + '">✕ ELIMINAR</button>' +
               '</div></div>';
           });
           musicList.innerHTML = html;
@@ -1756,15 +1844,27 @@
       if (!s) { showToast('Cliente Supabase no disponible', 'error'); return; }
       if (!file && !textoLargo) { showToast('Agrega un archivo o texto largo', 'error'); return; }
 
+      // Metadatos opcionales
+      var adminGeo = document.getElementById('admin-upload-geo');
+      var adminFecha = document.getElementById('admin-upload-fecha');
+      var adminTags = document.getElementById('admin-upload-tags');
+      var metaData = {
+        nombre: 'Admin',
+        descripcion: descripcion,
+        texto_largo: textoLargo,
+        categoria: seccion,
+        geolocalizacion: adminGeo ? adminGeo.value.trim() || null : null,
+        fecha_creacion_archivo: adminFecha ? adminFecha.value || null : null,
+        tags: null
+      };
+      if (adminTags && adminTags.value.trim()) {
+        metaData.tags = adminTags.value.trim().split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t.length > 0; });
+      }
+
       procesarSubida(btn, async function() {
         if (file && file.size > 0) {
           console.log('[Upload] Subiendo archivo con subirArchivo...');
-          await subirArchivo(file, seccion, {
-            nombre: 'Admin',
-            descripcion: descripcion,
-            texto_largo: textoLargo,
-            categoria: seccion
-          });
+          await subirArchivo(file, seccion, metaData);
           console.log('[Upload] subirArchivo completado');
         } else {
           console.log('[Upload] Solo texto, insertando directamente...');
@@ -1774,7 +1874,10 @@
             mensaje_largo: textoLargo || null,
             seccion: seccion,
             aprobado: true,
-            categoria: seccion
+            categoria: seccion,
+            geolocalizacion: metaData.geolocalizacion || null,
+            tags: metaData.tags || null,
+            fecha_creacion_archivo: metaData.fecha_creacion_archivo || null
           };
           var { error: insertError } = await s.from('recuerdos').insert(insertData);
           if (insertError) throw insertError;

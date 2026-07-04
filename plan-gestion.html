@@ -80,6 +80,13 @@
             <li><strong>aprobado:</strong> Estado del flujo curatorial (pendiente / publicado).</li>
           </ul>
           <p>Estos metadatos permiten auditorías completas, verificación de autenticidad y migraciones controladas a futuros sistemas.</p>
+          <p style="margin-top:12px;"><strong>Integridad mediante Hashing:</strong> Cada archivo subido al Storage se somete a un proceso de hash SHA-256. El hash resultante se almacena como metadato adicional del registro (columna <code>hash_sha256</code>). Este hash permite:</p>
+          <ul>
+            <li><strong>Verificación de integridad:</strong> Comparar el hash del archivo almacenado contra el hash original para detectar corrupción de datos, alteraciones no autorizadas o errores de transferencia.</li>
+            <li><strong>Autenticidad forense:</strong> Proporcionar una huella digital única del archivo que puede cotejarse en auditorías externas o procesos legales.</li>
+            <li><strong>Detección de duplicados:</strong> Identificar archivos idénticos mediante la comparación de hashes, optimizando el uso del Storage.</li>
+          </ul>
+          <p>El cálculo del hash se realiza en el momento de la subida mediante la API <code>SubtleCrypto.digest()</code> del navegador (Web Crypto API) y se almacena junto con el registro en la base de datos. En migraciones futuras, el hash se recalcula y verifica contra el valor almacenado.</p>
         </div>
 
         <div class="seccion">

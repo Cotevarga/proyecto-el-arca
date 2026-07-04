@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS public.recuerdos (
     nombre VARCHAR(255),
     anio VARCHAR(255),
     mensaje TEXT,
+    mensaje_largo TEXT,
     tipo_archivo VARCHAR(100),
     url_archivo VARCHAR(1024),
     storage_path VARCHAR(512),
@@ -32,7 +33,12 @@ CREATE TABLE IF NOT EXISTS public.recuerdos (
     texto TEXT,
     tipo VARCHAR(50),
     url VARCHAR(1024),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    -- Metadatos avanzados (v2)
+    geolocalizacion TEXT,
+    tags TEXT[] DEFAULT '{}',
+    fecha_creacion_archivo DATE,
+    hash_sha256 VARCHAR(64)
 );
 
 CREATE TABLE IF NOT EXISTS public.musica_reproductor (

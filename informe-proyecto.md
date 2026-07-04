@@ -44,6 +44,10 @@ El archivo se organiza en seis categorías (secciones) que reflejan la estructur
 - `seccion`: Clasificación taxonómica
 - `aprobado`: Estado del flujo curatorial
 - `created_at`: Timestamp de ingreso
+- `geolocalizacion`: Ubicación geográfica del contenido (opcional)
+- `tags`: Arreglo de etiquetas para búsqueda facetada (text[])
+- `fecha_creacion_archivo`: Fecha original del material (date, opcional)
+- `hash_sha256`: Hash SHA-256 del archivo para verificación de integridad
 
 ---
 
