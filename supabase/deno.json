@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.49.1"
+  },
+  "tasks": {
+    "auth": "deno serve --watch functions/auth/index.ts",
+    "galeria": "deno serve --watch functions/galeria/index.ts",
+    "musica": "deno serve --watch functions/musica/index.ts",
+    "recuerdos": "deno serve --watch functions/recuerdos/index.ts",
+    "upload": "deno serve --watch functions/upload/index.ts"
+  }
+}

@@ -118,6 +118,12 @@
       box-shadow: 0 8px 30px rgba(229,9,20,0.15);
     }
   </style>
+  <script>
+    window.SUPABASE_URL = 'https://ukpoprkdgezgxlkjjuve.supabase.co';
+    window.SUPABASE_ANON_KEY = 'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi';
+    window.EDGE_FUNCTIONS_URL = 'https://ukpoprkdgezgxlkjjuve.supabase.co/functions/v1';
+  </script>
+  <script src="/supabase.js" defer></script>
   <script src="/audio-player.js" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
   <script>
@@ -259,25 +265,35 @@
     var lbNext = document.getElementById('lb-next');
     var lbLoader = document.getElementById('lb-loader');
 
-    // ─── Cargar desde API con timeout de 5s ───
-    var API_URL = '/api/v1/galeria';
-    var controller = new AbortController();
-    var timeout = setTimeout(function () { controller.abort(); }, 5000);
+    // ─── Cargar desde Supabase ───
+    function cargarGaleria() {
+      var sb = window._supabase;
+      if (!sb) { setTimeout(function () { if (imagenes.length === 0) cargarGaleria(); }, 1500); return; }
 
-    fetch(API_URL, { signal: controller.signal })
-      .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
-      .then(function (data) {
-        clearTimeout(timeout);
-        if (Array.isArray(data) && data.length > 0) {
-          imagenes = data;
-          renderThumbs();
-          showImage(0);
-        }
-      })
-      .catch(function () {
-        clearTimeout(timeout);
-        loadFallback();
-      });
+      sb.from('galeria')
+        .select('url_imagen, titulo')
+        .eq('activo', true)
+        .order('orden', { ascending: true })
+        .then(function (res) {
+          if (res.error) throw res.error;
+          if (res.data && res.data.length > 0) {
+            imagenes = res.data.map(function (item) { return { url: item.url_imagen, titulo: item.titulo }; });
+            renderThumbs();
+            showImage(0);
+          }
+        })
+        .catch(function () {
+          loadFallback();
+        });
+    }
+
+    var checkSb = setInterval(function () {
+      if (window._supabase) {
+        clearInterval(checkSb);
+        cargarGaleria();
+      }
+    }, 100);
+    setTimeout(function () { clearInterval(checkSb); }, 8000);
 
     function loadFallback() {
       imagenes = [
@@ -291,7 +307,7 @@
         { url: '/images/navidad_popular.jpg' },
         { url: '/images/companeros_melon.jpg' },
         { url: '/images/radio_libre.jpg' },
-        { url: '/images/antupeñi.jpeg' }
+        { url: '/images/antupeni.jpg' }
       ];
       renderThumbs();
       showImage(0);

@@ -1,7 +1,7 @@
 # El Arca — Archivo Comunitario
 
 Memorial de Pedro "Cabezón Jano" González.  
-**Arquitectura híbrida:** Backend en Render (Docker) + Frontend en Vercel (SPA).
+**Arquitectura BaaS:** Supabase (Edge Functions + PostgreSQL + Storage) + Frontend estático en Vercel.
 
 ---
 
@@ -9,171 +9,192 @@ Memorial de Pedro "Cabezón Jano" González.
 
 | Capa | Tecnología |
 |------|-----------|
-| Backend | Spring Boot 3.4 / Java 21 |
-| Base de datos | PostgreSQL (Supabase) |
-| Seguridad | Spring Security + JWT (jjwt 0.12) |
-| Migraciones | Flyway |
-| Rate Limiting | Bucket4j |
-| Documentación | SpringDoc OpenAPI (Swagger 3) |
-| Frontend | SPA (HTML/CSS/JS vanilla) |
-| Contenedor | Docker multietapa |
-| Backend host | Render |
-| Frontend host | Vercel |
+| Backend | Supabase Edge Functions (Deno/TypeScript) |
+| Base de datos | PostgreSQL (Supabase) con Row Level Security |
+| Autenticación | Supabase Auth + JWT |
+| Almacenamiento | Supabase Storage (bucket: `elarca-uploads`) |
+| Notificaciones | Resend (SMTP API) — notificación por email al subir recuerdos |
+| Frontend | SPA (HTML/CSS/JS vanilla) + Supabase JS SDK |
+| Frontend host | Vercel (o cualquier host estático) |
 
 ---
 
-## Arquitectura
+## Estructura del proyecto
 
 ```
-src/main/java/com/elarca/
-├── domain/            # Modelos (records), puertos de repositorio y servicios
-├── application/       # DTOs, casos de uso, mappers MapStruct
-├── infrastructure/    # Adaptadores: JPA, JWT, Security, storage, filters
-├── presentation/      # Controladores REST
-└── ElArcaApplication.java
+/
+├── supabase/
+│   ├── migrations/           # SQL schema + RLS policies
+│   │   └── 001_schema.sql
+│   ├── functions/
+│   │   ├── _shared/          # CORS, Supabase client helpers
+│   │   ├── auth/             # POST /auth — login + JWT
+│   │   ├── galeria/          # GET /galeria — imágenes activas
+│   │   ├── musica/           # CRUD /musica — gestión de canciones
+│   │   ├── recuerdos/        # CRUD /recuerdos — recuerdos comunitarios
+│   │   └── upload/           # POST /upload — subida + email (Resend)
+│   ├── config.toml
+│   └── deno.json
+├── src/main/resources/static/    # Frontend estático
+│   ├── index.html, galeria.html, videos.html, ...
+│   ├── admin.html
+│   ├── supabase.js           # Cliente Supabase compartido
+│   ├── app.js                # SPA router
+│   └── images/               # Fotos históricas (Che, Víctor Jara, Jano)
+├── src/main/java/...         # Legacy Spring Boot (no usado en producción)
+├── .env.template
+└── README.md
 ```
 
 ---
 
-## Requisitos locales
+## Requisitos
 
-- Java 21+ (JDK)
-- Maven 3.9+
-- PostgreSQL 16+ (o Supabase)
-- Docker (opcional)
+- Cuenta en [Supabase](https://supabase.com) (plan Free)
+- Cuenta en [Vercel](https://vercel.com) (o similar para estáticos)
+- [Resend](https://resend.com) API Key (para notificaciones por email)
+- [Supabase CLI](https://supabase.com/docs/guides/cli) (para deploy de Edge Functions)
 
 ---
 
-## Desarrollo local
+## Despliegue
+
+### 1. Supabase — Base de datos y RLS
+
+1. Crear proyecto en [supabase.com](https://supabase.com)
+2. Ir a **SQL Editor** → pegar el contenido de `supabase/migrations/001_schema.sql` → Ejecutar
+3. Ir a **Authentication** → Settings → habilitar email/password auth
+4. Ir a **Storage** → crear bucket público `elarca-uploads`
+5. Crear usuario admin en **Authentication** → Users → Add User (email: `mariajosevarga@gmail.com`, password: la que elijas)
+
+> ⚠️ La migración SQL ya incluye el seed del admin y todas las políticas RLS.
+
+### 2. Edge Functions (Backend)
 
 ```bash
-# Compilar
-mvn clean package -DskipTests
+# Instalar Supabase CLI
+npm install -g supabase
 
-# Ejecutar con perfil dev
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
+# Iniciar sesión
+supabase login
 
-# Tests
-mvn test
+# Vincular con tu proyecto
+supabase link --project-ref <tu-project-id>
+
+# Desplegar todas las Edge Functions
+supabase functions deploy auth
+supabase functions deploy galeria
+supabase functions deploy musica
+supabase functions deploy recuerdos
+supabase functions deploy upload
 ```
 
-### Docker local
+Setear variables de entorno para las funciones:
 
 ```bash
-docker compose up --build -d
-docker compose logs -f
-docker compose down
+supabase secrets set RESEND_API_KEY=re_your-api-key
+supabase secrets set ADMIN_EMAIL=mariajosevarga@gmail.com
 ```
 
----
-
-## Despliegue en Render (Backend)
-
-Render ejecuta el Dockerfile del repositorio.  
-El backend queda en, por ejemplo: `https://elarca-backend.onrender.com`
-
-### Pasos
-
-1. **Crear servicio Web en Render**
-   - Ir a [dashboard.render.com](https://dashboard.render.com) → New → Web Service
-   - Conectar el repositorio de GitHub/GitLab
-   - **Name:** `elarca-backend`
-   - **Region:** Oregon (us-east) — cercano a Supabase
-   - **Branch:** `main`
-   - **Runtime:** Docker
-   - **Plan:** Free (o Starter para producción)
-
-2. **Variables de entorno en Render Dashboard**
-
-   Ir a Environment → Environment Variables y agregar:
-
-   | Variable | Valor | Ejemplo |
-   |----------|-------|---------|
-   | `SPRING_DATASOURCE_URL` | URL JDBC de Supabase | `jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require` |
-   | `SPRING_DATASOURCE_USERNAME` | Usuario Supabase | `postgres.abcdefghijkl` |
-   | `SPRING_DATASOURCE_PASSWORD` | Contraseña Supabase | `your-supabase-password` |
-   | `JWT_SECRET` | Secreto JWT (min 32 chars) | `mi_secreto_jwt_super_seguro_2026_cambiar` |
-   | `JWT_EXPIRATION_MS` | Expiración del token | `28800000` (8 horas) |
-   | `CORS_ALLOWED_ORIGINS` | Orígenes permitidos (separados por coma) | `https://proyecto-el-arca.vercel.app` |
-   | `UPLOAD_DIR` | Directorio de subida (persistencia efímera en Free) | `/tmp/elarca-uploads` |
-   | `PORT` | Puerto (Render lo asigna automáticamente) | `8080` |
-   | `RATE_LIMITING_ENABLED` | Activar rate limiting | `true` |
-
-   > ⚠️ En el plan Free de Render el disco es efímero. Para subida de archivos se recomienda usar Supabase Storage o AWS S3 en producción.
-
-3. **Health check**  
-   Render monitorea automáticamente el endpoint `/api/v1/health`.  
-   Se configura en el dashboard de Render (Settings → Health Check Path).  
-   Usa `http://localhost:8080/api/v1/health` como health check.
-
-4. **Auto-deploy**  
-   Por defecto Render redepliega automáticamente al hacer push a la rama configurada.
-
----
-
-## Despliegue en Vercel (Frontend)
+### 3. Vercel — Frontend
 
 1. Ir a [vercel.com](https://vercel.com) → Importar repositorio
 2. **Root Directory:** `src/main/resources/static`
-3. **Build Command:** `-` (solo estáticos)
-4. **Output:** `-`
-5. **Variables:** ninguna
+3. **Build Command:** nada (solo estáticos)
+4. **Output:** nada
 
-O bien, copiar el contenido de `src/main/resources/static/` a un repositorio separado y desplegar como sitio estático en Vercel.
+**O bien**, copiar el contenido de `src/main/resources/static/` a un repositorio separado y desplegar.
 
----
+**Importante:** Setear estas variables de entorno en Vercel:
 
-## Endpoints de la API
+| Variable | Valor |
+|----------|-------|
+| `SUPABASE_PROJECT_ID` | `tu-project-id` |
+| `SUPABASE_URL` | `https://tu-project.supabase.co` |
+| `SUPABASE_ANON_KEY` | tu anon key (pública) |
 
-### Públicos
-
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/api/v1/health` | Health check |
-| POST | `/api/v1/auth/login` | Iniciar sesión |
-| GET | `/api/v1/galeria` | Galería de imágenes |
-| GET | `/api/v1/musica` | Canciones activas |
-| POST | `/api/v1/upload` | Subir recuerdo |
-| POST | `/api/v1/subir` | Alias de upload |
-
-### Admin (requiere token JWT en header `Authorization: Bearer <token>`)
-
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/api/v1/admin/recuerdos` | Todos los recuerdos |
-| PUT | `/api/v1/admin/recuerdos/{id}/aprobar` | Aprobar recuerdo |
-| DELETE | `/api/v1/admin/recuerdos/{id}` | Eliminar recuerdo |
-| GET | `/api/v1/admin/musica` | Todas las canciones |
-| POST | `/api/v1/admin/musica` | Subir canción |
-| PUT | `/api/v1/admin/musica/{id}` | Activar/desactivar |
-| DELETE | `/api/v1/admin/musica/{id}` | Eliminar canción |
-| POST | `/api/v1/admin/subir` | Subida admin |
+Luego reemplazar `${SUPABASE_PROJECT_ID}` y `${SUPABASE_ANON_KEY}` en los HTMLs con los valores reales, o inyectarlos via Vercel Environment Variables + build script.
 
 ---
 
-## Documentación Swagger
+## Variables de entorno
 
-Una vez corriendo:  
-- **Local:** http://localhost:8080/swagger-ui.html  
-- **Render:** `https://elarca-backend.onrender.com/swagger-ui.html`
+Ver `.env.template` para referencia completa.
+
+### Supabase (Edge Functions)
+
+| Variable | Descripción |
+|----------|-------------|
+| `SUPABASE_URL` | URL del proyecto |
+| `SUPABASE_ANON_KEY` | Clave anónima (pública) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Clave service_role (solo server-side) |
+| `RESEND_API_KEY` | API Key de Resend para emails |
+| `ADMIN_EMAIL` | Email del administrador para notificaciones |
+
+### Frontend (inyectadas en HTML)
+
+Estos placeholders deben ser reemplazados por valores reales:
+- `${SUPABASE_PROJECT_ID}` → tu project ID
+- `${SUPABASE_ANON_KEY}` → tu anon key pública
 
 ---
 
-## Respuestas de error
+## Edge Functions — API
 
-Todas las respuestas de error siguen la estructura:
+### Públicas (sin autenticación)
 
-```json
-{
-  "timestamp": "2026-07-02T10:30:00.000Z",
-  "status": 500,
-  "message": "Ha ocurrido un error interno. Por favor, intenta de nuevo."
-}
+| Función | Ruta | Método | Descripción |
+|---------|------|--------|-------------|
+| `auth` | `/auth` | POST | Login (email + password) → JWT |
+| `galeria` | `/galeria` | GET | Imágenes activas de la galería |
+| `recuerdos` | `/recuerdos` | GET | Recuerdos aprobados |
+| `upload` | `/upload` | POST | Subir recuerdo + notificación email |
+
+### Admin (requiere JWT en `Authorization: Bearer <token>`)
+
+| Función | Ruta | Método | Descripción |
+|---------|------|--------|-------------|
+| `musica` | `/musica` | GET | Todas las canciones |
+| `musica` | `/musica` | POST | Subir canción nueva |
+| `musica` | `/musica/:id` | PUT | Activar/desactivar canción |
+| `musica` | `/musica/:id` | DELETE | Eliminar canción |
+| `recuerdos` | `/recuerdos/:id/aprobar` | PUT | Aprobar recuerdo |
+| `recuerdos` | `/recuerdos/:id` | DELETE | Eliminar recuerdo |
+
+---
+
+## Validación de archivos
+
+Todos los uploads validan:
+- **MIME type:** solo JPG, PNG, WebP, MP3, WAV, MP4, PDF
+- **Tamaño máximo:** 50 MB
+- **Sanitize de nombre:** caracteres no alfanuméricos reemplazados por `_` (previene path traversal)
+
+---
+
+## RLS (Row Level Security)
+
+Todas las tablas tienen RLS habilitado:
+- **recuerdos:** público insert (cualquiera puede subir), lectura solo aprobados, admin full CRUD
+- **musica_reproductor:** público lectura solo activos, admin CRUD
+- **galeria:** público lectura solo activos, admin CRUD
+- **admin_users:** solo lectura pública (para login), admin manage
+- **storage.objects:** lectura pública, escritura solo admin autenticado
+
+---
+
+## Legacy (Spring Boot)
+
+El proyecto conserva el backend Java Spring Boot 3.4 para referencia y desarrollo local.  
+No se usa en producción — toda la lógica corre en Supabase Edge Functions.
+
+Para desarrollo local del backend legacy:
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 ---
 
-## Bypass temporal
+## Licencia
 
-Durante desarrollo, cualquier usuario con contraseña `"admin"` puede iniciar sesión sin verificar bcrypt.  
-Eliminar en producción final.
+Memoria Popular El Arca — La Pintana, Santiago de Chile.

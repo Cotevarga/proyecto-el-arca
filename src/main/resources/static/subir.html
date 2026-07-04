@@ -25,6 +25,12 @@
     @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
     .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
   </style>
+  <script>
+    window.SUPABASE_URL = 'https://ukpoprkdgezgxlkjjuve.supabase.co';
+    window.SUPABASE_ANON_KEY = 'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi';
+    window.EDGE_FUNCTIONS_URL = 'https://ukpoprkdgezgxlkjjuve.supabase.co/functions/v1';
+  </script>
+  <script src="/supabase.js" defer></script>
   <script src="/audio-player.js" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
   <script>
@@ -151,7 +157,8 @@
         var messages = document.getElementById('form-messages');
         var fd = new FormData(formArchivo);
         btn.textContent = 'Enviando\u2026'; btn.disabled = true; messages.classList.add('hidden');
-        fetch(API_BASE + '/api/v1/subir', { method: 'POST', body: fd })
+        var uploadUrl = window.fnUrl ? window.fnUrl('upload') : (API_BASE + '/api/v1/subir');
+        fetch(uploadUrl, { method: 'POST', body: fd })
           .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
           .then(function () {
             messages.textContent = '\u00a1Gracias por compartir tu recuerdo!';

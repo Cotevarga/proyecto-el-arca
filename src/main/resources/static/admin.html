@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Control — El Arca</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script>
+    window.SUPABASE_URL = 'https://ukpoprkdgezgxlkjjuve.supabase.co';
+    window.SUPABASE_ANON_KEY = 'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi';
+    window.EDGE_FUNCTIONS_URL = 'https://ukpoprkdgezgxlkjjuve.supabase.co/functions/v1';
+  </script>
+  <script src="/supabase.js" defer></script>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
   <style>
     :root {
@@ -755,7 +761,7 @@
       });
     });
 
-    // ─── Login ───
+    // ─── Login via Supabase Auth ───
     loginForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       var email = document.getElementById('login-email').value.trim();
@@ -766,7 +772,8 @@
       btnLogin.disabled = true;
 
       try {
-        var res = await fetch('/api/v1/auth/login', {
+        var authUrl = window.fnUrl ? window.fnUrl('auth') : (API_BASE + '/api/v1/auth/login');
+        var res = await fetch(authUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: email, password: password })
@@ -798,36 +805,22 @@
       showToast('Sesión cerrada', 'info');
     });
 
-    // ─── API helper ───
-    function apiHeaders() {
-      return {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      };
-    }
+    // ─── Supabase helpers ───
+    function sb() { return window._supabase; }
 
-    async function apiGet(url) {
-      var res = await fetch(API_BASE + url, { headers: apiHeaders() });
-      if (res.status === 401) { handleUnauthorized(); throw new Error('Sesión expirada'); }
-      return res.json();
-    }
-
-    async function apiPut(url, body) {
-      var res = await fetch(API_BASE + url, {
-        method: 'PUT',
-        headers: apiHeaders(),
-        body: JSON.stringify(body)
-      });
-      if (res.status === 401) { handleUnauthorized(); throw new Error('Sesión expirada'); }
-      return res.json();
-    }
-
-    async function apiDelete(url) {
-      var res = await fetch(API_BASE + url, {
-        method: 'DELETE',
-        headers: apiHeaders()
-      });
-      if (res.status === 401) { handleUnauthorized(); throw new Error('Sesión expirada'); }
+    async function adminFetch(path, options) {
+      var url = (window.fnUrl ? window.fnUrl(path.split('/')[0]) : null)
+        || (API_BASE + '/api/v1/admin/' + path);
+      var opts = options || {};
+      opts.headers = opts.headers || {};
+      opts.headers['Authorization'] = 'Bearer ' + token;
+      if (!opts.method) opts.method = 'GET';
+      if (opts.body && typeof opts.body === 'object' && !(opts.body instanceof FormData)) {
+        opts.headers['Content-Type'] = 'application/json';
+        opts.body = JSON.stringify(opts.body);
+      }
+      var res = await fetch(url, opts);
+      if (res.status === 401 || res.status === 403) { handleUnauthorized(); throw new Error('Sesión expirada'); }
       return res.json();
     }
 
@@ -843,8 +836,16 @@
     // ─── Dashboard ───
     async function loadDashboard() {
       try {
-        var recuerdos = await apiGet('/api/v1/admin/recuerdos');
-        var musica = await apiGet('/api/v1/admin/musica');
+        var s = sb();
+        if (!s) return;
+
+        var [recRes, musRes] = await Promise.all([
+          s.from('recuerdos').select('*').order('created_at', { ascending: false }),
+          s.from('musica_reproductor').select('*')
+        ]);
+
+        var recuerdos = recRes.data || [];
+        var musica = musRes.data || [];
         var pending = recuerdos.filter(function(r) { return !r.aprobado; });
         var approved = recuerdos.filter(function(r) { return r.aprobado; });
         var activeMusic = musica.filter(function(m) { return m.activo; });
@@ -880,8 +881,11 @@
     // ─── Pending ───
     async function loadPending() {
       try {
-        var recuerdos = await apiGet('/api/v1/admin/recuerdos');
-        var pending = recuerdos.filter(function(r) { return !r.aprobado; });
+        var s = sb();
+        if (!s) return;
+        var { data, error } = await s.from('recuerdos').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        var pending = (data || []).filter(function(r) { return !r.aprobado; });
         document.getElementById('pending-count').textContent = pending.length;
         var list = document.getElementById('pending-list');
         if (pending.length === 0) {
@@ -924,8 +928,10 @@
     // ─── Approved ───
     async function loadApproved() {
       try {
-        var recuerdos = await apiGet('/api/v1/admin/recuerdos');
-        var approved = recuerdos.filter(function(r) { return r.aprobado; });
+        var s = sb();
+        if (!s) return;
+        var { data } = await s.from('recuerdos').select('*').eq('aprobado', true).order('created_at', { ascending: false });
+        var approved = data || [];
         var list = document.getElementById('approved-list');
         if (approved.length === 0) {
           list.innerHTML = '<div class="empty-state"><div class="icon">📸</div><div class="text">No hay recuerdos aprobados</div></div>';
@@ -933,12 +939,10 @@
         }
         var html = '<table><thead><tr><th>Nombre</th><th class="hide-mobile">Tipo</th><th class="hide-mobile">Fecha</th><th>Acción</th></tr></thead><tbody>';
         approved.forEach(function(r) {
-          var tipoClass = 'badge-approved';
-          var tipoLabel = r.tipo_archivo && r.tipo_archivo.indexOf('audio') !== -1 ? 'Audio' : 'Imagen';
           var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL') : '—';
           html += '<tr>' +
             '<td class="truncate">' + escapeHtml(r.nombre) + '</td>' +
-            '<td class="hide-mobile"><span class="badge badge-approved">' + tipoLabel + '</span></td>' +
+            '<td class="hide-mobile"><span class="badge badge-approved">' + (r.tipo_archivo && r.tipo_archivo.indexOf('audio') !== -1 ? 'Audio' : 'Imagen') + '</span></td>' +
             '<td class="hide-mobile">' + fecha + '</td>' +
             '<td><button class="btn-sm btn-sm-danger" onclick="window.rejectRecuerdo(\'' + r.id + '\')">✕ Eliminar</button></td></tr>';
         });
@@ -954,7 +958,10 @@
       try {
         var seccionSelect = document.getElementById('seccion-' + id);
         var seccion = seccionSelect ? seccionSelect.value : 'general';
-        var data = await apiPut('/api/v1/admin/recuerdos/' + id + '/aprobar', { seccion: seccion });
+        var data = await adminFetch('recuerdos/' + id + '/aprobar', {
+          method: 'PUT',
+          body: { seccion: seccion }
+        });
         if (data.success) {
           showToast('Recuerdo aprobado y publicado en ' + seccion, 'success');
           loadPending();
@@ -968,7 +975,7 @@
     window.rejectRecuerdo = async function(id) {
       if (!confirm('¿Eliminar este recuerdo permanentemente?')) return;
       try {
-        var data = await apiDelete('/api/v1/admin/recuerdos/' + id);
+        var data = await adminFetch('recuerdos/' + id, { method: 'DELETE' });
         if (data.success) {
           showToast('Recuerdo eliminado', 'info');
           loadPending();
@@ -983,7 +990,10 @@
     // ─── Music ───
     async function loadMusic() {
       try {
-        var musica = await apiGet('/api/v1/admin/musica');
+        var s = sb();
+        if (!s) return;
+        var { data } = await s.from('musica_reproductor').select('*').order('orden', { ascending: true });
+        var musica = data || [];
         var list = document.getElementById('music-list');
         if (musica.length === 0) {
           list.innerHTML = '<div class="empty-state"><div class="icon">🎶</div><div class="text">No hay canciones subidas</div></div>';
@@ -1011,7 +1021,7 @@
 
     window.toggleMusic = async function(id, activo) {
       try {
-        var data = await apiPut('/api/v1/admin/musica/' + id, { activo: activo });
+        var data = await adminFetch('musica/' + id, { method: 'PUT', body: { activo: activo } });
         if (data.success) { showToast('Estado actualizado', 'success'); loadMusic(); loadDashboard(); }
       } catch (err) {
         if (err.message !== 'Sesión expirada') showToast('Error al actualizar', 'error');
@@ -1021,7 +1031,7 @@
     window.deleteMusic = async function(id) {
       if (!confirm('¿Eliminar esta canción permanentemente?')) return;
       try {
-        var data = await apiDelete('/api/v1/admin/musica/' + id);
+        var data = await adminFetch('musica/' + id, { method: 'DELETE' });
         if (data.success) { showToast('Canción eliminada', 'info'); loadMusic(); loadDashboard(); }
       } catch (err) {
         if (err.message !== 'Sesión expirada') showToast('Error al eliminar', 'error');
@@ -1074,7 +1084,8 @@
         fd.append('titulo', titulo);
         fd.append('artista', artista);
 
-        var res = await fetch(API_BASE + '/api/v1/admin/musica', {
+        var musicUrl = window.fnUrl ? window.fnUrl('musica') : (API_BASE + '/api/v1/admin/musica');
+        var res = await fetch(musicUrl, {
           method: 'POST',
           headers: { 'Authorization': 'Bearer ' + token },
           body: fd
@@ -1136,7 +1147,8 @@
         fd.append('texto', texto);
         fd.append('seccion', seccion);
 
-        var res = await fetch(API_BASE + '/api/v1/admin/subir', {
+        var uploadUrl = window.fnUrl ? window.fnUrl('upload') : (API_BASE + '/api/v1/admin/subir');
+        var res = await fetch(uploadUrl, {
           method: 'POST',
           headers: { 'Authorization': 'Bearer ' + token },
           body: fd

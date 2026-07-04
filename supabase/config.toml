@@ -1,0 +1,16 @@
+[functions]
+
+[functions.auth]
+verify_jwt = false
+
+[functions.galeria]
+verify_jwt = true
+
+[functions.musica]
+verify_jwt = true
+
+[functions.recuerdos]
+verify_jwt = false
+
+[functions.upload]
+verify_jwt = false
