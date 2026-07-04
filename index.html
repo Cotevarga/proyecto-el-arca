@@ -243,17 +243,22 @@
 
           var { data, error } = await supabaseClient
             .from('recuerdos')
-            .select('id, titulo_relato, mensaje, mensaje_largo, url_archivo, tipo_archivo, seccion, created_at')
+            .select('id, titulo_relato, mensaje, mensaje_largo, url_archivo, tipo_archivo, seccion, created_at, es_efimero')
             .eq('aprobado', true)
             .eq('destacado', true)
             .order('created_at', { ascending: false })
-            .limit(6);
+            .limit(20);
 
           if (error) throw error;
 
-          var items = data || [];
+          var items = (data || []).filter(function(item) {
+            if (!item.es_efimero) return true;
+            var edad = Date.now() - new Date(item.created_at).getTime();
+            return edad < 48 * 60 * 60 * 1000;
+          }).slice(0, 6);
           if (items.length === 0) {
-            grid.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#666;grid-column:1/-1;"><div style="font-size:48px;opacity:0.3;margin-bottom:12px;">🏛️</div><p>Aún no hay contenido destacado en la vitrina.</p></div>';
+            var vitrinaSection = document.getElementById('vitrina');
+            if (vitrinaSection) vitrinaSection.style.display = 'none';
             return;
           }
 

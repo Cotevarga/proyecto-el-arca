@@ -1061,6 +1061,7 @@
         seccion: seccion,
         aprobado: true,
         destacado: extraData.destacado === true,
+        es_efimero: extraData.es_efimero === true,
         geolocalizacion: extraData.geolocalizacion || null,
         tags: extraData.tags || null,
         fecha_creacion_archivo: extraData.fecha_creacion_archivo || null
@@ -1631,7 +1632,8 @@
             titulo_relato: tituloRelato || null,
             nombre_serie: nombreSerie || null,
             mensaje_largo: textoLargo || null,
-            destacado: destacado
+            destacado: destacado,
+            es_efimero: destacado
           };
 
           var { error: updateError } = await s
@@ -2135,6 +2137,7 @@
         descripcion: descripcion || textoLargo ? (descripcion || textoLargo.substring(0, 200)) : null,
         texto_largo: textoLargo || null,
         destacado: destacado,
+        es_efimero: destacado,
         geolocalizacion: adminGeo ? adminGeo.value.trim() || null : null,
         fecha_creacion_archivo: adminFecha ? adminFecha.value || null : null,
         tags: null
@@ -2156,6 +2159,7 @@
             seccion: seccion,
             aprobado: true,
             destacado: destacado,
+            es_efimero: destacado,
             geolocalizacion: extraData.geolocalizacion || null,
             tags: extraData.tags || null,
             fecha_creacion_archivo: extraData.fecha_creacion_archivo || null
