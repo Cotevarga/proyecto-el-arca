@@ -18,6 +18,14 @@ window.API_BASE = '';
   errorBanner.textContent = '⚠ Servicio degradado temporalmente — algunas funciones pueden no estar disponibles.';
   document.body.appendChild(errorBanner);
 
+  // ─── Estilos persistentes para SPA ───
+  var persistentStyles = document.createElement('style');
+  persistentStyles.textContent =
+    'h1, h2, h3, h4, h5, h6 { text-align: center !important; } ' +
+    'p, article, .texto-justificado { text-align: justify !important; }';
+  persistentStyles.id = 'arca-persistent-styles';
+  document.head.appendChild(persistentStyles);
+
   window.showArcaError = function (visible) {
     errorBanner.style.display = visible ? 'block' : 'none';
     if (visible) {
@@ -282,6 +290,7 @@ window.API_BASE = '';
     if (targetPath.indexOf('galeria') !== -1) {
       setTimeout(initGaleria, 50);
     }
+    try { if (typeof gtag === 'function') gtag('config', 'G-0M3Q8DQ3QF', { 'page_path': targetPath }); } catch (e) {}
   }
 
   window.initGaleria = initGaleria;

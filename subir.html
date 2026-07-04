@@ -10,6 +10,7 @@
     :root { --color-mir: #E50914; --color-noche: #111111; }
     html { scroll-behavior: smooth; }
     body { font-family: 'Inter', system-ui, sans-serif; background-color: #000 !important; color: #fff !important; }
+    h1, h2, h3, h4, h5, h6 { text-align: center !important; }
     p { text-align: justify !important; }
     .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
     .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -95,7 +96,7 @@
           <div>
             <label for="tipo_contenido" class="block text-sm font-bold text-white/80 mb-1 uppercase">Tipo de contenido</label>
             <select id="tipo_contenido" name="tipo_contenido" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
-              <option value="foto">Foto (Galería)</option>
+              <option value="galeria">Galería</option>
               <option value="relato">Relato</option>
               <option value="entrevista">Entrevista</option>
               <option value="legado">Legado</option>
@@ -148,7 +149,7 @@
 
       function actualizarRequerimiento() {
         var tipo = tipoSelect.value;
-        if (tipo === 'foto') {
+        if (tipo === 'galeria') {
           fileInput.required = true;
           if (fileRequired) fileRequired.style.display = 'inline';
           if (fileHint) fileHint.textContent = 'Formatos: JPG, PNG &middot; Máx 50 MB &middot; Obligatorio para fotos.';
