@@ -243,6 +243,9 @@ window.API_BASE = '';
   };
 
   function cargarGaleria() {
+    var contenedor = document.getElementById('galeria-container');
+    if (contenedor) contenedor.innerHTML = '';
+
     var thumbCol = document.getElementById('thumb-col');
     var thumbLoader = document.getElementById('thumb-loader');
     var viewerImg = document.getElementById('main-viewer-img');
@@ -250,7 +253,6 @@ window.API_BASE = '';
 
     if (!thumbCol) return;
 
-    // Clean container to avoid duplicates
     thumbCol.innerHTML = '';
     if (thumbLoader) thumbLoader.remove();
     if (viewerImg) { viewerImg.src = ''; viewerImg.style.opacity = '0'; }
@@ -291,7 +293,8 @@ window.API_BASE = '';
   function cambiarVista(url) {
     var targetPath = new URL(url, window.location.origin).pathname;
     if (targetPath.indexOf('galeria') !== -1) {
-      setTimeout(cargarGaleria, 50);
+      console.log("Navegando a galería, forzando carga...");
+      cargarGaleria();
     }
     try { if (typeof gtag === 'function') gtag('config', 'G-0M3Q8DQ3QF', { 'page_path': targetPath }); } catch (e) {}
   }
@@ -299,14 +302,18 @@ window.API_BASE = '';
   window.cargarGaleria = cargarGaleria;
   window.cambiarVista = cambiarVista;
 
-  // ─── Inicializar galería si estamos en esa página ───
-  if (window.location.pathname.indexOf('galeria') !== -1) {
-    var esperarSb = setInterval(function () {
-      if (window._supabase) {
-        clearInterval(esperarSb);
-        cargarGaleria();
+  window.inicializarGaleria = function () {
+    if (window.location.pathname.indexOf('galeria') !== -1) {
+      var check = function () {
+        if (window._supabase) { cargarGaleria(); return true; }
+        return false;
+      };
+      if (!check()) {
+        var iv = setInterval(function () { if (check()) clearInterval(iv); }, 100);
+        setTimeout(function () { clearInterval(iv); }, 8000);
       }
-    }, 100);
-    setTimeout(function () { clearInterval(esperarSb); }, 8000);
-  }
+    }
+  };
+
+  window.inicializarGaleria();
 })();
