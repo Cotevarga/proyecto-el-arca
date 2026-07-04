@@ -728,15 +728,12 @@
                 <div class="form-group">
                   <label>Sección / Subsección</label>
                   <select id="admin-upload-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
-                    <option value="general">General</option>
-                    <option value="relatos">Relatos</option>
-                    <option value="legado">Legado</option>
-                    <option value="jano">Jano</option>
-                    <option value="arca">Arca</option>
-                    <option value="organizaciones">Organizaciones</option>
-                    <option value="entrevista">Entrevista</option>
-                    <option value="historia">Historia</option>
-                    <option value="poesia">Poesía</option>
+                    <option value="galeria">Galería</option>
+                    <option value="videos">Videos y Audios</option>
+                    <option value="relatos_jano">Relatos: El Jano</option>
+                    <option value="relatos_arca">Relatos: El Arca</option>
+                    <option value="relatos_organizaciones">Relatos: Otras organizaciones</option>
+                    <option value="relatos_legado">Relatos: El Legado</option>
                   </select>
                 </div>
                 <div class="form-group">
@@ -775,15 +772,12 @@
       <div class="form-group">
         <label>Sección / Subsección</label>
         <select id="approval-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
-          <option value="general">General</option>
-          <option value="relatos">Relatos</option>
-          <option value="legado">Legado</option>
-          <option value="jano">Jano</option>
-          <option value="arca">Arca</option>
-          <option value="organizaciones">Organizaciones</option>
-          <option value="entrevista">Entrevista</option>
-          <option value="historia">Historia</option>
-          <option value="poesia">Poesía</option>
+          <option value="galeria">Galería</option>
+          <option value="videos">Videos y Audios</option>
+          <option value="relatos_jano">Relatos: El Jano</option>
+          <option value="relatos_arca">Relatos: El Arca</option>
+          <option value="relatos_organizaciones">Relatos: Otras organizaciones</option>
+          <option value="relatos_legado">Relatos: El Legado</option>
         </select>
       </div>
       <div class="form-group">
@@ -933,6 +927,28 @@
       return window.miSupabase || window._supabase;
     }
 
+    // ─── Helper unificado de feedback ───
+    function mostrarToastExito(msg) { showToast(msg, 'success'); }
+    function mostrarToastError(msg) { showToast('Error al subir: ' + msg, 'error'); }
+
+    // ─── Manejador de eventos unificado para formularios ───
+    async function procesarSubida(btn, fn) {
+      if (!btn) return;
+      var textoOriginal = btn.textContent;
+      btn.textContent = 'Publicando...';
+      btn.disabled = true;
+      try {
+        await fn();
+        mostrarToastExito('Subido correctamente');
+      } catch (err) {
+        console.error('[procesarSubida]', err);
+        mostrarToastError(err.message || 'Error desconocido');
+      } finally {
+        btn.textContent = textoOriginal;
+        btn.disabled = false;
+      }
+    }
+
     // ─── Subir archivo a Storage + insertar en recuerdos ───
     async function subirArchivo(file, seccion, extraData) {
       var s = getSupabaseClient();
@@ -940,20 +956,14 @@
 
       var bucket = 'elarca-uploads';
 
-      // ─── Determinar carpeta según sección ───
+      // ─── Determinar carpeta destino según sección ───
       var folderMap = {
-        'musica': 'musica',
-        'cancion': 'musica',
-        'general': 'recuerdos',
-        'relatos': 'relatos',
-        'legado': 'legado',
-        'jano': 'jano',
-        'arca': 'arca',
-        'organizaciones': 'organizaciones',
-        'entrevista': 'entrevistas',
-        'historia': 'historias',
-        'poesia': 'poesia',
-        'images': 'images'
+        'galeria': 'images',
+        'videos': 'videos',
+        'relatos_jano': 'recuerdos',
+        'relatos_arca': 'recuerdos',
+        'relatos_organizaciones': 'recuerdos',
+        'relatos_legado': 'recuerdos',
       };
       var folder = folderMap[seccion] || 'recuerdos';
 
@@ -1077,8 +1087,8 @@
           titleEl.textContent = data[0].titulo || '—';
           artistEl.textContent = data[0].artista || 'El Arca';
         } else {
-          titleEl.textContent = '—';
-          artistEl.textContent = 'Ninguna canción activa';
+          titleEl.textContent = 'Radio en vivo';
+          artistEl.textContent = 'Esperando transmisión...';
         }
       } catch (err) {
         console.error('[AhoraSuena] Error:', err);
@@ -1088,6 +1098,21 @@
     // ═══════════════════════════════════════════════
     // DASHBOARD — listado + contadores
     // ═══════════════════════════════════════════════
+
+    var NOMBRES_SECCION = {
+      'galeria': 'Galería',
+      'videos': 'Videos y Audios',
+      'relatos_jano': 'Relatos: El Jano',
+      'relatos_arca': 'Relatos: El Arca',
+      'relatos_organizaciones': 'Relatos: Otras organizaciones',
+      'relatos_legado': 'Relatos: El Legado',
+      'musica': 'Música',
+      'general': 'General'
+    };
+
+    function nombreSeccion(raw) {
+      return NOMBRES_SECCION[raw] || (raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : 'General');
+    }
 
     async function renderRecentRecuerdos() {
       try {
@@ -1108,7 +1133,7 @@
         recuerdos.forEach(function(r) {
           var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL') : '—';
           var nombre = escapeHtml(r.nombre || 'Anónimo');
-          var seccionLabel = r.seccion ? r.seccion.charAt(0).toUpperCase() + r.seccion.slice(1) : 'General';
+          var seccionLabel = nombreSeccion(r.seccion);
 
           var estadoBadge = '';
           var acciones = '';
@@ -1211,17 +1236,15 @@
         }
         var html = '<table><thead><tr><th>Nombre</th><th>Año</th><th class="hide-mobile">Categoría</th><th class="hide-mobile">Tipo</th><th>Contenido</th><th class="hide-mobile">Fecha</th><th>Acción</th></tr></thead><tbody>';
         pending.forEach(function(r) {
-          var catLabel = r.categoria || 'foto';
-          var catBadge = 'badge-image';
-          if (catLabel === 'relato') catBadge = 'badge-audio';
-          else if (catLabel === 'entrevista') catBadge = 'badge-video';
-          else if (catLabel === 'legado') catBadge = 'badge-approved';
+          var rawCat = r.categoria || r.seccion || '';
+          var catLabel = nombreSeccion(rawCat);
+          var catBadge = rawCat.indexOf('relato') !== -1 ? 'badge-audio' : 'badge-image';
           var tipoClass = 'badge-image';
           var tipoLabel = 'Imagen';
           if (r.tipo_archivo && r.tipo_archivo.indexOf('audio') !== -1) { tipoClass = 'badge-audio'; tipoLabel = 'Audio'; }
           else if (r.tipo_archivo && r.tipo_archivo.indexOf('video') !== -1) { tipoClass = 'badge-video'; tipoLabel = 'Video'; }
           var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL') : '—';
-          var esTexto = catLabel === 'relato' || catLabel === 'entrevista';
+          var esTexto = rawCat.indexOf('relato') !== -1;
           var contenidoHtml = esTexto
             ? '<textarea id="texto-' + r.id + '" rows="3" style="width:100%;background:#1e1e1e;color:#ccc;border:1px solid #333;border-radius:4px;padding:6px;font-size:12px;resize:vertical;">' + escapeHtml(r.mensaje_largo || r.mensaje || '') + '</textarea>'
             : '<span class="truncate" style="max-width:150px;color:#888;display:inline-block;">' + escapeHtml(r.mensaje || '—') + '</span>';
@@ -1234,15 +1257,12 @@
             '<td class="hide-mobile">' + fecha + '</td>' +
             '<td style="white-space:nowrap;">' +
               '<select id="seccion-' + r.id + '" style="background:#2a2a2a;color:white;border:1px solid #333;border-radius:4px;font-size:11px;padding:4px 6px;margin-right:6px;">' +
-                '<option value="general">General</option>' +
-                '<option value="relatos">Relatos</option>' +
-                '<option value="legado">Legado</option>' +
-                '<option value="jano">Jano</option>' +
-                '<option value="arca">Arca</option>' +
-                '<option value="organizaciones">Organizaciones</option>' +
-                '<option value="entrevista">Entrevista</option>' +
-                '<option value="historia">Historia</option>' +
-                '<option value="poesia">Poesía</option>' +
+                '<option value="galeria">Galería</option>' +
+                '<option value="videos">Videos y Audios</option>' +
+                '<option value="relatos_jano">Relatos: El Jano</option>' +
+                '<option value="relatos_arca">Relatos: El Arca</option>' +
+                '<option value="relatos_organizaciones">Relatos: Otras organizaciones</option>' +
+                '<option value="relatos_legado">Relatos: El Legado</option>' +
               '</select>' +
               '<button class="btn-sm btn-sm-approve" onclick="window.approveRecuerdo(\'' + r.id + '\')">✓ Aprobar</button> ' +
               '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')">✕ Rechazar</button>' +
@@ -1489,7 +1509,7 @@
       }
     });
 
-    document.getElementById('music-upload-form').addEventListener('submit', async function(e) {
+    document.getElementById('music-upload-form').addEventListener('submit', function(e) {
       e.preventDefault();
       var titulo = document.getElementById('music-titulo').value.trim();
       var artista = document.getElementById('music-artista').value.trim() || 'El Arca';
@@ -1498,10 +1518,8 @@
       if (!titulo) { showToast('Ingresa el título', 'error'); return; }
 
       var btn = document.getElementById('btn-upload-music');
-      btn.textContent = 'Subiendo...';
-      btn.disabled = true;
 
-      try {
+      procesarSubida(btn, async function() {
         var fd = new FormData();
         fd.append('archivo', file);
         fd.append('titulo', titulo);
@@ -1515,19 +1533,13 @@
         });
         var data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Error al subir');
-        showToast('Canción subida exitosamente', 'success');
         document.getElementById('music-upload-form').reset();
         musicFileInfo.textContent = '';
         musicUploadText.textContent = 'Haz clic para seleccionar archivo MP3';
         loadMusic();
         renderizarCanciones();
         loadDashboard();
-      } catch (err) {
-        if (err.message !== 'Sesión expirada') showToast(err.message, 'error');
-      } finally {
-        btn.textContent = 'Subir canción';
-        btn.disabled = false;
-      }
+      });
     });
 
     // ─── Admin Upload (Subida Manual) ───
@@ -1554,9 +1566,10 @@
       });
     }
 
-    document.getElementById('admin-upload-form').addEventListener('submit', async function(e) {
+    document.getElementById('admin-upload-form').addEventListener('submit', function(e) {
       e.preventDefault();
 
+      var btn = document.getElementById('btn-admin-upload');
       var seccion = document.getElementById('admin-upload-seccion').value;
       var descripcion = document.getElementById('admin-upload-descripcion').value.trim();
       var textoLargo = document.getElementById('admin-upload-textolargo').value.trim();
@@ -1566,11 +1579,7 @@
       if (!s) { showToast('Cliente Supabase no disponible', 'error'); return; }
       if (!file && !textoLargo) { showToast('Agrega un archivo o texto largo', 'error'); return; }
 
-      var btn = document.getElementById('btn-admin-upload');
-      btn.textContent = 'Publicando...';
-      btn.disabled = true;
-
-      try {
+      procesarSubida(btn, async function() {
         if (file && file.size > 0) {
           console.log('[Upload] Subiendo archivo con subirArchivo...');
           await subirArchivo(file, seccion, {
@@ -1594,19 +1603,12 @@
           if (insertError) throw insertError;
         }
 
-        showToast('Contenido publicado en ' + seccion, 'success');
         document.getElementById('admin-upload-form').reset();
         if (adminUploadFileInfo) { adminUploadFileInfo.textContent = ''; }
         if (adminUploadText) { adminUploadText.textContent = 'Haz clic para seleccionar archivo'; }
         if (typeof loadApproved === 'function') loadApproved();
         if (typeof loadDashboard === 'function') loadDashboard();
-      } catch (err) {
-        console.error('[Upload] Error:', err);
-        showToast(err.message || 'Error al publicar', 'error');
-      } finally {
-        btn.textContent = 'Publicar';
-        btn.disabled = false;
-      }
+      });
     });
 
     // ─── Helpers ───

@@ -312,12 +312,25 @@
     <script>
     (function () {
       'use strict';
-      var API_BASE = window.API_BASE || '';
+
+      // ─── Helper unificado de feedback ───
+      function mostrarFeedback(el, texto, tipo) {
+        if (!el) return;
+        el.textContent = texto;
+        el.className = 'text-center text-sm font-medium';
+        if (tipo === 'success') el.classList.add('text-green-400');
+        else if (tipo === 'error') el.classList.add('text-mir');
+        el.classList.remove('hidden');
+      }
+
       var formArchivo = document.getElementById('form-archivo');
       if (!formArchivo) return;
+
       var fileInput = document.getElementById('archivo');
       var fileError = document.getElementById('file-error');
       var fileInfo = document.getElementById('file-info');
+      var messages = document.getElementById('form-messages');
+
       if (fileInput) {
         fileInput.addEventListener('change', function () {
           var file = fileInput.files[0];
@@ -337,23 +350,41 @@
           fileInfo.classList.remove('hidden');
         });
       }
+
       formArchivo.addEventListener('submit', function (e) {
         e.preventDefault();
         var btn = document.getElementById('btn-enviar');
-        var messages = document.getElementById('form-messages');
-        var fd = new FormData(formArchivo);
-        btn.textContent = 'Enviando\u2026'; btn.disabled = true; messages.classList.add('hidden');
+        messages.classList.add('hidden');
+
+        var nombre = document.getElementById('nombre').value.trim();
+        var anio = document.getElementById('anio').value.trim();
+        var mensaje = document.getElementById('mensaje').value.trim();
+        var file = fileInput ? fileInput.files[0] : null;
+
+        if (!nombre) { mostrarFeedback(messages, 'Escribe tu nombre o pseud\u00f3nimo.', 'error'); return; }
+
+        btn.textContent = 'Enviando\u2026'; btn.disabled = true;
+
+        var fd = new FormData();
+        fd.append('nombre', nombre);
+        if (anio) fd.append('anio', anio);
+        if (mensaje) fd.append('mensaje', mensaje);
+        if (file) fd.append('archivo', file);
+
         var uploadUrl = window.fnUrl ? window.fnUrl('upload') : (API_BASE + '/api/v1/subir');
         fetch(uploadUrl, { method: 'POST', body: fd })
-          .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
-          .then(function () {
-            messages.textContent = '\u00a1Gracias por compartir tu recuerdo!';
-            messages.className = 'text-center text-sm font-medium text-green-400'; messages.classList.remove('hidden');
-            formArchivo.reset(); if (fileInfo) fileInfo.classList.add('hidden');
+          .then(function (r) {
+            if (!r.ok) return r.json().then(function (d) { throw new Error(d.error || 'Error del servidor'); });
+            return r.json();
           })
-          .catch(function () {
-            messages.textContent = 'Hubo un error al enviar. Intenta de nuevo o escribe a contacto@elarca.cl';
-            messages.className = 'text-center text-sm font-medium text-mir'; messages.classList.remove('hidden');
+          .then(function () {
+            mostrarFeedback(messages, '\u00a1Gracias por compartir tu recuerdo!', 'success');
+            formArchivo.reset();
+            if (fileInfo) fileInfo.classList.add('hidden');
+          })
+          .catch(function (err) {
+            console.error('[FormPublico] Error:', err);
+            mostrarFeedback(messages, 'Error al subir: ' + (err.message || 'Intenta de nuevo o escribe a contacto@elarca.cl'), 'error');
           })
           .finally(function () { btn.textContent = 'Subir y compartir recuerdo'; btn.disabled = false; });
       });

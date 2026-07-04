@@ -27,12 +27,15 @@
     @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
     .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
   <script>
+    window.miSupabase = supabase.createClient(
+      'https://ukpoprkdgezgxlkjjuve.supabase.co',
+      'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi'
+    );
     window.SUPABASE_URL = 'https://ukpoprkdgezgxlkjjuve.supabase.co';
     window.SUPABASE_ANON_KEY = 'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi';
-    window.EDGE_FUNCTIONS_URL = 'https://ukpoprkdgezgxlkjjuve.supabase.co/functions/v1';
   </script>
-  <script src="/supabase.js" defer></script>
   <script src="/audio-player.js" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
   <script>
@@ -84,7 +87,7 @@
 
     <section class="py-16" style="background-color:#111111">
       <div class="max-w-3xl mx-auto px-4">
-        <form id="form-archivo" class="space-y-6 card-mir" enctype="multipart/form-data">
+        <form id="form-archivo" class="space-y-6 card-mir">
           <div>
             <label for="nombre" class="block text-sm font-bold text-white/80 mb-1 uppercase">Nombre o Pseudónimo</label>
             <input type="text" id="nombre" name="nombre" required class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
@@ -93,25 +96,16 @@
             <label for="anio" class="block text-sm font-bold text-white/80 mb-1 uppercase">Año estimado del material</label>
             <input type="number" id="anio" name="anio" min="1990" max="2026" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
           </div>
-          <div>
-            <label for="categoria" class="block text-sm font-bold text-white/80 mb-1 uppercase">Categoría</label>
-            <select id="categoria" name="categoria" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
-              <option value="galeria">Galería</option>
-              <option value="relato">Relato</option>
-              <option value="entrevista">Entrevista</option>
-              <option value="legado">Legado</option>
-            </select>
-          </div>
           <div id="archivo-group">
-            <label for="archivo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Foto, Audio o Video <span id="archivo-required" class="text-mir">*</span></label>
+            <label for="archivo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Foto, Audio o Video</label>
             <input type="file" id="archivo" name="archivo" accept=".jpg,.jpeg,.png,.mp3,.wav,.mp4" class="block w-full text-sm text-white/50 border border-white/20 p-2 bg-black">
             <div id="file-error" class="text-mir text-sm mt-1 hidden"></div>
             <div id="file-info" class="text-white/50 text-sm mt-1 hidden"></div>
-            <p class="text-white/40 text-xs mt-2" id="file-hint">Formatos: JPG, PNG, MP3, WAV, MP4 &middot; Máx 50 MB &middot; Opcional si solo es texto.</p>
+            <p class="text-white/40 text-xs mt-2">Formatos: JPG, PNG, MP3, WAV, MP4 &middot; Máx 50 MB &middot; Opcional si solo es texto.</p>
           </div>
           <div>
-            <label for="mensaje_largo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Relato o descripción completa</label>
-            <textarea id="mensaje_largo" name="mensaje_largo" rows="15" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-y" placeholder="Escribe aquí tu relato, entrevista o descripción completa..."></textarea>
+            <label for="relato" class="block text-sm font-bold text-white/80 mb-1 uppercase">Relato</label>
+            <textarea id="relato" name="relato" rows="15" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-y" placeholder="Escribe aquí tu relato, entrevista o descripción completa..."></textarea>
           </div>
           <button type="submit" id="btn-enviar" class="btn-mir w-full">Subir y compartir recuerdo</button>
           <div id="form-messages" class="text-center text-sm font-medium hidden"></div>
@@ -131,36 +125,25 @@
   <script>
     (function () {
       'use strict';
-      var API_BASE = window.API_BASE || '';
+      var supabaseClient = window.miSupabase;
+      if (!supabaseClient) {
+        document.getElementById('form-messages').textContent = 'Error de conexión. Recarga la página.';
+        document.getElementById('form-messages').className = 'text-center text-sm font-medium text-mir';
+        document.getElementById('form-messages').classList.remove('hidden');
+        return;
+      }
+
       var formArchivo = document.getElementById('form-archivo');
-      if (!formArchivo) return;
-      var tipoSelect = document.getElementById('categoria');
       var fileInput = document.getElementById('archivo');
       var fileError = document.getElementById('file-error');
       var fileInfo = document.getElementById('file-info');
-      var fileRequired = document.getElementById('archivo-required');
-      var fileHint = document.getElementById('file-hint');
       var menuToggle = document.getElementById('menu-toggle');
       var mobileMenu = document.getElementById('mobile-menu');
+
       if (menuToggle && mobileMenu) {
         menuToggle.addEventListener('click', function () { mobileMenu.classList.toggle('hidden'); });
         mobileMenu.querySelectorAll('a').forEach(function (l) { l.addEventListener('click', function () { mobileMenu.classList.add('hidden'); }); });
       }
-
-      function actualizarRequerimiento() {
-        var tipo = tipoSelect.value;
-        if (tipo === 'galeria') {
-          fileInput.required = true;
-          if (fileRequired) fileRequired.style.display = 'inline';
-          if (fileHint) fileHint.textContent = 'Formatos: JPG, PNG &middot; Máx 50 MB &middot; Obligatorio para fotos.';
-        } else {
-          fileInput.required = false;
-          if (fileRequired) fileRequired.style.display = 'none';
-          if (fileHint) fileHint.textContent = 'Formatos: JPG, PNG, MP3, WAV, MP4 &middot; Máx 50 MB &middot; Opcional si solo es texto.';
-        }
-      }
-      if (tipoSelect) tipoSelect.addEventListener('change', actualizarRequerimiento);
-      actualizarRequerimiento();
 
       if (fileInput) {
         fileInput.addEventListener('change', function () {
@@ -181,26 +164,89 @@
           fileInfo.classList.remove('hidden');
         });
       }
-      formArchivo.addEventListener('submit', function (e) {
-        e.preventDefault();
-        var btn = document.getElementById('btn-enviar');
-        var messages = document.getElementById('form-messages');
-        var fd = new FormData(formArchivo);
-        btn.textContent = 'Enviando\u2026'; btn.disabled = true; messages.classList.add('hidden');
-        var uploadUrl = window.fnUrl ? window.fnUrl('upload') : (API_BASE + '/api/v1/subir');
-        fetch(uploadUrl, { method: 'POST', body: fd })
-          .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
-          .then(function () {
-            messages.textContent = '\u00a1Gracias por compartir tu recuerdo!';
-            messages.className = 'text-center text-sm font-medium text-green-400'; messages.classList.remove('hidden');
-            formArchivo.reset(); if (fileInfo) fileInfo.classList.add('hidden');
-          })
-          .catch(function () {
+
+      async function manejarSubida(file, metadata) {
+        var fileName = Date.now() + '_' + file.name;
+        var { error: uploadError } = await supabaseClient
+          .storage
+          .from('elarca-uploads')
+          .upload('recuerdos/' + fileName, file);
+        if (uploadError) throw uploadError;
+
+        var { data: { publicUrl } } = supabaseClient
+          .storage
+          .from('elarca-uploads')
+          .getPublicUrl('recuerdos/' + fileName);
+
+        var { error: dbError } = await supabaseClient
+          .from('recuerdos')
+          .insert({
+            nombre: metadata.nombre,
+            anio: metadata.anio || null,
+            url_archivo: publicUrl,
+            storage_path: 'recuerdos/' + fileName,
+            tipo_archivo: file.type,
+            nombre_original: file.name,
+            tamanio_bytes: file.size,
+            mensaje_largo: metadata.relato || null,
+            aprobado: false
+          });
+        if (dbError) throw dbError;
+      }
+
+      if (formArchivo) {
+        formArchivo.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var btn = document.getElementById('btn-enviar');
+          var messages = document.getElementById('form-messages');
+          messages.classList.add('hidden');
+
+          var nombre = document.getElementById('nombre').value.trim();
+          var anio = document.getElementById('anio').value.trim();
+          var relato = document.getElementById('relato').value.trim();
+          var file = fileInput ? fileInput.files[0] : null;
+
+          if (!file && !relato) {
+            messages.textContent = 'Agrega un archivo o escribe un relato.';
+            messages.className = 'text-center text-sm font-medium text-mir';
+            messages.classList.remove('hidden');
+            return;
+          }
+
+          btn.textContent = 'Enviando\u2026';
+          btn.disabled = true;
+
+          try {
+            if (file && file.size > 0) {
+              await manejarSubida(file, { nombre: nombre, anio: anio, relato: relato });
+            } else {
+              var { error: dbError } = await supabaseClient
+                .from('recuerdos')
+                .insert({
+                  nombre: nombre,
+                  anio: anio || null,
+                  mensaje_largo: relato || null,
+                  aprobado: false
+                });
+              if (dbError) throw dbError;
+            }
+
+            messages.textContent = '\u00a1Gracias por compartir tu recuerdo! Ser\u00e1 revisado pronto.';
+            messages.className = 'text-center text-sm font-medium text-green-400';
+            messages.classList.remove('hidden');
+            formArchivo.reset();
+            if (fileInfo) fileInfo.classList.add('hidden');
+          } catch (err) {
+            console.error('[Subir] Error:', err);
             messages.textContent = 'Hubo un error al enviar. Intenta de nuevo o escribe a contacto@elarca.cl';
-            messages.className = 'text-center text-sm font-medium text-mir'; messages.classList.remove('hidden');
-          })
-          .finally(function () { btn.textContent = 'Subir y compartir recuerdo'; btn.disabled = false; });
-      });
+            messages.className = 'text-center text-sm font-medium text-mir';
+            messages.classList.remove('hidden');
+          } finally {
+            btn.textContent = 'Subir y compartir recuerdo';
+            btn.disabled = false;
+          }
+        });
+      }
     })();
   </script>
   <script src="/app.js"></script>
