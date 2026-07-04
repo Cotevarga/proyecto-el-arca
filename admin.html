@@ -851,7 +851,7 @@
         var [countPend, countAprob, countMus, recRes] = await Promise.all([
           s.from('recuerdos').select('*', { count: 'exact', head: true }).eq('aprobado', false),
           s.from('recuerdos').select('*', { count: 'exact', head: true }).eq('aprobado', true),
-          s.from('musica_reproductor').select('*', { count: 'exact', head: true }),
+          s.from('musica_reproductor').select('*', { count: 'exact', head: true }).eq('activo', true),
           s.from('recuerdos').select('*').order('created_at', { ascending: false })
         ]);
 
