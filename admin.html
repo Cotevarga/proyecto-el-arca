@@ -345,6 +345,8 @@
     .btn-sm-approve:hover { background: rgba(76,175,80,0.3); }
     .btn-sm-reject { background: rgba(229,9,20,0.1); color: var(--color-mir); }
     .btn-sm-reject:hover { background: rgba(229,9,20,0.25); }
+    .btn-ver-completo { background:none;border:none;color:var(--color-mir);font-size:11px;font-weight:700;letter-spacing:0.05em;cursor:pointer;padding:4px 0;display:block;margin-top:4px; }
+    .btn-ver-completo:hover { text-decoration:underline; }
     .btn-sm-danger { background: rgba(229,9,20,0.12); color: var(--color-mir); }
     .btn-sm-danger:hover { background: rgba(229,9,20,0.25); }
     .btn-sm-edit { background: rgba(33,150,243,0.12); color: #42a5f5; }
@@ -765,28 +767,13 @@
   </div>
 
   <!-- ─── Approval Modal ─── -->
-  <div id="approval-modal" style="display:none;position:fixed;z-index:99998;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
-    <div style="background:#121212;border:1px solid rgba(229,9,20,0.2);border-radius:16px;padding:32px;max-width:560px;width:90%;max-height:90vh;overflow-y:auto;">
-      <h3 style="font-size:18px;font-weight:700;color:white;margin:0 0 4px 0;">Aprobar recuerdo</h3>
-      <p style="font-size:12px;color:#888;margin:0 0 20px 0;">Edita el texto largo y confirma la sección antes de publicar.</p>
-      <div class="form-group">
-        <label>Sección / Subsección</label>
-        <select id="approval-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
-          <option value="galeria">Galería</option>
-          <option value="videos">Videos y Audios</option>
-          <option value="relatos_jano">Relatos: El Jano</option>
-          <option value="relatos_arca">Relatos: El Arca</option>
-          <option value="relatos_organizaciones">Relatos: Otras organizaciones</option>
-          <option value="relatos_legado">Relatos: El Legado</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Texto largo</label>
-        <textarea id="approval-textolargo" rows="10" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Contenido de la entrevista o relato..."></textarea>
-      </div>
+  <div id="review-modal" style="display:none;position:fixed;z-index:99998;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
+    <div style="background:#121212;border:1px solid rgba(229,9,20,0.2);border-radius:16px;padding:32px;max-width:680px;width:90%;max-height:90vh;overflow-y:auto;">
+      <h3 style="font-size:18px;font-weight:700;color:white;margin:0 0 20px 0;">Revisión detallada</h3>
+      <img id="review-img" src="" style="width:100%;max-height:400px;object-fit:contain;border-radius:8px;margin-bottom:20px;display:none;background:#000;" alt="Vista previa">
+      <div id="review-text" style="font-size:14px;color:#ccc;line-height:1.7;white-space:pre-wrap;word-break:break-word;"></div>
       <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
-        <button class="btn-secondary" id="btn-modal-cancel">Cancelar</button>
-        <button class="btn-primary" id="btn-modal-save">✓ Publicar</button>
+        <button class="btn-secondary" id="btn-review-close">Cerrar</button>
       </div>
     </div>
   </div>
@@ -1225,47 +1212,43 @@
       try {
         var s = getSupabaseClient();
         if (!s) return;
-        var { data, error } = await s.from('recuerdos').select('*').eq('aprobado', false).order('created_at', { ascending: false });
+        var { data, error } = await s
+          .from('recuerdos')
+          .select('id, nombre, url_archivo, mensaje_largo, mensaje, created_at')
+          .eq('aprobado', false)
+          .order('created_at', { ascending: false });
         if (error) throw error;
-        var pending = (data || []).filter(function(r) { return !r.aprobado; });
+        var pending = data || [];
         document.getElementById('pending-count').textContent = pending.length;
         var list = document.getElementById('pending-list');
         if (pending.length === 0) {
           list.innerHTML = '<div class="empty-state"><div class="icon">✅</div><div class="text">Todo revisado — no hay pendientes</div></div>';
           return;
         }
-        var html = '<table><thead><tr><th>Nombre</th><th>Año</th><th class="hide-mobile">Categoría</th><th class="hide-mobile">Tipo</th><th>Contenido</th><th class="hide-mobile">Fecha</th><th>Acción</th></tr></thead><tbody>';
+        var html = '<table><thead><tr><th>Vista previa</th><th>Relato</th><th>Acción</th></tr></thead><tbody>';
         pending.forEach(function(r) {
-          var rawCat = r.categoria || r.seccion || '';
-          var catLabel = nombreSeccion(rawCat);
-          var catBadge = rawCat.indexOf('relato') !== -1 ? 'badge-audio' : 'badge-image';
-          var tipoClass = 'badge-image';
-          var tipoLabel = 'Imagen';
-          if (r.tipo_archivo && r.tipo_archivo.indexOf('audio') !== -1) { tipoClass = 'badge-audio'; tipoLabel = 'Audio'; }
-          else if (r.tipo_archivo && r.tipo_archivo.indexOf('video') !== -1) { tipoClass = 'badge-video'; tipoLabel = 'Video'; }
-          var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL') : '—';
-          var esTexto = rawCat.indexOf('relato') !== -1;
-          var contenidoHtml = esTexto
-            ? '<textarea id="texto-' + r.id + '" rows="3" style="width:100%;background:#1e1e1e;color:#ccc;border:1px solid #333;border-radius:4px;padding:6px;font-size:12px;resize:vertical;">' + escapeHtml(r.mensaje_largo || r.mensaje || '') + '</textarea>'
-            : '<span class="truncate" style="max-width:150px;color:#888;display:inline-block;">' + escapeHtml(r.mensaje || '—') + '</span>';
+          var imgHtml = r.url_archivo
+            ? '<img src="' + r.url_archivo + '" width="100" style="border-radius:8px;object-fit:cover;max-height:80px;" alt="Vista previa">'
+            : '<span style="color:#666;font-size:11px;">Archivo no disponible</span>';
+
+          var textoRelato = r.mensaje_largo || r.mensaje || '';
+          var relatoHtml = '';
+          if (textoRelato) {
+            var textoTruncado = textoRelato.length > 200 ? textoRelato.substring(0, 200) + '...' : textoRelato;
+            relatoHtml = '<div style="max-height:100px;overflow-y:auto;font-size:12px;color:#ccc;line-height:1.5;">' + escapeHtml(textoTruncado) + '</div>';
+            if (textoRelato.length > 200) {
+              relatoHtml += '<button class="btn-ver-completo" onclick="window.verCompleto(\'' + r.id + '\')">VER COMPLETO</button>';
+            }
+          } else {
+            relatoHtml = '<span style="color:#555;font-size:11px;">Sin relato</span>';
+          }
+
           html += '<tr>' +
-            '<td class="truncate">' + escapeHtml(r.nombre) + '</td>' +
-            '<td>' + escapeHtml(r.anio || '—') + '</td>' +
-            '<td class="hide-mobile"><span class="badge ' + catBadge + '">' + catLabel.charAt(0).toUpperCase() + catLabel.slice(1) + '</span></td>' +
-            '<td class="hide-mobile"><span class="badge ' + tipoClass + '">' + tipoLabel + '</span></td>' +
-            '<td style="max-width:200px;">' + contenidoHtml + '</td>' +
-            '<td class="hide-mobile">' + fecha + '</td>' +
-            '<td style="white-space:nowrap;">' +
-              '<select id="seccion-' + r.id + '" style="background:#2a2a2a;color:white;border:1px solid #333;border-radius:4px;font-size:11px;padding:4px 6px;margin-right:6px;">' +
-                '<option value="galeria">Galería</option>' +
-                '<option value="videos">Videos y Audios</option>' +
-                '<option value="relatos_jano">Relatos: El Jano</option>' +
-                '<option value="relatos_arca">Relatos: El Arca</option>' +
-                '<option value="relatos_organizaciones">Relatos: Otras organizaciones</option>' +
-                '<option value="relatos_legado">Relatos: El Legado</option>' +
-              '</select>' +
-              '<button class="btn-sm btn-sm-approve" onclick="window.approveRecuerdo(\'' + r.id + '\')">✓ Aprobar</button> ' +
-              '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')">✕ Rechazar</button>' +
+            '<td style="vertical-align:middle;">' + imgHtml + '</td>' +
+            '<td style="vertical-align:middle;">' + relatoHtml + '</td>' +
+            '<td style="vertical-align:middle;white-space:nowrap;">' +
+              '<button class="btn-sm btn-sm-approve" onclick="window.aprobarDirecto(\'' + r.id + '\')">✓ APROBAR</button> ' +
+              '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')">✕ ELIMINAR</button>' +
             '</td></tr>';
         });
         html += '</tbody></table>';
@@ -1273,6 +1256,56 @@
       } catch (err) {
         if (err.message !== 'Sesión expirada') showToast('Error al cargar pendientes', 'error');
       }
+    }
+
+    // ─── Modal de revisión detallada ───
+    var _reviewTargetId = null;
+    var reviewModal = document.getElementById('review-modal');
+    var reviewImg = document.getElementById('review-img');
+    var reviewText = document.getElementById('review-text');
+
+    function closeReviewModal() {
+      _reviewTargetId = null;
+      if (reviewModal) reviewModal.style.display = 'none';
+    }
+
+    window.verCompleto = async function(id) {
+      try {
+        var s = getSupabaseClient();
+        if (!s) return;
+        var { data, error } = await s
+          .from('recuerdos')
+          .select('id, nombre, url_archivo, mensaje_largo, mensaje')
+          .eq('id', id)
+          .single();
+        if (error) throw error;
+        if (!data) return;
+
+        _reviewTargetId = id;
+
+        if (reviewImg) {
+          reviewImg.src = data.url_archivo || '';
+          reviewImg.style.display = data.url_archivo ? 'block' : 'none';
+          if (!data.url_archivo) {
+            reviewImg.alt = 'Archivo no disponible';
+          }
+        }
+        if (reviewText) {
+          reviewText.textContent = data.mensaje_largo || data.mensaje || 'Sin contenido.';
+        }
+        if (reviewModal) reviewModal.style.display = 'flex';
+      } catch (err) {
+        console.error('[Review] Error:', err);
+        showToast('Error al cargar detalle', 'error');
+      }
+    };
+
+    if (reviewModal) {
+      var btnReviewClose = document.getElementById('btn-review-close');
+      if (btnReviewClose) btnReviewClose.addEventListener('click', closeReviewModal);
+      reviewModal.addEventListener('click', function (e) {
+        if (e.target === reviewModal) closeReviewModal();
+      });
     }
 
     // ─── Approved ───
@@ -1303,88 +1336,21 @@
       }
     }
 
-    // ─── Modal de aprobación ───
-    var _approvalTargetId = null;
-    var approvalModal = document.getElementById('approval-modal');
-    var approvalSeccion = document.getElementById('approval-seccion');
-    var approvalTextoLargo = document.getElementById('approval-textolargo');
-    var btnModalCancel = document.getElementById('btn-modal-cancel');
-    var btnModalSave = document.getElementById('btn-modal-save');
-
-    function openApprovalModal(id, currentSeccion, currentTextoLargo) {
-      _approvalTargetId = id;
-      if (approvalSeccion) approvalSeccion.value = currentSeccion || 'general';
-      if (approvalTextoLargo) approvalTextoLargo.value = currentTextoLargo || '';
-      if (approvalModal) approvalModal.style.display = 'flex';
-    }
-
-    function closeApprovalModal() {
-      _approvalTargetId = null;
-      if (approvalModal) approvalModal.style.display = 'none';
-    }
-
-    if (btnModalCancel) {
-      btnModalCancel.addEventListener('click', closeApprovalModal);
-    }
-
-    if (approvalModal) {
-      approvalModal.addEventListener('click', function (e) {
-        if (e.target === approvalModal) closeApprovalModal();
-      });
-    }
-
-    if (btnModalSave) {
-      btnModalSave.addEventListener('click', async function () {
-        var id = _approvalTargetId;
-        if (!id) { closeApprovalModal(); return; }
-
-        var seccion = approvalSeccion ? approvalSeccion.value : 'general';
-        var textoLargo = approvalTextoLargo ? approvalTextoLargo.value.trim() : '';
-
-        btnModalSave.textContent = 'Publicando...';
-        btnModalSave.disabled = true;
-
-        try {
-          var s = getSupabaseClient();
-          if (!s) throw new Error('Cliente Supabase no disponible');
-
-          var updateData = {
-            aprobado: true,
-            seccion: seccion,
-            mensaje_largo: textoLargo || null
-          };
-
-          console.log('[Aprobar] Actualizando recuerdo', id, 'con:', updateData);
-
-          var { error: updateError } = await s
-            .from('recuerdos')
-            .update(updateData)
-            .eq('id', id);
-
-          if (updateError) throw updateError;
-
-          showToast('Recuerdo aprobado y publicado en ' + seccion, 'success');
-          closeApprovalModal();
-          loadPending();
-          loadDashboard();
-          loadApproved();
-        } catch (err) {
-          console.error('[Aprobar] Error:', err);
-          showToast('Error al aprobar: ' + (err.message || 'desconocido'), 'error');
-        } finally {
-          btnModalSave.textContent = '✓ Publicar';
-          btnModalSave.disabled = false;
-        }
-      });
-    }
-
     // ─── Actions ───
-    window.approveRecuerdo = function(id) {
-      var seccionSelect = document.getElementById('seccion-' + id);
-      var currentSeccion = seccionSelect ? seccionSelect.value : 'general';
-      var textareaEl = document.getElementById('texto-' + id);
-      var currentTextoLargo = textareaEl ? textareaEl.value : '';
-      openApprovalModal(id, currentSeccion, currentTextoLargo);
+    window.aprobarDirecto = async function(id) {
+      try {
+        var s = getSupabaseClient();
+        if (!s) throw new Error('Cliente Supabase no disponible');
+        var { error } = await s.from('recuerdos').update({ aprobado: true }).eq('id', id);
+        if (error) throw error;
+        showToast('Recuerdo aprobado y publicado', 'success');
+        loadPending();
+        loadDashboard();
+        loadApproved();
+      } catch (err) {
+        console.error('[Aprobar] Error:', err);
+        if (err.message !== 'Sesión expirada') showToast('Error al aprobar: ' + (err.message || 'desconocido'), 'error');
+      }
     };
 
     window.rejectRecuerdo = async function(id) {
