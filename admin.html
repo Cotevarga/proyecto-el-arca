@@ -825,6 +825,10 @@
       </div>
       <div id="approval-relato-fields" style="display:none;">
         <div class="form-group">
+          <label>Serie / Colección</label>
+          <input type="text" id="approval-serie" placeholder="Ej: Memorias de La Pintana, Archivo sonoro..." style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+        </div>
+        <div class="form-group">
           <label>Texto largo (cuerpo del relato)</label>
           <textarea id="approval-textolargo" rows="10" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Completa o edita el relato... (puede incluir HTML: &lt;b&gt;, &lt;i&gt;, &lt;u&gt;)"></textarea>
         </div>
@@ -1047,56 +1051,13 @@
 
       var bucket = 'elarca-uploads';
 
-      // ─── Determinar carpeta destino según sección ───
-      var folderMap = {
-        'galeria': 'images',
-        'videos': 'videos',
-        'relatos_jano': 'recuerdos',
-        'relatos_arca': 'recuerdos',
-        'relatos_organizaciones': 'recuerdos',
-      };
-      var folder = folderMap[seccion] || 'recuerdos';
-
-      // ─── Sanitizar nombre ───
-      var sanitize = function (name) {
-        return name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.\./g, '.');
-      };
-      var ext = file.name.lastIndexOf('.') !== -1 ? file.name.slice(file.name.lastIndexOf('.')) : '';
-      var baseName = file.name.replace(/\.[^/.]+$/, '').substring(0, 40);
-      var storagePath = folder + '/' + Date.now() + '_' + sanitize(baseName) + ext;
-
-      console.log('[subirArchivo] Subiendo a:', storagePath, 'tamaño:', file.size);
-
-      // ─── Upload ───
-      var { error: uploadError } = await s.storage
-        .from(bucket)
-        .upload(storagePath, file, { contentType: file.type, upsert: false });
-
-      if (uploadError) {
-        console.error('[subirArchivo] Error upload:', uploadError);
-        throw new Error('Error al subir archivo: ' + uploadError.message);
-      }
-
-      console.log('[subirArchivo] Upload exitoso');
-
-      // ─── URL pública ───
-      var { data: { publicUrl } } = s.storage
-        .from(bucket)
-        .getPublicUrl(storagePath);
-
-      console.log('[subirArchivo] URL pública:', publicUrl);
-
-      // ─── Insertar en recuerdos ───
+      // ─── 1. Insertar registro primero para obtener ID ───
       var insertData = {
         nombre: extraData.nombre || 'Admin',
         mensaje: extraData.descripcion || null,
         mensaje_largo: extraData.texto_largo || null,
         titulo_relato: extraData.titulo_relato || null,
-        url_archivo: publicUrl,
-        storage_path: storagePath,
-        tipo_archivo: file.type,
-        nombre_original: file.name,
-        tamanio_bytes: file.size,
+        nombre_serie: extraData.nombre_serie || null,
         seccion: seccion,
         aprobado: true,
         destacado: extraData.destacado === true,
@@ -1105,7 +1066,7 @@
         fecha_creacion_archivo: extraData.fecha_creacion_archivo || null
       };
 
-      console.log('[subirArchivo] Insertando en recuerdos:', insertData);
+      console.log('[subirArchivo] Insertando registro previo:', insertData);
 
       var { data: inserted, error: insertError } = await s
         .from('recuerdos')
@@ -1118,7 +1079,63 @@
         throw new Error('Error al guardar registro: ' + insertError.message);
       }
 
-      console.log('[subirArchivo] Registro creado ID:', inserted.id);
+      var recordId = inserted.id;
+      console.log('[subirArchivo] Registro creado ID:', recordId);
+
+      // ─── 2. Subir archivo a recuerdos/{id}/ ───
+      var sanitize = function (name) {
+        return name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.\./g, '.');
+      };
+      var ext = file.name.lastIndexOf('.') !== -1 ? file.name.slice(file.name.lastIndexOf('.')) : '';
+      var baseName = file.name.replace(/\.[^/.]+$/, '').substring(0, 40);
+      var storagePath = 'recuerdos/' + recordId + '/' + sanitize(baseName) + ext;
+
+      console.log('[subirArchivo] Subiendo a:', storagePath, 'tamaño:', file.size);
+
+      var { error: uploadError } = await s.storage
+        .from(bucket)
+        .upload(storagePath, file, { contentType: file.type, upsert: false });
+
+      if (uploadError) {
+        console.error('[subirArchivo] Error upload:', uploadError);
+        // Clean up: delete the orphan record
+        await s.from('recuerdos').delete().eq('id', recordId);
+        throw new Error('Error al subir archivo: ' + uploadError.message);
+      }
+
+      console.log('[subirArchivo] Upload exitoso');
+
+      // ─── 3. URL pública ───
+      var { data: { publicUrl } } = s.storage
+        .from(bucket)
+        .getPublicUrl(storagePath);
+
+      console.log('[subirArchivo] URL pública:', publicUrl);
+
+      // ─── 4. Actualizar registro con datos del archivo ───
+      var { error: updateError } = await s
+        .from('recuerdos')
+        .update({
+          url_archivo: publicUrl,
+          storage_path: storagePath,
+          tipo_archivo: file.type,
+          nombre_original: file.name,
+          tamanio_bytes: file.size
+        })
+        .eq('id', recordId);
+
+      if (updateError) {
+        console.error('[subirArchivo] Error update:', updateError);
+        throw new Error('Error al vincular archivo: ' + updateError.message);
+      }
+
+      inserted.url_archivo = publicUrl;
+      inserted.storage_path = storagePath;
+      inserted.tipo_archivo = file.type;
+      inserted.nombre_original = file.name;
+      inserted.tamanio_bytes = file.size;
+
+      console.log('[subirArchivo] Archivo vinculado al recuerdo ID:', recordId);
       return inserted;
     }
 
@@ -1522,6 +1539,7 @@
     var approvalTextoLargo = document.getElementById('approval-textolargo');
     var approvalTextoLargoStd = document.getElementById('approval-textolargo-std');
     var approvalTitulo = document.getElementById('approval-titulo');
+    var approvalSerie = document.getElementById('approval-serie');
     var approvalRelatoFields = document.getElementById('approval-relato-fields');
     var approvalStdFields = document.getElementById('approval-standard-fields');
     var approvalDestacado = document.getElementById('approval-destacado');
@@ -1563,6 +1581,7 @@
       if (approvalTextoLargo) approvalTextoLargo.value = txt;
       if (approvalTextoLargoStd) approvalTextoLargoStd.value = txt;
       if (approvalTitulo) approvalTitulo.value = (record && (record.titulo_relato || record.nombre || '')) || '';
+      if (approvalSerie) approvalSerie.value = (record && record.nombre_serie) || '';
       if (approvalDestacado) approvalDestacado.checked = (record && record.destacado === true);
       if (approvalModal) approvalModal.style.display = 'flex';
     };
@@ -1588,9 +1607,11 @@
         var seccion = approvalSeccion ? approvalSeccion.value : 'galeria';
         var textoLargo = '';
         var tituloRelato = '';
+        var nombreSerie = '';
         if (seccion === 'relatos_jano' || seccion === 'relatos_arca' || seccion === 'relatos_organizaciones') {
           textoLargo = approvalTextoLargo ? approvalTextoLargo.value.trim() : '';
           tituloRelato = approvalTitulo ? approvalTitulo.value.trim() : '';
+          nombreSerie = approvalSerie ? approvalSerie.value.trim() : '';
         } else {
           textoLargo = approvalTextoLargoStd ? approvalTextoLargoStd.value.trim() : '';
           tituloRelato = approvalTitulo ? approvalTitulo.value.trim() : '';
@@ -1608,6 +1629,7 @@
             aprobado: true,
             seccion: seccion,
             titulo_relato: tituloRelato || null,
+            nombre_serie: nombreSerie || null,
             mensaje_largo: textoLargo || null,
             destacado: destacado
           };
@@ -1973,6 +1995,10 @@
       // ─── Texto largo (solo para relatos) ───
       if (isRelato) {
         html += '<div class="form-group">' +
+          '<label>Serie / Colección</label>' +
+          '<input type="text" id="admin-upload-serie" placeholder="Ej: Memorias de La Pintana, Archivo sonoro..." style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">' +
+        '</div>' +
+        '<div class="form-group">' +
           '<label>Texto largo (cuerpo del relato) <span style="color:var(--color-mir);">*</span></label>' +
           '<div style="background:var(--color-acero);border:1px solid #333;border-radius:8px;overflow:hidden;">' +
             '<div id="editor-toolbar" style="display:flex;gap:4px;padding:6px 8px;border-bottom:1px solid #333;background:var(--color-plata);">' +
@@ -2073,9 +2099,23 @@
       var titulo = document.getElementById('admin-upload-titulo').value.trim();
       var descripcion = isRelato ? '' : (document.getElementById('admin-upload-descripcion') ? document.getElementById('admin-upload-descripcion').value.trim() : '');
       var textoLargo = isRelato ? (document.getElementById('admin-upload-textolargo') ? document.getElementById('admin-upload-textolargo').value.trim() : '') : '';
+      var nombreSerie = isRelato ? (document.getElementById('admin-upload-serie') ? document.getElementById('admin-upload-serie').value.trim() : '') : '';
       var fileInput = document.getElementById('admin-upload-file');
       var file = fileInput ? fileInput.files[0] : null;
       var destacado = document.getElementById('admin-upload-destacado').checked;
+
+      // ─── Sanitizar HTML (solo b, i, u) ───
+      if (textoLargo) {
+        textoLargo = textoLargo
+          .replace(/<script[^>]*>.*?<\/script>/gi, '')
+          .replace(/on\w+=["'][^"']*["']/gi, '')
+          .replace(/<[^>]*>/g, function(m) {
+            var allowed = ['<b>','</b>','<i>','</i>','<u>','</u>','<br>','<br/>','<br />'];
+            if (allowed.indexOf(m.toLowerCase()) !== -1) return m;
+            if (/^<br\s*\/?>$/i.test(m)) return '<br>';
+            return '';
+          });
+      }
 
       // ─── Validaciones ───
       if (!titulo) { showToast('El campo "Título" es obligatorio.', 'error'); return; }
@@ -2091,6 +2131,7 @@
       var extraData = {
         nombre: 'Admin',
         titulo_relato: titulo,
+        nombre_serie: nombreSerie || null,
         descripcion: descripcion || textoLargo ? (descripcion || textoLargo.substring(0, 200)) : null,
         texto_largo: textoLargo || null,
         destacado: destacado,
@@ -2109,6 +2150,7 @@
           var insertData = {
             nombre: 'Admin',
             titulo_relato: titulo || null,
+            nombre_serie: nombreSerie || null,
             mensaje: extraData.descripcion || null,
             mensaje_largo: textoLargo || null,
             seccion: seccion,

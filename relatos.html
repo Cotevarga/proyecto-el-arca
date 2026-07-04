@@ -196,6 +196,9 @@
 
       var supabase = window.miSupabase;
 
+      // ─── Flat list of all relatos for lookup ───
+      var allRelatos = [];
+
       async function cargarRelatos() {
         var container = document.getElementById('relatos-container');
         if (!container) return;
@@ -205,16 +208,18 @@
         try {
           var { data, error } = await supabase
             .from('recuerdos')
-            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, seccion')
+            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, seccion, nombre_serie')
             .eq('aprobado', true)
             .in('seccion', ['relatos_jano', 'relatos_arca', 'relatos_organizaciones'])
             .not('titulo_relato', 'is', null)
             .neq('titulo_relato', '')
+            .order('nombre_serie', { ascending: true, nullsFirst: false })
             .order('created_at', { ascending: false });
 
           if (error) throw error;
 
           var relatos = data || [];
+          allRelatos = relatos;
 
           if (relatos.length === 0) {
             container.innerHTML =
@@ -225,24 +230,60 @@
             return;
           }
 
-          // Build layout
+          // ─── Group relatos by nombre_serie ───
+          var groups = [];
+          var groupMap = {};
+
+          relatos.forEach(function(r) {
+            var serie = r.nombre_serie ? r.nombre_serie.trim() : '';
+            if (!serie) serie = '—';
+            if (!groupMap[serie]) {
+              groupMap[serie] = { nombre: serie, relatos: [] };
+              groups.push(groupMap[serie]);
+            }
+            groupMap[serie].relatos.push(r);
+          });
+
+          // Sort groups: unnamed series ("—") goes last
+          groups.sort(function(a, b) {
+            if (a.nombre === '—' && b.nombre !== '—') return 1;
+            if (b.nombre === '—' && a.nombre !== '—') return -1;
+            return a.nombre.localeCompare(b.nombre, 'es');
+          });
+
+          var seccionLabels = { relatos_jano: 'El Jano', relatos_arca: 'El Arca', relatos_organizaciones: 'Otras Org.' };
+
+          // ─── Build layout ───
           var html =
             '<div class="relato-layout" style="display:flex;gap:0;max-width:1200px;margin:0 auto;">' +
               '<div class="relato-index" style="width:300px;flex-shrink:0;border-right:1px solid rgba(229,9,20,0.15);max-height:600px;overflow-y:auto;">' +
                 '<div style="padding:16px 20px;border-bottom:1px solid rgba(229,9,20,0.1);">' +
                   '<h3 style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin:0;font-weight:700;font-family:Arial,Helvetica,sans-serif;">Índice de relatos</h3>' +
-                  '<span style="font-size:10px;color:#555;">' + relatos.length + ' relatos</span>' +
+                  '<span style="font-size:10px;color:#555;">' + relatos.length + ' relatos' +
+                    (groups.length > 1 ? ' · ' + groups.length + ' series' : '') +
+                  '</span>' +
                 '</div>';
 
-          relatos.forEach(function(r, idx) {
-            var titulo = r.titulo_relato || 'Sin título';
-            var seccionLabels = { relatos_jano: 'El Jano', relatos_arca: 'El Arca', relatos_organizaciones: 'Otras Org.' };
+          var firstRelato = null;
+
+          groups.forEach(function(group) {
+            var isUnnamed = (group.nombre === '—');
             html +=
-              '<button class="relato-index-item' + (idx === 0 ? ' active' : '') + '" data-id="' + r.id + '" data-index="' + idx + '">' +
-                '<div style="font-size:11px;color:var(--color-mir);margin-bottom:2px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">' + (seccionLabels[r.seccion] || 'Relato') + '</div>' +
-                '<span style="font-weight:600;">' + escapeHtml(titulo) + '</span>' +
-                '<div style="font-size:11px;color:#666;margin-top:3px;">por ' + escapeHtml(r.nombre || 'Anónimo') + '</div>' +
-              '</button>';
+              '<div role="heading" aria-level="3" style="padding:10px 16px 2px 16px;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#555;font-weight:700;font-family:Arial,Helvetica,sans-serif;border-top:1px solid rgba(229,9,20,0.08);">' +
+                (isUnnamed ? 'Sin serie' : escapeHtml(group.nombre)) +
+                ' <span style="color:#444;font-weight:400;">(' + group.relatos.length + ')</span>' +
+              '</div>';
+
+            group.relatos.forEach(function(r) {
+              if (!firstRelato) firstRelato = r;
+              var titulo = r.titulo_relato || 'Sin título';
+              html +=
+                '<button class="relato-index-item' + (firstRelato === r ? ' active' : '') + '" data-id="' + r.id + '">' +
+                  '<div style="font-size:10px;color:var(--color-mir);margin-bottom:1px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">' + (seccionLabels[r.seccion] || 'Relato') + '</div>' +
+                  '<span style="font-weight:600;font-size:13px;">' + escapeHtml(titulo) + '</span>' +
+                  '<div style="font-size:11px;color:#666;margin-top:2px;">por ' + escapeHtml(r.nombre || 'Anónimo') + '</div>' +
+                '</button>';
+            });
           });
 
           html += '</div>';
@@ -251,8 +292,7 @@
           html += '<div class="relato-body" style="flex:1;padding:32px 40px;min-height:500px;overflow-y:auto;">';
 
           // Render first relato by default
-          var first = relatos[0];
-          html += renderRelatoBody(first);
+          if (firstRelato) html += renderRelatoBody(firstRelato);
 
           html += '</div></div>';
 
@@ -262,8 +302,7 @@
           container.querySelectorAll('.relato-index-item').forEach(function(btn) {
             btn.addEventListener('click', function() {
               var id = this.getAttribute('data-id');
-              var idx = parseInt(this.getAttribute('data-index'), 10);
-              var relato = relatos[idx];
+              var relato = allRelatos.filter(function(r) { return String(r.id) === String(id); })[0];
               if (!relato) return;
 
               // Update active state
@@ -294,16 +333,18 @@
         var titulo = r.titulo_relato || 'Sin título';
         var cuerpoHTML = r.mensaje_largo || r.mensaje || '';
         var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+        var serie = r.nombre_serie || '';
 
         // Sanitize: remove potentially dangerous HTML but keep <b>, <i>, <u>
         cuerpoHTML = sanitizeRelatoHTML(cuerpoHTML);
 
         return '' +
           '<h2 style="font-family:Arial,Helvetica,sans-serif;color:var(--color-mir);text-transform:uppercase;letter-spacing:0.05em;font-size:28px;margin:0 0 8px 0;text-align:left !important;">' + escapeHtml(titulo) + '</h2>' +
-          '<div style="display:flex;gap:12px;font-size:12px;color:#666;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(229,9,20,0.1);">' +
+          '<div style="display:flex;gap:12px;font-size:12px;color:#666;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(229,9,20,0.1);flex-wrap:wrap;">' +
             (fecha ? '<span>' + fecha + '</span>' : '') +
             '<span>por ' + escapeHtml(r.nombre || 'Anónimo') + '</span>' +
-            '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Relato</span>' +
+            (serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escapeHtml(serie) + '</span>' : '') +
+            '<span style="text-transform:uppercase;letter-spacing:0.05em;color:#888;">Relato</span>' +
           '</div>' +
           '<div style="font-size:15px;line-height:1.8;color:#ddd;">' +
             (cuerpoHTML || '<em style="color:#666;">Sin contenido</em>') +
