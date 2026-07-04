@@ -6,6 +6,26 @@ window.API_BASE = '';
   var mainContent = document.getElementById('main-content');
   if (!mainContent) return;
 
+  // ─── 1. Inicialización global segura de Supabase ───
+  var supClient = null;
+
+  function asegurarSupabase() {
+    if (supClient) return Promise.resolve(supClient);
+    if (window._supabase) {
+      supClient = window._supabase;
+      return Promise.resolve(supClient);
+    }
+    if (typeof window.inicializarSupabase === 'function') {
+      window.inicializarSupabase();
+      if (window._supabase) {
+        supClient = window._supabase;
+        return Promise.resolve(supClient);
+      }
+    }
+    console.error("[Galeria] Supabase no encontrado en el scope global");
+    return Promise.resolve(null);
+  }
+
   // ─── Error banner ───
   var errorBanner = document.createElement('div');
   errorBanner.id = 'arca-error-banner';
@@ -15,7 +35,7 @@ window.API_BASE = '';
     'text-align:center;padding:8px 16px;font-size:12px;' +
     'letter-spacing:0.05em;border-bottom:1px solid rgba(229,9,20,0.1);' +
     'backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);';
-  errorBanner.textContent = '⚠ Servicio degradado temporalmente — algunas funciones pueden no estar disponibles.';
+  errorBanner.textContent = '\u26a0 Servicio degradado temporalmente \u2014 algunas funciones pueden no estar disponibles.';
   document.body.appendChild(errorBanner);
 
   // ─── Estilos persistentes para SPA ───
@@ -47,6 +67,10 @@ window.API_BASE = '';
 
   // ─── Re-ejecutar scripts en contenido nuevo ───
   function reejecutarScripts(contenedor) {
+    if (!contenedor) {
+      console.warn('[SPA] Contenedor no v\u00e1lido, omitiendo re-ejecuci\u00f3n');
+      return;
+    }
     var scripts = contenedor.querySelectorAll('script');
     var i, oldScript, newScript, j, attrs, attr;
     for (i = 0; i < scripts.length; i++) {
@@ -242,16 +266,31 @@ window.API_BASE = '';
     }
   };
 
-  function cargarGaleria() {
-    var contenedor = document.getElementById('galeria-container');
-    if (contenedor) contenedor.innerHTML = '';
+  // ─── 2. Función de carga de galería con reintento y validación ───
+  async function cargarGaleria() {
+    console.log("Iniciando carga de galer\u00eda...");
+    var client = await asegurarSupabase();
+
+    if (!client) {
+      console.warn("[Galeria] Supabase sigue no disponible");
+      return;
+    }
+
+    // 3. Validación de existencia del DOM antes de manipular
+    var galeriaContenedor = document.getElementById('galeria-container');
+    if (galeriaContenedor) {
+      galeriaContenedor.innerHTML = '';
+    }
 
     var thumbCol = document.getElementById('thumb-col');
+    if (!thumbCol) {
+      console.warn("[Galeria] thumb-col no encontrado en el DOM actual");
+      return;
+    }
+
     var thumbLoader = document.getElementById('thumb-loader');
     var viewerImg = document.getElementById('main-viewer-img');
     var viewerEmpty = document.getElementById('viewer-empty');
-
-    if (!thumbCol) return;
 
     thumbCol.innerHTML = '';
     if (thumbLoader) thumbLoader.remove();
@@ -261,20 +300,9 @@ window.API_BASE = '';
     window._galeriaImages = [];
     window._galeriaCurrentIndex = 0;
 
-    var sb = window._supabase;
-    if (!sb || typeof sb === 'undefined') {
-      console.error("[Galeria] Supabase no cargado, intentando re-inicializar...");
-      if (typeof window.inicializarSupabase === 'function') {
-        window.inicializarSupabase();
-        sb = window._supabase;
-      }
-      if (!sb) {
-        console.warn('[Galeria] Supabase sigue no disponible');
-        return;
-      }
-    }
+    console.log("Supabase disponible, procediendo con fetch...");
 
-    sb.from('galeria')
+    client.from('galeria')
       .select('url_imagen, titulo')
       .eq('activo', true)
       .order('orden', { ascending: true })
@@ -300,7 +328,7 @@ window.API_BASE = '';
   function cambiarVista(url) {
     var targetPath = new URL(url, window.location.origin).pathname;
     if (targetPath.indexOf('galeria') !== -1) {
-      console.log("Navegando a galería, forzando carga...");
+      console.log("Navegando a galer\u00eda, forzando carga...");
       cargarGaleria();
     }
     try { if (typeof gtag === 'function') gtag('config', 'G-0M3Q8DQ3QF', { 'page_path': targetPath }); } catch (e) {}
