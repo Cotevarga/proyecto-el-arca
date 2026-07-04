@@ -207,7 +207,7 @@
             .from('recuerdos')
             .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, seccion')
             .eq('aprobado', true)
-            .in('seccion', ['relatos', 'entrevista'])
+            .in('seccion', ['relatos_jano', 'relatos_arca', 'relatos_organizaciones'])
             .not('titulo_relato', 'is', null)
             .neq('titulo_relato', '')
             .order('created_at', { ascending: false });
@@ -236,10 +236,10 @@
 
           relatos.forEach(function(r, idx) {
             var titulo = r.titulo_relato || 'Sin título';
-            var seccionLabel = r.seccion === 'entrevista' ? 'Entrevista' : 'Relato';
+            var seccionLabels = { relatos_jano: 'El Jano', relatos_arca: 'El Arca', relatos_organizaciones: 'Otras Org.' };
             html +=
               '<button class="relato-index-item' + (idx === 0 ? ' active' : '') + '" data-id="' + r.id + '" data-index="' + idx + '">' +
-                '<div style="font-size:11px;color:' + (r.seccion === 'entrevista' ? '#42a5f5' : 'var(--color-mir)') + ';margin-bottom:2px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">' + seccionLabel + '</div>' +
+                '<div style="font-size:11px;color:var(--color-mir);margin-bottom:2px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">' + (seccionLabels[r.seccion] || 'Relato') + '</div>' +
                 '<span style="font-weight:600;">' + escapeHtml(titulo) + '</span>' +
                 '<div style="font-size:11px;color:#666;margin-top:3px;">por ' + escapeHtml(r.nombre || 'Anónimo') + '</div>' +
               '</button>';
@@ -303,7 +303,7 @@
           '<div style="display:flex;gap:12px;font-size:12px;color:#666;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(229,9,20,0.1);">' +
             (fecha ? '<span>' + fecha + '</span>' : '') +
             '<span>por ' + escapeHtml(r.nombre || 'Anónimo') + '</span>' +
-            '<span style="text-transform:uppercase;letter-spacing:0.05em;color:' + (r.seccion === 'entrevista' ? '#42a5f5' : 'var(--color-mir)') + ';">' + (r.seccion === 'entrevista' ? 'Entrevista' : 'Relato') + '</span>' +
+            '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Relato</span>' +
           '</div>' +
           '<div style="font-size:15px;line-height:1.8;color:#ddd;">' +
             (cuerpoHTML || '<em style="color:#666;">Sin contenido</em>') +

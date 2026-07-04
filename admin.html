@@ -751,51 +751,24 @@
                   <select id="admin-upload-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" aria-label="Seleccionar sección del archivo">
                     <option value="galeria">Galería</option>
                     <option value="videos">Videos y Audios</option>
-                    <option value="relatos">Relatos</option>
-                    <option value="entrevista">Entrevista</option>
-                    <option value="legado">Legado</option>
-                    <option value="jano">El Jano</option>
-                    <option value="arca">El Arca</option>
-                    <option value="organizaciones">Otras organizaciones</option>
-                    <option value="general">General</option>
+                    <option value="relatos_jano">Relatos: El Jano</option>
+                    <option value="relatos_arca">Relatos: El Arca</option>
+                    <option value="relatos_organizaciones">Relatos: Otras organizaciones</option>
                   </select>
                 </div>
-                <div id="relato-fields" style="display:none;">
-                  <div class="form-group">
-                    <label>Título del relato <span style="color:var(--color-mir);">*</span></label>
-                    <input type="text" id="admin-upload-titulo" placeholder="Ej: La Caleta y Antupeñi" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
-                  </div>
-                  <div class="form-group">
-                    <label>Cuerpo del Texto <span style="color:var(--color-mir);">*</span></label>
-                    <div style="background:var(--color-acero);border:1px solid #333;border-radius:8px;overflow:hidden;">
-                      <div id="editor-toolbar" style="display:flex;gap:4px;padding:6px 8px;border-bottom:1px solid #333;background:var(--color-plata);">
-                        <button type="button" class="editor-btn" data-tag="b" title="Negrita" style="padding:6px 12px;background:transparent;border:1px solid #555;border-radius:4px;color:white;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s;">B</button>
-                        <button type="button" class="editor-btn" data-tag="i" title="Cursiva" style="padding:6px 12px;background:transparent;border:1px solid #555;border-radius:4px;color:white;font-style:italic;font-size:13px;cursor:pointer;transition:all 0.2s;">I</button>
-                        <button type="button" class="editor-btn" data-tag="u" title="Subrayado" style="padding:6px 12px;background:transparent;border:1px solid #555;border-radius:4px;color:white;text-decoration:underline;font-size:13px;cursor:pointer;transition:all 0.2s;">U</button>
-                        <span style="flex:1;"></span>
-                        <span style="font-size:10px;color:#666;align-self:center;">Modo HTML</span>
-                      </div>
-                      <textarea id="admin-upload-cuerpo" rows="12" style="width:100%;padding:10px 14px;background:var(--color-acero);border:none;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Escribe o pega aquí el contenido del relato... Puedes usar los botones B / I / U para dar formato."></textarea>
-                    </div>
-                    <div style="font-size:10px;color:#666;margin-top:4px;">Usa los botones <b>B</b> <i>I</i> <u>U</u> para aplicar formato HTML. El texto se guardará con etiquetas.</div>
-                  </div>
-                </div>
+
+                <!-- ─── Título (compartido por todas) ─── -->
                 <div class="form-group">
-                  <label>Descripción breve</label>
-                  <input type="text" id="admin-upload-descripcion" placeholder="Breve descripción del contenido">
+                  <label>Título <span style="color:var(--color-mir);">*</span></label>
+                  <input type="text" id="admin-upload-titulo" placeholder="Título del contenido" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
                 </div>
-                <div class="form-group">
-                  <label>Archivo (imagen, video o audio)</label>
-                  <div class="upload-area" id="admin-upload-area">
-                    <div class="icon">📁</div>
-                    <div class="text" id="admin-upload-text">Haz clic para seleccionar archivo</div>
-                    <div class="hint">JPG, PNG, MP4, MP3, WAV · Máximo 50 MB</div>
-                    <input type="file" id="admin-upload-file" accept=".jpg,.jpeg,.png,.webp,.mp4,.mp3,.wav" style="display:none">
-                  </div>
-                  <div class="file-info" id="admin-upload-file-info"></div>
-                </div>
+
+                <!-- ─── Campos dinámicos según sección ─── -->
+                <div id="dynamic-fields-container"></div>
+
+                <!-- ─── Metadatos estándar (siempre visibles) ─── -->
                 <div style="padding:12px 16px;background:rgba(229,9,20,0.04);border:1px solid rgba(229,9,20,0.1);border-radius:8px;margin-bottom:20px;">
-                  <p style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:12px;">Metadatos adicionales (opcionales)</p>
+                  <p style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:12px;">Metadatos</p>
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group" style="margin-bottom:0;">
                       <label>Ubicación</label>
@@ -811,6 +784,16 @@
                     <input type="text" id="admin-upload-tags" placeholder="Ej: marcha, pobladores, años 90">
                   </div>
                 </div>
+
+                <!-- ─── Vitrina checkbox ─── -->
+                <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;background:rgba(229,9,20,0.04);border:1px solid rgba(229,9,20,0.15);border-radius:8px;margin-bottom:20px;">
+                  <input type="checkbox" id="admin-upload-destacado" style="margin-top:2px;accent-color:var(--color-mir);width:18px;height:18px;flex-shrink:0;">
+                  <label for="admin-upload-destacado" style="font-size:13px;color:#ccc;cursor:pointer;line-height:1.4;">
+                    <strong style="color:white;">Publicar extracto en vitrina (index)</strong><br>
+                    <span style="font-size:11px;color:#888;">Si activas esto, aparecerá en la vitrina principal de la página de inicio.</span>
+                  </label>
+                </div>
+
                 <button type="submit" class="btn-primary" id="btn-admin-upload" aria-label="Publicar contenido en el archivo">Publicar</button>
               </form>
             </div>
@@ -831,30 +814,30 @@
         <select id="approval-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" aria-label="Seleccionar sección del archivo">
           <option value="galeria">Galería</option>
           <option value="videos">Videos y Audios</option>
-          <option value="relatos">Relatos</option>
-          <option value="entrevista">Entrevista</option>
-          <option value="legado">Legado</option>
-          <option value="jano">El Jano</option>
-          <option value="arca">El Arca</option>
-          <option value="organizaciones">Otras organizaciones</option>
-          <option value="general">General</option>
+          <option value="relatos_jano">Relatos: El Jano</option>
+          <option value="relatos_arca">Relatos: El Arca</option>
+          <option value="relatos_organizaciones">Relatos: Otras organizaciones</option>
         </select>
+      </div>
+      <div class="form-group">
+        <label>Título</label>
+        <input type="text" id="approval-titulo" placeholder="Título del contenido" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
       </div>
       <div id="approval-relato-fields" style="display:none;">
         <div class="form-group">
-          <label>Título del relato</label>
-          <input type="text" id="approval-titulo" placeholder="Ej: La Caleta y Antupeñi" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
-        </div>
-        <div class="form-group">
-          <label>Texto del relato (cuerpo)</label>
+          <label>Texto largo (cuerpo del relato)</label>
           <textarea id="approval-textolargo" rows="10" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Completa o edita el relato... (puede incluir HTML: &lt;b&gt;, &lt;i&gt;, &lt;u&gt;)"></textarea>
         </div>
       </div>
       <div id="approval-standard-fields">
         <div class="form-group">
-          <label>Texto del relato</label>
-          <textarea id="approval-textolargo-std" rows="10" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Completa o edita el relato..."></textarea>
+          <label>Descripción</label>
+          <textarea id="approval-textolargo-std" rows="5" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Descripción opcional..."></textarea>
         </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;">
+        <input type="checkbox" id="approval-destacado" style="accent-color:var(--color-mir);width:16px;height:16px;">
+        <label for="approval-destacado" style="font-size:12px;color:#aaa;cursor:pointer;">Publicar en vitrina (index)</label>
       </div>
       <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
         <button class="btn-secondary" id="btn-approval-cancel" aria-label="Cancelar aprobación y cerrar modal">Cancelar</button>
@@ -1068,13 +1051,9 @@
       var folderMap = {
         'galeria': 'images',
         'videos': 'videos',
-        'relatos': 'recuerdos',
-        'entrevista': 'recuerdos',
-        'legado': 'recuerdos',
-        'jano': 'recuerdos',
-        'arca': 'recuerdos',
-        'organizaciones': 'recuerdos',
-        'general': 'recuerdos',
+        'relatos_jano': 'recuerdos',
+        'relatos_arca': 'recuerdos',
+        'relatos_organizaciones': 'recuerdos',
       };
       var folder = folderMap[seccion] || 'recuerdos';
 
@@ -1120,7 +1099,7 @@
         tamanio_bytes: file.size,
         seccion: seccion,
         aprobado: true,
-        categoria: extraData.categoria || seccion,
+        destacado: extraData.destacado === true,
         geolocalizacion: extraData.geolocalizacion || null,
         tags: extraData.tags || null,
         fecha_creacion_archivo: extraData.fecha_creacion_archivo || null
@@ -1267,13 +1246,9 @@
     var NOMBRES_SECCION = {
       'galeria': 'Galería',
       'videos': 'Videos y Audios',
-      'relatos': 'Relatos',
-      'entrevista': 'Entrevista',
-      'legado': 'Legado',
-      'jano': 'El Jano',
-      'arca': 'El Arca',
-      'organizaciones': 'Otras organizaciones',
-      'general': 'General',
+      'relatos_jano': 'Relatos: El Jano',
+      'relatos_arca': 'Relatos: El Arca',
+      'relatos_organizaciones': 'Relatos: Otras organizaciones',
       'musica': 'Música'
     };
 
@@ -1549,12 +1524,13 @@
     var approvalTitulo = document.getElementById('approval-titulo');
     var approvalRelatoFields = document.getElementById('approval-relato-fields');
     var approvalStdFields = document.getElementById('approval-standard-fields');
+    var approvalDestacado = document.getElementById('approval-destacado');
     var btnApprovalCancel = document.getElementById('btn-approval-cancel');
     var btnApprovalConfirm = document.getElementById('btn-approval-confirm');
 
     function toggleApprovalRelatoFields() {
       var val = approvalSeccion ? approvalSeccion.value : '';
-      if (val === 'relatos' || val === 'entrevista') {
+      if (val === 'relatos_jano' || val === 'relatos_arca' || val === 'relatos_organizaciones') {
         approvalRelatoFields.style.display = 'block';
         approvalStdFields.style.display = 'none';
       } else {
@@ -1577,7 +1553,7 @@
       }
       if (approvalSeccion) {
         var seccionActual = (record && record.seccion) || 'galeria';
-        var validSections = ['galeria','videos','relatos','entrevista','legado','jano','arca','organizaciones','general'];
+        var validSections = ['galeria','videos','relatos_jano','relatos_arca','relatos_organizaciones'];
         if (validSections.indexOf(seccionActual) !== -1) {
           approvalSeccion.value = seccionActual;
         }
@@ -1586,7 +1562,8 @@
       var txt = (record && (record.mensaje_largo || record.mensaje)) || '';
       if (approvalTextoLargo) approvalTextoLargo.value = txt;
       if (approvalTextoLargoStd) approvalTextoLargoStd.value = txt;
-      if (approvalTitulo) approvalTitulo.value = (record && (record.titulo_relato || '')) || '';
+      if (approvalTitulo) approvalTitulo.value = (record && (record.titulo_relato || record.nombre || '')) || '';
+      if (approvalDestacado) approvalDestacado.checked = (record && record.destacado === true);
       if (approvalModal) approvalModal.style.display = 'flex';
     };
 
@@ -1611,12 +1588,14 @@
         var seccion = approvalSeccion ? approvalSeccion.value : 'galeria';
         var textoLargo = '';
         var tituloRelato = '';
-        if (seccion === 'relatos' || seccion === 'entrevista') {
+        if (seccion === 'relatos_jano' || seccion === 'relatos_arca' || seccion === 'relatos_organizaciones') {
           textoLargo = approvalTextoLargo ? approvalTextoLargo.value.trim() : '';
           tituloRelato = approvalTitulo ? approvalTitulo.value.trim() : '';
         } else {
           textoLargo = approvalTextoLargoStd ? approvalTextoLargoStd.value.trim() : '';
+          tituloRelato = approvalTitulo ? approvalTitulo.value.trim() : '';
         }
+        var destacado = approvalDestacado ? approvalDestacado.checked : false;
 
         btnApprovalConfirm.textContent = 'Publicando...';
         btnApprovalConfirm.disabled = true;
@@ -1625,8 +1604,13 @@
           var s = getSupabaseClient();
           if (!s) throw new Error('Cliente Supabase no disponible');
 
-          var updateData = { aprobado: true, seccion: seccion, mensaje_largo: textoLargo || null };
-          if (tituloRelato) updateData.titulo_relato = tituloRelato;
+          var updateData = {
+            aprobado: true,
+            seccion: seccion,
+            titulo_relato: tituloRelato || null,
+            mensaje_largo: textoLargo || null,
+            destacado: destacado
+          };
 
           var { error: updateError } = await s
             .from('recuerdos')
@@ -1635,7 +1619,7 @@
 
           if (updateError) throw updateError;
 
-          showToast('Recuerdo aprobado y publicado en ' + seccion, 'success');
+          showToast('Recuerdo aprobado y publicado en ' + (NOMBRES_SECCION[seccion] || seccion), 'success');
           closeApprovalModal();
           loadPending();
           loadDashboard();
@@ -1923,140 +1907,223 @@
       });
     });
 
-    // ─── Dynamic fields: show Title + Body for relatos / entrevista ───
-    var adminUploadSeccion = document.getElementById('admin-upload-seccion');
-    var relatoFields = document.getElementById('relato-fields');
-    var adminUploadTitulo = document.getElementById('admin-upload-titulo');
-    var adminUploadCuerpo = document.getElementById('admin-upload-cuerpo');
+    // ═══════════════════════════════════════════════
+    // FORMULARIO DINÁMICO — Subida Manual
+    // ═══════════════════════════════════════════════
 
-    function toggleRelatoFields() {
-      var val = adminUploadSeccion ? adminUploadSeccion.value : '';
-      if (val === 'relatos' || val === 'entrevista') {
-        relatoFields.style.display = 'block';
-      } else {
-        relatoFields.style.display = 'none';
+    var SECCIONES_CONFIG = {
+      galeria: {
+        label: 'Galería',
+        fields: ['imagen'],
+        requireFile: true,
+        requireTexto: false
+      },
+      videos: {
+        label: 'Videos y Audios',
+        fields: ['multimedia'],
+        requireFile: true,
+        requireTexto: false
+      },
+      relatos_jano: {
+        label: 'Relatos: El Jano',
+        fields: ['archivo_opcional', 'texto_largo'],
+        requireFile: false,
+        requireTexto: true
+      },
+      relatos_arca: {
+        label: 'Relatos: El Arca',
+        fields: ['archivo_opcional', 'texto_largo'],
+        requireFile: false,
+        requireTexto: true
+      },
+      relatos_organizaciones: {
+        label: 'Relatos: Otras organizaciones',
+        fields: ['archivo_opcional', 'texto_largo'],
+        requireFile: false,
+        requireTexto: true
       }
+    };
+
+    var adminUploadSeccion = document.getElementById('admin-upload-seccion');
+    var dynamicContainer = document.getElementById('dynamic-fields-container');
+
+    function renderDynamicFields(val) {
+      var cfg = SECCIONES_CONFIG[val];
+      if (!cfg) { dynamicContainer.innerHTML = ''; return; }
+
+      var html = '';
+
+      // ─── Archivo (obligatorio para galeria/videos, opcional para relatos) ───
+      var isRelato = val.indexOf('relatos_') === 0;
+      var fileRequired = cfg.requireFile;
+      var acceptAttr = val === 'galeria' ? '.jpg,.jpeg,.png,.webp' : '.jpg,.jpeg,.png,.webp,.mp4,.mp3,.wav';
+      var hintText = val === 'galeria' ? 'JPG, PNG, WebP · Máximo 50 MB' : (val === 'videos' ? 'MP4, MP3, WAV, JPG, PNG · Máximo 50 MB' : 'JPG, PNG, MP4, MP3, WAV · Opcional · Máximo 50 MB');
+
+      html += '<div class="form-group">' +
+        '<label>Archivo' + (fileRequired ? ' <span style="color:var(--color-mir);">*</span>' : ' (opcional)') + '</label>' +
+        '<div class="upload-area" id="admin-upload-area">' +
+          '<div class="icon">📁</div>' +
+          '<div class="text" id="admin-upload-text">Haz clic para seleccionar archivo</div>' +
+          '<div class="hint">' + hintText + '</div>' +
+          '<input type="file" id="admin-upload-file" accept="' + acceptAttr + '" style="display:none">' +
+        '</div>' +
+        '<div class="file-info" id="admin-upload-file-info"></div>' +
+      '</div>';
+
+      // ─── Texto largo (solo para relatos) ───
+      if (isRelato) {
+        html += '<div class="form-group">' +
+          '<label>Texto largo (cuerpo del relato) <span style="color:var(--color-mir);">*</span></label>' +
+          '<div style="background:var(--color-acero);border:1px solid #333;border-radius:8px;overflow:hidden;">' +
+            '<div id="editor-toolbar" style="display:flex;gap:4px;padding:6px 8px;border-bottom:1px solid #333;background:var(--color-plata);">' +
+              '<button type="button" class="editor-btn" data-tag="b" title="Negrita" style="padding:6px 12px;background:transparent;border:1px solid #555;border-radius:4px;color:white;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s;">B</button>' +
+              '<button type="button" class="editor-btn" data-tag="i" title="Cursiva" style="padding:6px 12px;background:transparent;border:1px solid #555;border-radius:4px;color:white;font-style:italic;font-size:13px;cursor:pointer;transition:all 0.2s;">I</button>' +
+              '<button type="button" class="editor-btn" data-tag="u" title="Subrayado" style="padding:6px 12px;background:transparent;border:1px solid #555;border-radius:4px;color:white;text-decoration:underline;font-size:13px;cursor:pointer;transition:all 0.2s;">U</button>' +
+              '<span style="flex:1;"></span>' +
+              '<span style="font-size:10px;color:#666;align-self:center;">Modo HTML</span>' +
+            '</div>' +
+            '<textarea id="admin-upload-textolargo" rows="12" style="width:100%;padding:10px 14px;background:var(--color-acero);border:none;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Escribe o pega aquí el contenido del relato... Puedes usar los botones B / I / U para dar formato."></textarea>' +
+          '</div>' +
+        '</div>';
+      }
+
+      // ─── Descripción (galeria / videos) ───
+      if (!isRelato) {
+        html += '<div class="form-group">' +
+          '<label>Descripción</label>' +
+          '<textarea id="admin-upload-descripcion" rows="4" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Descripción del contenido..."></textarea>' +
+        '</div>';
+      }
+
+      dynamicContainer.innerHTML = html;
+
+      // ─── Re-bind file input ───
+      bindFileUpload();
+
+      // ─── Re-bind editor toolbar ───
+      bindEditorToolbar();
     }
 
+    function bindFileUpload() {
+      var area = document.getElementById('admin-upload-area');
+      var input = document.getElementById('admin-upload-file');
+      var info = document.getElementById('admin-upload-file-info');
+      var text = document.getElementById('admin-upload-text');
+      if (!area || !input) return;
+
+      area.onclick = function() { input.click(); };
+      input.onchange = function() {
+        var file = input.files[0];
+        if (!file) { if (info) info.textContent = ''; return; }
+        if (file.size > 50 * 1024 * 1024) {
+          if (info) { info.textContent = 'El archivo supera los 50 MB.'; info.style.color = '#E50914'; }
+          input.value = '';
+          return;
+        }
+        if (info) { info.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(1) + ' MB)'; info.style.color = '#66bb6a'; }
+        if (text) text.textContent = file.name;
+      };
+    }
+
+    function bindEditorToolbar() {
+      document.querySelectorAll('.editor-btn').forEach(function(btn) {
+        btn.onclick = function(e) {
+          e.preventDefault();
+          var tag = this.getAttribute('data-tag');
+          var textarea = document.getElementById('admin-upload-textolargo');
+          if (!textarea) return;
+          var start = textarea.selectionStart;
+          var end = textarea.selectionEnd;
+          var text = textarea.value;
+          var selected = text.substring(start, end);
+          var replacement = selected
+            ? '<' + tag + '>' + selected + '</' + tag + '>'
+            : '<' + tag + '></' + tag + '>';
+          textarea.value = text.substring(0, start) + replacement + text.substring(end);
+          textarea.focus();
+          textarea.setSelectionRange(start + replacement.length, start + replacement.length);
+        };
+      });
+    }
+
+    // ─── Sección change ───
     if (adminUploadSeccion) {
-      adminUploadSeccion.addEventListener('change', toggleRelatoFields);
-    }
-
-    // ─── Editor toolbar: inject <b>, <i>, <u> ───
-    document.querySelectorAll('.editor-btn').forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        var tag = this.getAttribute('data-tag');
-        var textarea = document.getElementById('admin-upload-cuerpo');
-        if (!textarea) return;
-        var start = textarea.selectionStart;
-        var end = textarea.selectionEnd;
-        var text = textarea.value;
-        var selected = text.substring(start, end);
-        var replacement = '';
-        if (selected) {
-          replacement = '<' + tag + '>' + selected + '</' + tag + '>';
-        } else {
-          replacement = '<' + tag + '></' + tag + '>';
-        }
-        textarea.value = text.substring(0, start) + replacement + text.substring(end);
-        textarea.focus();
-        var newPos = start + replacement.length;
-        textarea.setSelectionRange(newPos, newPos);
-      });
-    });
-
-    // ─── Init toggle on page load ───
-    setTimeout(toggleRelatoFields, 100);
-
-    // ─── Admin Upload (Subida Manual) ───
-    var adminUploadArea = document.getElementById('admin-upload-area');
-    var adminUploadFile = document.getElementById('admin-upload-file');
-    var adminUploadFileInfo = document.getElementById('admin-upload-file-info');
-    var adminUploadText = document.getElementById('admin-upload-text');
-
-    if (adminUploadArea) {
-      adminUploadArea.addEventListener('click', function() { adminUploadFile.click(); });
-      adminUploadFile.addEventListener('change', function() {
-        var file = adminUploadFile.files[0];
-        if (file) {
-          if (file.size > 50 * 1024 * 1024) {
-            adminUploadFileInfo.textContent = 'El archivo supera los 50 MB.';
-            adminUploadFileInfo.style.color = '#E50914';
-            adminUploadFile.value = '';
-            return;
-          }
-          adminUploadFileInfo.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(1) + ' MB)';
-          adminUploadFileInfo.style.color = '#66bb6a';
-          adminUploadText.textContent = file.name;
-        }
+      adminUploadSeccion.addEventListener('change', function() {
+        renderDynamicFields(this.value);
       });
     }
 
+    // ─── Init first render ───
+    setTimeout(function() {
+      if (adminUploadSeccion) renderDynamicFields(adminUploadSeccion.value);
+    }, 100);
+
+    // ─── Submit ───
     document.getElementById('admin-upload-form').addEventListener('submit', function(e) {
       e.preventDefault();
 
       var btn = document.getElementById('btn-admin-upload');
-      var seccion = document.getElementById('admin-upload-seccion').value;
-      var descripcion = document.getElementById('admin-upload-descripcion').value.trim();
-      var textoLargo = document.getElementById('admin-upload-cuerpo') ? document.getElementById('admin-upload-cuerpo').value.trim() : document.getElementById('admin-upload-textolargo').value.trim();
-      var tituloRelato = document.getElementById('admin-upload-titulo') ? document.getElementById('admin-upload-titulo').value.trim() : '';
-      var file = adminUploadFile.files[0];
       var s = getSupabaseClient();
-
       if (!s) { showToast('Cliente Supabase no disponible', 'error'); return; }
 
-      // Validar campos requeridos para relatos / entrevista
-      if (seccion === 'relatos' || seccion === 'entrevista') {
-        if (!tituloRelato) { showToast('El campo "Título del relato" es obligatorio para esta categoría.', 'error'); return; }
-        if (!textoLargo) { showToast('El campo "Cuerpo del Texto" es obligatorio para esta categoría.', 'error'); return; }
-      }
-      if (!file && !textoLargo) { showToast('Agrega un archivo o texto largo', 'error'); return; }
+      var seccion = adminUploadSeccion.value;
+      var cfg = SECCIONES_CONFIG[seccion];
+      var isRelato = seccion.indexOf('relatos_') === 0;
 
-      // Metadatos opcionales
+      var titulo = document.getElementById('admin-upload-titulo').value.trim();
+      var descripcion = isRelato ? '' : (document.getElementById('admin-upload-descripcion') ? document.getElementById('admin-upload-descripcion').value.trim() : '');
+      var textoLargo = isRelato ? (document.getElementById('admin-upload-textolargo') ? document.getElementById('admin-upload-textolargo').value.trim() : '') : '';
+      var fileInput = document.getElementById('admin-upload-file');
+      var file = fileInput ? fileInput.files[0] : null;
+      var destacado = document.getElementById('admin-upload-destacado').checked;
+
+      // ─── Validaciones ───
+      if (!titulo) { showToast('El campo "Título" es obligatorio.', 'error'); return; }
+      if (cfg.requireFile && !file) { showToast('Debes seleccionar un archivo para esta sección.', 'error'); return; }
+      if (isRelato && !textoLargo) { showToast('El campo "Texto largo" es obligatorio para relatos.', 'error'); return; }
+      if (!file && !textoLargo && !descripcion) { showToast('Agrega al menos un archivo, texto o descripción.', 'error'); return; }
+
+      // ─── Metadatos ───
       var adminGeo = document.getElementById('admin-upload-geo');
       var adminFecha = document.getElementById('admin-upload-fecha');
       var adminTags = document.getElementById('admin-upload-tags');
-      var metaData = {
+
+      var extraData = {
         nombre: 'Admin',
-        descripcion: descripcion,
-        texto_largo: textoLargo,
-        titulo_relato: tituloRelato || null,
-        categoria: seccion,
+        titulo_relato: titulo,
+        descripcion: descripcion || textoLargo ? (descripcion || textoLargo.substring(0, 200)) : null,
+        texto_largo: textoLargo || null,
+        destacado: destacado,
         geolocalizacion: adminGeo ? adminGeo.value.trim() || null : null,
         fecha_creacion_archivo: adminFecha ? adminFecha.value || null : null,
         tags: null
       };
       if (adminTags && adminTags.value.trim()) {
-        metaData.tags = adminTags.value.trim().split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t.length > 0; });
+        extraData.tags = adminTags.value.trim().split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t.length > 0; });
       }
 
       procesarSubida(btn, async function() {
         if (file && file.size > 0) {
-          console.log('[Upload] Subiendo archivo con subirArchivo...');
-          await subirArchivo(file, seccion, metaData);
-          console.log('[Upload] subirArchivo completado');
+          await subirArchivo(file, seccion, extraData);
         } else {
-          console.log('[Upload] Solo texto, insertando directamente...');
           var insertData = {
             nombre: 'Admin',
-            mensaje: descripcion || null,
+            titulo_relato: titulo || null,
+            mensaje: extraData.descripcion || null,
             mensaje_largo: textoLargo || null,
-            titulo_relato: metaData.titulo_relato || null,
             seccion: seccion,
             aprobado: true,
-            categoria: seccion,
-            geolocalizacion: metaData.geolocalizacion || null,
-            tags: metaData.tags || null,
-            fecha_creacion_archivo: metaData.fecha_creacion_archivo || null
+            destacado: destacado,
+            geolocalizacion: extraData.geolocalizacion || null,
+            tags: extraData.tags || null,
+            fecha_creacion_archivo: extraData.fecha_creacion_archivo || null
           };
           var { error: insertError } = await s.from('recuerdos').insert(insertData);
           if (insertError) throw insertError;
         }
 
         document.getElementById('admin-upload-form').reset();
-        if (adminUploadFileInfo) { adminUploadFileInfo.textContent = ''; }
-        if (adminUploadText) { adminUploadText.textContent = 'Haz clic para seleccionar archivo'; }
+        if (adminUploadSeccion) renderDynamicFields(adminUploadSeccion.value);
         if (typeof loadApproved === 'function') loadApproved();
         if (typeof loadDashboard === 'function') loadDashboard();
       });
