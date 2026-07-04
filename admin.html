@@ -714,7 +714,7 @@
                     <div class="text">No hay canciones subidas</div>
                   </div>
                 </div>
-                <ul id="canciones-list" class="mt-4" style="list-style:none;padding:0;"></ul>
+                <div id="contenedor-canciones" class="mt-4"></div>
               </div>
             </div>
           </div>
@@ -1519,31 +1519,31 @@
         if (error) throw error;
         var canciones = data || [];
 
-        var lista = document.getElementById('canciones-list');
-        if (!lista) return;
+        var contenedor = document.getElementById('contenedor-canciones');
+        if (!contenedor) return;
 
-        lista.innerHTML = '';
+        contenedor.innerHTML = '';
 
         if (canciones.length === 0) {
-          lista.innerHTML = '<div class="empty-state" style="padding:20px 0;"><div class="icon">🎶</div><div class="text">No hay canciones subidas</div></div>';
+          contenedor.innerHTML = '<div class="empty-state" style="padding:20px 0;"><div class="icon">🎶</div><div class="text">No hay canciones subidas</div></div>';
           return;
         }
 
         canciones.forEach(function(c) {
-          var li = document.createElement('li');
-          li.style.cssText = 'list-style:none;margin-bottom:8px;';
+          var card = document.createElement('div');
+          card.className = 'song-item';
           var badgeHtml = c.activo
             ? '<span class="badge badge-approved" style="font-size:10px;margin-left:8px;">AL AIRE</span>'
             : '';
-          li.innerHTML = '<div class="song-item">' +
+          card.innerHTML =
             '<div class="song-info">' +
               '<div class="song-title">' + escapeHtml(c.titulo) + ' ' + badgeHtml + '</div>' +
               '<div class="song-artist">' + escapeHtml(c.artista || 'El Arca') + '</div>' +
             '</div>' +
             '<div class="song-actions">' +
               '<button class="btn-sm btn-sm-reject" onclick="window.eliminarCancion(\'' + c.id + '\')">✕ ELIMINAR</button>' +
-            '</div></div>';
-          lista.appendChild(li);
+            '</div>';
+          contenedor.appendChild(card);
         });
       } catch (err) {
         if (err.message !== 'Sesión expirada') showToast('Error al cargar canciones', 'error');

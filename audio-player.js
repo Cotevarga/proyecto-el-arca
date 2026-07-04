@@ -1,23 +1,6 @@
 (function () {
   'use strict';
 
-  var API_BASE = window.API_BASE || '';
-
-  var LOCAL_FALLBACK = [
-    { id: 'local-1', titulo: 'Radio Libre', artista: 'El Arca', url_mp3: '/musica/index.mp3' },
-    { id: 'local-2', titulo: 'Radio Libre 2', artista: 'El Arca', url_mp3: '/musica/index2.mp3' },
-    { id: 'local-3', titulo: 'Radio Libre 3', artista: 'El Arca', url_mp3: '/musica/index3.mp3' },
-    { id: 'local-4', titulo: 'Galería', artista: 'El Arca', url_mp3: '/musica/galeria.mp3' },
-    { id: 'local-5', titulo: 'Galería 2', artista: 'El Arca', url_mp3: '/musica/galeria2.mp3' },
-    { id: 'local-6', titulo: 'Galería 3', artista: 'El Arca', url_mp3: '/musica/galeria3.mp3' },
-    { id: 'local-7', titulo: 'Legado', artista: 'El Arca', url_mp3: '/musica/legado.mp3' },
-    { id: 'local-8', titulo: 'Legado 2', artista: 'El Arca', url_mp3: '/musica/legado2.mp3' },
-    { id: 'local-9', titulo: 'Legado 3', artista: 'El Arca', url_mp3: '/musica/legado3.mp3' },
-    { id: 'local-10', titulo: 'Relatos', artista: 'El Arca', url_mp3: '/musica/relatos.mp3' },
-    { id: 'local-11', titulo: 'Relatos 2', artista: 'El Arca', url_mp3: '/musica/relatos2.mp3' },
-    { id: 'local-12', titulo: 'Relatos 3', artista: 'El Arca', url_mp3: '/musica/relatos3.mp3' }
-  ];
-
   var canciones = [];
   var currentAudio = null;
   var currentTrackIndex = -1;
@@ -35,41 +18,73 @@
   var btnPlay, btnPrev, btnNext, trackInfo;
   var audioElementId = 'arca-hidden-audio';
 
-  // ─── Cargar canciones ───
-  function ensureCanciones() {
-    if (canciones.length === 0) {
-      canciones = LOCAL_FALLBACK.slice();
+  // ─── Consulta dinámica desde Supabase ───
+  async function cargarPlaylistDesdeBD() {
+    var s = window.miSupabase || window._supabase;
+    if (!s) return [];
+    var { data, error } = await s
+      .from('musica_reproductor')
+      .select('*')
+      .eq('activo', true);
+    if (error) {
+      console.warn('[Player] Error al cargar playlist:', error.message);
+      return [];
     }
+    canciones = data || [];
+    return canciones;
   }
 
-  function cargarCanciones() {
-    ensureCanciones();
+  function obtenerCancionAleatoria(lista) {
+    if (!lista || lista.length === 0) return null;
+    return lista[Math.floor(Math.random() * lista.length)];
+  }
+
+  function playCancion(cancion) {
+    if (!cancion) return;
+    var audio = getAudio();
+    audio.src = cancion.url_mp3;
+    audio.currentTime = 0;
+    currentTrackIndex = canciones.indexOf(cancion);
+    audio.play().then(function () {
+      isPlaying = true;
+      updateUI(cancion);
+      localStorage.setItem('arca_playing', 'true');
+    }).catch(function () {
+      isPlaying = false;
+      updateUI();
+    });
+  }
+
+  function playRandom() {
+    var cancion = obtenerCancionAleatoria(canciones);
+    if (cancion) playCancion(cancion);
+  }
+
+  // ─── Inicialización: carga desde BD, luego restaura o arranca ───
+  async function inicializar() {
+    await cargarPlaylistDesdeBD();
     if (!playerInited) initPlayer();
-    fetch(API_BASE + '/api/v1/musica')
-      .then(function (r) {
-        if (!r.ok) throw new Error('Error ' + r.status);
-        return r.json();
-      })
-      .then(function (data) {
-        if (Array.isArray(data) && data.length > 0) {
-          canciones = data;
-          try { localStorage.setItem('arca_canciones', JSON.stringify(data)); } catch (e) {}
-        } else {
-          ensureCanciones();
-        }
-        if (savedPlaying) reanudar();
-      })
-      .catch(function () {
-        ensureCanciones();
-        if (savedPlaying) reanudar();
-      });
+    if (savedPlaying && canciones.length > 0) {
+      var idx = savedTrack >= 0 && savedTrack < canciones.length ? savedTrack : -1;
+      if (idx >= 0) {
+        currentTrackIndex = idx;
+        var audio = getAudio();
+        audio.src = canciones[idx].url_mp3;
+        if (savedTime > 0 && savedTime < 3600) audio.currentTime = savedTime;
+        audio.play().then(function () {
+          isPlaying = true;
+          updateUI(canciones[idx]);
+        }).catch(function () {});
+      } else {
+        playRandom();
+      }
+    }
   }
 
   // ─── Inicializar UI en navbar ───
   function initPlayer() {
     if (playerInited) return;
     playerInited = true;
-    ensureCanciones();
 
     if (!navPlayer) {
       var container = document.createElement('div');
@@ -108,7 +123,6 @@
 
     if (!btnPlay) return;
     attachEvents();
-    maybeRestoreAudio();
   }
 
   // ─── Audio element persistente ───
@@ -124,25 +138,6 @@
       }
     }
     return currentAudio;
-  }
-
-  function maybeRestoreAudio() {
-    if (!savedPlaying) return;
-    ensureCanciones();
-    if (canciones.length === 0) return;
-    var idx = savedTrack >= 0 && savedTrack < canciones.length ? savedTrack : 0;
-    currentTrackIndex = idx;
-    var audio = getAudio();
-    audio.src = canciones[idx].url_mp3;
-    if (savedTime > 0 && savedTime < 3600) audio.currentTime = savedTime;
-    audio.play().then(function () {
-      isPlaying = true;
-      updateUI();
-      localStorage.setItem('arca_playing', 'true');
-    }).catch(function () {
-      isPlaying = false;
-      updateUI();
-    });
   }
 
   // ─── Eventos ───
@@ -162,19 +157,16 @@
   }
 
   function togglePlay() {
-    ensureCanciones();
     if (canciones.length === 0) return;
     var audio = getAudio();
     if (!audio.src || audio.src === window.location.href || audio.ended) {
-      if (currentTrackIndex < 0 || currentTrackIndex >= canciones.length) {
-        currentTrackIndex = Math.floor(Math.random() * canciones.length);
-      }
-      audio.src = canciones[currentTrackIndex].url_mp3;
+      playRandom();
+      return;
     }
     if (audio.paused) {
       audio.play().then(function () {
         isPlaying = true;
-        updateUI();
+        updateUI(canciones[currentTrackIndex]);
         localStorage.setItem('arca_playing', 'true');
       }).catch(function () {
         isPlaying = false;
@@ -189,56 +181,23 @@
   }
 
   function nextTrack() {
-    ensureCanciones();
     if (canciones.length === 0) return;
-    currentTrackIndex = (currentTrackIndex + 1) % canciones.length;
-    playIndex(currentTrackIndex);
+    playRandom();
   }
 
   function prevTrack() {
-    ensureCanciones();
     if (canciones.length === 0) return;
     currentTrackIndex = (currentTrackIndex - 1 + canciones.length) % canciones.length;
-    playIndex(currentTrackIndex);
-  }
-
-  function playIndex(idx) {
-    if (idx < 0 || idx >= canciones.length) return;
-    currentTrackIndex = idx;
-    var audio = getAudio();
-    audio.src = canciones[idx].url_mp3;
-    audio.currentTime = 0;
-    audio.play().then(function () {
-      isPlaying = true;
-      updateUI();
-      localStorage.setItem('arca_playing', 'true');
-    }).catch(function () {
-      isPlaying = false;
-      updateUI();
-    });
-  }
-
-  function reanudar() {
-    ensureCanciones();
-    if (canciones.length === 0) return;
-    var idx = savedTrack >= 0 && savedTrack < canciones.length ? savedTrack : 0;
-    currentTrackIndex = idx;
-    var audio = getAudio();
-    audio.src = canciones[idx].url_mp3;
-    if (savedTime > 0 && savedTime < 3600) audio.currentTime = savedTime;
-    audio.play().then(function () {
-      isPlaying = true;
-      updateUI();
-    }).catch(function () {});
+    playCancion(canciones[currentTrackIndex]);
   }
 
   // ─── UI Update ───
-  function updateUI() {
+  function updateUI(cancion) {
     if (btnPlay) {
       btnPlay.textContent = isPlaying ? '⏸' : '▶';
     }
     if (trackInfo) {
-      trackInfo.textContent = 'Mejora tu Experiencia — PLAY';
+      trackInfo.textContent = cancion ? (cancion.titulo + ' — ' + (cancion.artista || 'El Arca')) : 'Mejora tu Experiencia — PLAY';
     }
   }
 
@@ -261,24 +220,15 @@
     audio.addEventListener('timeupdate', function () {
       guardarEstado();
     });
-    audio.addEventListener('ended', function () {
-      ensureCanciones();
+    audio.addEventListener('ended', async function () {
+      await cargarPlaylistDesdeBD();
       if (canciones.length > 0) {
-        currentTrackIndex = (currentTrackIndex + 1) % canciones.length;
-        audio.src = canciones[currentTrackIndex].url_mp3;
-        audio.play().then(function () {
-          isPlaying = true;
-          updateUI();
-          localStorage.setItem('arca_track', currentTrackIndex);
-        }).catch(function () {
-          isPlaying = false;
-          updateUI();
-        });
+        playRandom();
       }
     });
     audio.addEventListener('play', function () {
       isPlaying = true;
-      updateUI();
+      updateUI(canciones[currentTrackIndex]);
       guardarEstado();
     });
     audio.addEventListener('pause', function () {
@@ -289,7 +239,6 @@
       guardarEstado();
     });
     audio.addEventListener('error', function () {
-      ensureCanciones();
       if (canciones.length > 1) {
         setTimeout(function () { nextTrack(); }, 3000);
       }
@@ -308,5 +257,5 @@
   };
 
   setupPersistencia();
-  cargarCanciones();
+  inicializar();
 })();
