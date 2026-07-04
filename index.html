@@ -303,6 +303,12 @@
             <label for="mensaje" class="block text-sm font-bold text-white/80 mb-1 uppercase">Mensaje (opcional)</label>
             <textarea id="mensaje" name="mensaje" rows="3" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-none"></textarea>
           </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;">
+            <input type="checkbox" id="autorizacion" name="autorizacion" required style="margin-top:3px;accent-color:var(--color-mir);width:18px;height:18px;flex-shrink:0;">
+            <label for="autorizacion" style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5;cursor:pointer;">
+              Autorizo a 'El Arca' a resguardar, digitalizar y publicar mi aporte con fines de memoria colectiva y archivo comunitario, aceptando los <a href="/terminos.html" target="_blank" style="color:var(--color-mir);text-decoration:underline;">Términos y Condiciones</a>.
+            </label>
+          </div>
           <button type="submit" id="btn-enviar" class="btn-mir w-full">Subir y compartir recuerdo</button>
           <div id="form-messages" class="text-center text-sm font-medium hidden"></div>
         </form>
@@ -361,7 +367,9 @@
         var mensaje = document.getElementById('mensaje').value.trim();
         var file = fileInput ? fileInput.files[0] : null;
 
+        var autorizacion = document.getElementById('autorizacion');
         if (!nombre) { mostrarFeedback(messages, 'Escribe tu nombre o pseud\u00f3nimo.', 'error'); return; }
+        if (!autorizacion || !autorizacion.checked) { mostrarFeedback(messages, 'Debes autorizar el resguardo y publicaci\u00f3n de tu aporte.', 'error'); return; }
 
         btn.textContent = 'Enviando\u2026'; btn.disabled = true;
 
@@ -394,13 +402,18 @@
   </main>
 
   <!-- ===== FOOTER ===== -->
-  <footer class="bg-black text-white/50 py-12 border-t border-t-[rgba(229,9,20,0.2)]">
+<footer class="bg-black text-white/50 py-12 border-t border-t-[rgba(229,9,20,0.2)]">
     <div class="max-w-5xl mx-auto px-4 text-center">
       <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
       <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
+        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
+        <span>|</span>
+        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
+      </nav>
       <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
     </div>
-  </footer>
+</footer>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
