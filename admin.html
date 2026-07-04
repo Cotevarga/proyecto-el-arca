@@ -849,7 +849,7 @@
         sectionTitle.textContent = titles[section] || 'Dashboard';
         if (section === 'pending') loadPending();
         if (section === 'approved') loadApproved();
-        if (section === 'music') { renderizarListadoMusica(); }
+        if (section === 'music') { renderizarListadoMusica(); iniciarRealtimeMusica(); }
         if (section === 'dashboard') loadDashboard();
       });
     });
@@ -1232,6 +1232,34 @@
         s.removeChannel(_realtimeChannel);
         _realtimeChannel = null;
       }
+      if (s && _musicaChannel) {
+        s.removeChannel(_musicaChannel);
+        _musicaChannel = null;
+      }
+    }
+
+    // ─── Realtime: Música ───
+    var _musicaChannel = null;
+
+    function iniciarRealtimeMusica() {
+      var s = getSupabaseClient();
+      if (!s) return;
+
+      if (_musicaChannel) {
+        try { s.removeChannel(_musicaChannel); } catch(e) {}
+      }
+
+      _musicaChannel = s.channel('musica-channel')
+        .on('postgres_changes',
+          { event: '*', schema: 'public', table: 'musica_reproductor' },
+          function(payload) {
+            console.log('[Realtime] Cambio en musica_reproductor:', payload.eventType);
+            actualizarListadoMusica();
+          }
+        )
+        .subscribe(function(status) {
+          console.log('[Realtime] Estado musica-channel:', status);
+        });
     }
 
     // ─── Pending ───
@@ -1479,7 +1507,50 @@
       a.src = '';
     }
 
-    // ─── Música: Listado en tiempo real ───
+    // ─── Canciones actuales (listado simple) ───
+    async function actualizarListadoMusica() {
+      try {
+        var s = getSupabaseClient();
+        if (!s) return;
+        var { data, error } = await s
+          .from('musica_reproductor')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        var canciones = data || [];
+
+        var lista = document.getElementById('canciones-list');
+        if (!lista) return;
+
+        lista.innerHTML = '';
+
+        if (canciones.length === 0) {
+          lista.innerHTML = '<div class="empty-state" style="padding:20px 0;"><div class="icon">🎶</div><div class="text">No hay canciones subidas</div></div>';
+          return;
+        }
+
+        canciones.forEach(function(c) {
+          var li = document.createElement('li');
+          li.style.cssText = 'list-style:none;margin-bottom:8px;';
+          var badgeHtml = c.activo
+            ? '<span class="badge badge-approved" style="font-size:10px;margin-left:8px;">AL AIRE</span>'
+            : '';
+          li.innerHTML = '<div class="song-item">' +
+            '<div class="song-info">' +
+              '<div class="song-title">' + escapeHtml(c.titulo) + ' ' + badgeHtml + '</div>' +
+              '<div class="song-artist">' + escapeHtml(c.artista || 'El Arca') + '</div>' +
+            '</div>' +
+            '<div class="song-actions">' +
+              '<button class="btn-sm btn-sm-reject" onclick="window.eliminarCancion(\'' + c.id + '\')">✕ ELIMINAR</button>' +
+            '</div></div>';
+          lista.appendChild(li);
+        });
+      } catch (err) {
+        if (err.message !== 'Sesión expirada') showToast('Error al cargar canciones', 'error');
+      }
+    }
+
+    // ─── Música: Listado completo con PLAY ───
     async function renderizarListadoMusica() {
       try {
         var s = getSupabaseClient();
@@ -1491,7 +1562,6 @@
         if (error) throw error;
         var canciones = data || [];
 
-        // Music management list
         var musicList = document.getElementById('music-list');
         if (!musicList) return;
         if (canciones.length === 0) {
@@ -1509,28 +1579,14 @@
               '</div>' +
               '<div class="song-actions">' +
                 '<button class="btn-sm btn-sm-approve" onclick="window.previsualizarMusica(\'' + escapeHtml(c.url_mp3) + '\')" title="Previsualizar">▶ PLAY</button> ' +
-                '<button class="btn-sm btn-sm-reject" onclick="window.deleteMusic(\'' + c.id + '\')">✕ ELIMINAR</button>' +
+                '<button class="btn-sm btn-sm-reject" onclick="window.eliminarCancion(\'' + c.id + '\')">✕ ELIMINAR</button>' +
               '</div></div>';
           });
           musicList.innerHTML = html;
         }
 
-        // Canciones actuales (simple list)
-        var cancionesList = document.getElementById('canciones-list');
-        if (cancionesList) {
-          if (canciones.length === 0) {
-            cancionesList.innerHTML = '<li style="color:#666;padding:8px 0;">No hay canciones</li>';
-          } else {
-            var listHtml = '';
-            canciones.forEach(function(c) {
-              var estado = c.activo ? '🟢' : '⚪';
-              listHtml += '<li style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;color:#ccc;">' +
-                estado + ' ' + escapeHtml(c.titulo) + ' — ' + escapeHtml(c.artista || 'El Arca') +
-                '</li>';
-            });
-            cancionesList.innerHTML = listHtml;
-          }
-        }
+        // También refrescar listado simple
+        actualizarListadoMusica();
       } catch (err) {
         if (err.message !== 'Sesión expirada') showToast('Error al cargar canciones', 'error');
       }
@@ -1553,22 +1609,8 @@
       });
     };
 
-    window.toggleMusic = async function(id, activo) {
-      try {
-        var s = getSupabaseClient();
-        if (!s) throw new Error('Cliente Supabase no disponible');
-        var { error } = await s.from('musica_reproductor').update({ activo: activo }).eq('id', id);
-        if (error) throw error;
-        showToast('Estado actualizado', 'success');
-        renderizarListadoMusica();
-        refrescarContadores();
-        cargarAhoraSuena();
-      } catch (err) {
-        if (err.message !== 'Sesión expirada') showToast('Error al actualizar', 'error');
-      }
-    };
-
-    window.deleteMusic = async function(id) {
+    // ─── Eliminar canción (BD + Storage) ───
+    window.eliminarCancion = async function(id) {
       if (!confirm('¿Eliminar esta canción permanentemente?')) return;
       try {
         var s = getSupabaseClient();
@@ -1585,7 +1627,7 @@
           var { error: storageError } = await s.storage
             .from('elarca-uploads')
             .remove([cancion.storage_path]);
-          if (storageError) console.error('[DeleteMusic] Error al eliminar de Storage:', storageError);
+          if (storageError) console.error('[EliminarCancion] Error al eliminar de Storage:', storageError);
         }
 
         var { error: deleteError } = await s.from('musica_reproductor').delete().eq('id', id);
@@ -1600,6 +1642,9 @@
         if (err.message !== 'Sesión expirada') showToast('Error al eliminar', 'error');
       }
     };
+
+    // Mantener alias para compatibilidad
+    window.deleteMusic = window.eliminarCancion;
 
     // ─── Music Upload ───
     var musicUploadArea = document.getElementById('music-upload-area');
@@ -1640,19 +1685,32 @@
       var btn = document.getElementById('btn-upload-music');
 
       procesarSubida(btn, async function() {
-        var fd = new FormData();
-        fd.append('archivo', file);
-        fd.append('titulo', titulo);
-        fd.append('artista', artista);
+        var s = getSupabaseClient();
+        if (!s) throw new Error('Cliente Supabase no disponible');
 
-        var musicUrl = window.fnUrl ? window.fnUrl('musica') : (API_BASE + '/api/v1/admin/musica');
-        var res = await fetch(musicUrl, {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + token },
-          body: fd
-        });
-        var data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Error al subir');
+        var fileName = 'musica/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+        var { error: uploadError } = await s.storage
+          .from('elarca-uploads')
+          .upload(fileName, file, { contentType: file.type });
+        if (uploadError) throw uploadError;
+
+        var { data: { publicUrl } } = s.storage
+          .from('elarca-uploads')
+          .getPublicUrl(fileName);
+
+        var { error: insertError } = await s
+          .from('musica_reproductor')
+          .insert({
+            titulo: titulo,
+            artista: artista,
+            url_mp3: publicUrl,
+            storage_path: fileName,
+            activo: true,
+            orden: 0
+          });
+        if (insertError) throw insertError;
+
         document.getElementById('music-upload-form').reset();
         musicFileInfo.textContent = '';
         musicUploadText.textContent = 'Haz clic para seleccionar archivo MP3';
