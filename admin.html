@@ -665,6 +665,7 @@
                     <div class="text">No hay canciones subidas</div>
                   </div>
                 </div>
+                <ul id="canciones-list" class="mt-4" style="list-style:none;padding:0;"></ul>
               </div>
             </div>
           </div>
@@ -757,7 +758,7 @@
         sectionTitle.textContent = titles[section] || 'Dashboard';
         if (section === 'pending') loadPending();
         if (section === 'approved') loadApproved();
-        if (section === 'music') loadMusic();
+        if (section === 'music') { loadMusic(); renderizarCanciones(); }
         if (section === 'dashboard') loadDashboard();
       });
     });
@@ -847,21 +848,18 @@
         var s = sb();
         if (!s) return;
 
-        var [recRes, musRes] = await Promise.all([
-          s.from('recuerdos').select('*').order('created_at', { ascending: false }),
-          s.from('musica_reproductor').select('*')
+        var [countPend, countAprob, countMus, recRes] = await Promise.all([
+          s.from('recuerdos').select('*', { count: 'exact', head: true }).eq('aprobado', false),
+          s.from('recuerdos').select('*', { count: 'exact', head: true }).eq('aprobado', true),
+          s.from('musica_reproductor').select('*', { count: 'exact', head: true }),
+          s.from('recuerdos').select('*').order('created_at', { ascending: false })
         ]);
 
+        document.getElementById('stat-pending').textContent = countPend.count ?? 0;
+        document.getElementById('stat-approved').textContent = countAprob.count ?? 0;
+        document.getElementById('stat-music').textContent = countMus.count ?? 0;
+
         var recuerdos = recRes.data || [];
-        var musica = musRes.data || [];
-        var pending = recuerdos.filter(function(r) { return !r.aprobado; });
-        var approved = recuerdos.filter(function(r) { return r.aprobado; });
-        var activeMusic = musica.filter(function(m) { return m.activo; });
-
-        document.getElementById('stat-pending').textContent = pending.length;
-        document.getElementById('stat-approved').textContent = approved.length;
-        document.getElementById('stat-music').textContent = activeMusic.length;
-
         var recentList = document.getElementById('recent-recuerdos-list');
         var recent = recuerdos.slice(0, 5);
         if (recent.length === 0) {
@@ -882,6 +880,7 @@
         html += '</tbody></table>';
         recentList.innerHTML = html;
       } catch (err) {
+        console.error('[Dashboard] Error:', err);
         if (err.message !== 'Sesión expirada') showToast('Error al cargar dashboard', 'error');
       }
     }
@@ -900,18 +899,28 @@
           list.innerHTML = '<div class="empty-state"><div class="icon">✅</div><div class="text">Todo revisado — no hay pendientes</div></div>';
           return;
         }
-        var html = '<table><thead><tr><th>Nombre</th><th>Año</th><th class="hide-mobile">Tipo</th><th>Mensaje</th><th class="hide-mobile">Fecha</th><th>Acción</th></tr></thead><tbody>';
+        var html = '<table><thead><tr><th>Nombre</th><th>Año</th><th class="hide-mobile">Categoría</th><th class="hide-mobile">Tipo</th><th>Contenido</th><th class="hide-mobile">Fecha</th><th>Acción</th></tr></thead><tbody>';
         pending.forEach(function(r) {
+          var catLabel = r.categoria || 'foto';
+          var catBadge = 'badge-image';
+          if (catLabel === 'relato') catBadge = 'badge-audio';
+          else if (catLabel === 'entrevista') catBadge = 'badge-video';
+          else if (catLabel === 'legado') catBadge = 'badge-approved';
           var tipoClass = 'badge-image';
           var tipoLabel = 'Imagen';
           if (r.tipo_archivo && r.tipo_archivo.indexOf('audio') !== -1) { tipoClass = 'badge-audio'; tipoLabel = 'Audio'; }
           else if (r.tipo_archivo && r.tipo_archivo.indexOf('video') !== -1) { tipoClass = 'badge-video'; tipoLabel = 'Video'; }
           var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL') : '—';
+          var esTexto = catLabel === 'relato' || catLabel === 'entrevista';
+          var contenidoHtml = esTexto
+            ? '<textarea id="texto-' + r.id + '" rows="3" style="width:100%;background:#1e1e1e;color:#ccc;border:1px solid #333;border-radius:4px;padding:6px;font-size:12px;resize:vertical;">' + escapeHtml(r.mensaje_largo || r.mensaje || '') + '</textarea>'
+            : '<span class="truncate" style="max-width:150px;color:#888;display:inline-block;">' + escapeHtml(r.mensaje || '—') + '</span>';
           html += '<tr>' +
             '<td class="truncate">' + escapeHtml(r.nombre) + '</td>' +
             '<td>' + escapeHtml(r.anio || '—') + '</td>' +
+            '<td class="hide-mobile"><span class="badge ' + catBadge + '">' + catLabel.charAt(0).toUpperCase() + catLabel.slice(1) + '</span></td>' +
             '<td class="hide-mobile"><span class="badge ' + tipoClass + '">' + tipoLabel + '</span></td>' +
-            '<td class="truncate" style="max-width:150px;color:#888;">' + escapeHtml(r.mensaje || '—') + '</td>' +
+            '<td style="max-width:200px;">' + contenidoHtml + '</td>' +
             '<td class="hide-mobile">' + fecha + '</td>' +
             '<td style="white-space:nowrap;">' +
               '<select id="seccion-' + r.id + '" style="background:#2a2a2a;color:white;border:1px solid #333;border-radius:4px;font-size:11px;padding:4px 6px;margin-right:6px;">' +
@@ -966,9 +975,12 @@
       try {
         var seccionSelect = document.getElementById('seccion-' + id);
         var seccion = seccionSelect ? seccionSelect.value : 'general';
+        var textareaEl = document.getElementById('texto-' + id);
+        var body = { seccion: seccion };
+        if (textareaEl) body.mensaje_largo = textareaEl.value;
         var data = await adminFetch('recuerdos/' + id + '/aprobar', {
           method: 'PUT',
-          body: { seccion: seccion }
+          body: body
         });
         if (data.success) {
           showToast('Recuerdo aprobado y publicado en ' + seccion, 'success');
@@ -1024,6 +1036,32 @@
         list.innerHTML = html;
       } catch (err) {
         if (err.message !== 'Sesión expirada') showToast('Error al cargar música', 'error');
+      }
+    }
+
+    async function renderizarCanciones() {
+      try {
+        var s = sb();
+        if (!s) return;
+        var { data, error } = await s.from('musica_reproductor').select('*').order('orden', { ascending: true });
+        if (error) throw error;
+        var lista = document.getElementById('canciones-list');
+        if (!lista) return;
+        var canciones = data || [];
+        if (canciones.length === 0) {
+          lista.innerHTML = '<li style="color:#666;padding:8px 0;">No hay canciones</li>';
+          return;
+        }
+        var html = '';
+        canciones.forEach(function(c) {
+          var estado = c.activo ? '🟢' : '⚪';
+          html += '<li style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;color:#ccc;">' +
+            estado + ' ' + escapeHtml(c.titulo) + ' — ' + escapeHtml(c.artista || 'El Arca') +
+            '</li>';
+        });
+        lista.innerHTML = html;
+      } catch (err) {
+        console.error('[renderizarCanciones] Error:', err);
       }
     }
 

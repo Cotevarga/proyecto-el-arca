@@ -98,6 +98,12 @@ window.API_BASE = '';
             window.scrollTo(0, 0);
             notificarGA();
             window.showArcaError(false);
+
+            // Inicializar galería si navegamos a esa vista
+            var targetPath = new URL(url, window.location.origin).pathname;
+            if (targetPath.indexOf('galeria') !== -1 && typeof window.cargarGaleria === 'function') {
+              setTimeout(window.cargarGaleria, 50);
+            }
           } catch (innerErr) {
             window.location.href = url;
           }
@@ -146,4 +152,145 @@ window.API_BASE = '';
   });
 
   notificarGA();
+
+  // ─── Galería: cargar desde Supabase ───
+  var FALLBACK_IMAGES = [
+    { url: '/images/FB_IMG_1782701605358.jpg' },
+    { url: '/images/FB_IMG_1782701655071.jpg' },
+    { url: '/images/FB_IMG_1782701775498.jpg' },
+    { url: '/images/FB_IMG_1782701859802.jpg' },
+    { url: '/images/FB_IMG_1782701766075.jpg' },
+    { url: '/images/FB_IMG_1782701826979.jpg' },
+    { url: '/images/jano_inicio.jpg' },
+    { url: '/images/navidad_popular.jpg' },
+    { url: '/images/companeros_melon.jpg' },
+    { url: '/images/radio_libre.jpg' },
+    { url: '/images/antupeni.jpg' }
+  ];
+
+  window._galeriaImages = [];
+  window._galeriaCurrentIndex = 0;
+
+  function renderizarGaleria() {
+    var thumbCol = document.getElementById('thumb-col');
+    var viewerImg = document.getElementById('main-viewer-img');
+    var viewerEmpty = document.getElementById('viewer-empty');
+    if (!thumbCol) return;
+
+    var imgs = window._galeriaImages || [];
+    thumbCol.innerHTML = '';
+
+    if (imgs.length === 0) {
+      if (viewerEmpty) viewerEmpty.style.display = '';
+      return;
+    }
+
+    imgs.forEach(function (img, idx) {
+      var thumb = document.createElement('img');
+      thumb.className = 'gallery-thumb' + (idx === 0 ? ' active' : '');
+      thumb.src = img.url;
+      thumb.loading = 'lazy';
+      thumb.addEventListener('click', function () {
+        window._galeriaCurrentIndex = idx;
+        mostrarGaleria(idx);
+      });
+      thumbCol.appendChild(thumb);
+    });
+
+    mostrarGaleria(0);
+  }
+
+  window.mostrarGaleria = function (idx) {
+    var imgs = window._galeriaImages || [];
+    if (!imgs[idx]) return;
+
+    window._galeriaCurrentIndex = idx;
+
+    var viewerLoader = document.getElementById('viewer-loader');
+    var viewerImg = document.getElementById('main-viewer-img');
+    var viewerEmpty = document.getElementById('viewer-empty');
+
+    if (viewerLoader) viewerLoader.style.display = 'block';
+    if (viewerImg) viewerImg.style.opacity = '0';
+    if (viewerEmpty) viewerEmpty.style.display = 'none';
+
+    var img = new Image();
+    img.onload = function () {
+      if (viewerImg) { viewerImg.src = imgs[idx].url; viewerImg.style.opacity = '1'; }
+      if (viewerLoader) viewerLoader.style.display = 'none';
+    };
+    img.onerror = function () {
+      if (viewerImg) { viewerImg.src = imgs[idx].url; viewerImg.style.opacity = '1'; }
+      if (viewerLoader) viewerLoader.style.display = 'none';
+    };
+    img.src = imgs[idx].url;
+
+    var thumbCol = document.getElementById('thumb-col');
+    if (thumbCol) {
+      var thumbs = thumbCol.querySelectorAll('.gallery-thumb');
+      thumbs.forEach(function (t, i) {
+        t.classList.toggle('active', i === idx);
+        if (i === idx) t.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    }
+  };
+
+  function cargarGaleria() {
+    var thumbCol = document.getElementById('thumb-col');
+    var thumbLoader = document.getElementById('thumb-loader');
+    var viewerImg = document.getElementById('main-viewer-img');
+    var viewerEmpty = document.getElementById('viewer-empty');
+
+    if (!thumbCol) return;
+
+    // Clean container
+    thumbCol.innerHTML = '';
+    if (thumbLoader) thumbLoader.remove();
+    if (viewerImg) { viewerImg.src = ''; viewerImg.style.opacity = '0'; }
+    if (viewerEmpty) viewerEmpty.style.display = '';
+
+    window._galeriaImages = [];
+    window._galeriaCurrentIndex = 0;
+
+    var sb = window._supabase;
+    if (!sb) {
+      console.warn('[Galeria] Supabase no disponible');
+      return;
+    }
+
+    sb.from('galeria')
+      .select('url_imagen, titulo')
+      .eq('activo', true)
+      .order('orden', { ascending: true })
+      .then(function (res) {
+        if (res.error) throw res.error;
+        if (res.data && res.data.length > 0) {
+          window._galeriaImages = res.data.map(function (item) {
+            return { url: item.url_imagen, titulo: item.titulo };
+          });
+        } else {
+          console.warn('[Galeria] 0 registros con activo=true, usando fallback');
+          window._galeriaImages = FALLBACK_IMAGES.slice();
+        }
+        renderizarGaleria();
+      })
+      .catch(function (err) {
+        console.error('[Galeria] Error al consultar Supabase:', err);
+        window._galeriaImages = FALLBACK_IMAGES.slice();
+        renderizarGaleria();
+      });
+  }
+
+  window.cargarGaleria = cargarGaleria;
+
+  // ─── Inicializar galería si estamos en esa página ───
+  if (window.location.pathname.indexOf('galeria') !== -1) {
+    var esperarSb = setInterval(function () {
+      if (window._supabase) {
+        clearInterval(esperarSb);
+        cargarGaleria();
+      }
+    }, 100);
+    setTimeout(function () { clearInterval(esperarSb); }, 8000);
+  }
 })();

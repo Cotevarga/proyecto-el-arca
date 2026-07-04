@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Archivo — El Arca</title>
+  <title>Autora — El Arca</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✊</text></svg>">
   <style>
     :root { --color-mir: #E50914; --color-noche: #111111; }
     html { scroll-behavior: smooth; }
@@ -14,16 +14,15 @@
     .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; }
     .text-mir { color: var(--color-mir) !important; }
     .border-mir { border-color: var(--color-mir) !important; }
-    .bg-mir { background-color: var(--color-mir) !important; }
-    .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
     .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
     .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
     .hover\:text-mir:hover { color: var(--color-mir) !important; }
     .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
     @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
     .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
-    .btn-outline-mir { background-color: transparent !important; color: white !important; font-weight: bold; padding: 0.75rem 2rem; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem; border: 2px solid var(--color-mir); }
-    .btn-outline-mir:hover { background-color: var(--color-mir) !important; }
+    .manifesto-text { font-size: 1.05rem; line-height: 1.9; color: rgba(255,255,255,0.85); }
+    .manifesto-text p { margin-bottom: 1.5rem; }
+    .signature { font-size: 1rem; color: var(--color-mir); font-weight: 600; letter-spacing: 0.02em; }
   </style>
   <script src="/audio-player.js" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
@@ -46,7 +45,7 @@
         <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
         <a href="/relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
         <a href="/legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
-        <a href="/archivo.html" class="text-mir border-b-2 border-mir pb-1">Archivo</a>
+        <a href="/archivo.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
       </div>
       <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -59,49 +58,43 @@
         <a href="/videos.html" class="hover:text-mir transition">Videos</a>
         <a href="/relatos.html" class="hover:text-mir transition">Relatos</a>
         <a href="/legado.html" class="hover:text-mir transition">El Legado</a>
-        <a href="/archivo.html" class="text-mir">Archivo</a>
+        <a href="/archivo.html" class="hover:text-mir transition">Archivo</a>
       </div>
     </div>
   </nav>
 
   <main id="main-content">
     <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
-      <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
-        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Memoria Colectiva</span>
-        <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Archivo Comunitario</h1>
+      <div class="max-w-4xl mx-auto px-4 animate-fade-in-up">
+        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Manifiesto</span>
+        <h1 class="heading-mir text-4xl md:text-6xl mt-4 mb-4">Informática Popular</h1>
         <div style="width:4rem;height:0.25rem;background-color:var(--color-mir);margin:1.5rem auto;"></div>
-        <p class="text-white/60 text-lg max-w-2xl mx-auto">Explora el archivo histórico de El Arca: fotos, audios, videos y documentos que preservan la memoria viva de La Goya.</p>
+        <p class="text-white/50 text-sm max-w-2xl mx-auto">Programo por amor y memoria</p>
       </div>
     </header>
 
     <section class="py-16" style="background-color:#111111">
-      <div class="max-w-5xl mx-auto px-4">
-        <div class="grid md:grid-cols-2 gap-8">
-          <a href="/galeria.html" class="card-mir flex flex-col items-center text-center min-h-[250px] justify-center hover:border-mir transition-all">
-            <div class="text-6xl mb-4 opacity-70">📷</div>
-            <h2 class="text-mir font-title text-2xl uppercase mb-3">Galería Histórica</h2>
-            <p class="text-white/50 text-sm leading-relaxed">Imágenes que preservan la memoria visual de El Arca, el Jano y la lucha popular.</p>
-          </a>
-          <a href="/videos.html" class="card-mir flex flex-col items-center text-center min-h-[250px] justify-center hover:border-mir transition-all">
-            <div class="text-6xl mb-4 opacity-70">🎥</div>
-            <h2 class="text-mir font-title text-2xl uppercase mb-3">Videos y Audios</h2>
-            <p class="text-white/50 text-sm leading-relaxed">Material audiovisual de la Radio Libre y la comunicación popular en La Goya.</p>
-          </a>
-          <a href="/subir.html" class="card-mir flex flex-col items-center text-center min-h-[250px] justify-center hover:border-mir transition-all">
-            <div class="text-6xl mb-4 opacity-70">📤</div>
-            <h2 class="text-mir font-title text-2xl uppercase mb-3">Aporta tu recuerdo</h2>
-            <p class="text-white/50 text-sm leading-relaxed">Comparte tu foto, audio o video para engrosar la memoria colectiva de El Arca.</p>
-          </a>
-          <a href="/legado.html" class="card-mir flex flex-col items-center text-center min-h-[250px] justify-center hover:border-mir transition-all">
-            <div class="text-6xl mb-4 opacity-70">🔥</div>
-            <h2 class="text-mir font-title text-2xl uppercase mb-3">El Legado</h2>
-            <p class="text-white/50 text-sm leading-relaxed">La mística de la lucha, el amor popular y el trabajo de masas con nuestras infancias.</p>
-          </a>
-          <a href="/autora.html" class="card-mir flex flex-col items-center text-center min-h-[250px] justify-center hover:border-mir transition-all">
-            <div class="text-6xl mb-4 opacity-70">✊</div>
-            <h2 class="text-mir font-title text-2xl uppercase mb-3">Manifiesto</h2>
-            <p class="text-white/50 text-sm leading-relaxed">"Programo por amor y memoria" — El manifiesto de una informática popular.</p>
-          </a>
+      <div class="max-w-4xl mx-auto px-4">
+        <div class="card-mir manifesto-text">
+          <p>Hay quienes ven la informática como una simple herramienta técnica, un puente para optimizar las ganancias de una empresa o una carrera para el éxito individual. Pero para mí, el código, los servidores y el desarrollo web tienen un sentido profundamente distinto: son mi trinchera, mis herramientas de sabotaje contra la historia oficial y mi forma de aportar a la lucha de clases de mi pueblo.</p>
+
+          <p>Este proyecto de memoria viva no nació en una oficina con presupuesto, ni busca el lucro, ni pretende ser un adorno académico estático. Nació de manera completamente gratuita, voluntaria y autogestionada, financiado únicamente por un amor desbordante y combativo. Lo levanté porque tengo una profunda capacidad de amar a los míos y porque, como dijo Allende: <em>"Tengo fe en Chile y su destino. Sigan ustedes sabiendo que, mucho más temprano que tarde, de nuevo se abrirán las grandes alamedas por donde pase el hombre libre, para construir una sociedad mejor".</em></p>
+
+          <p>Esta página web nace de la observación diaria de nuestro territorio. Nace de la rabia y la pena transformadas en acción al ver el cansancio de nuestra gente bajo el sometimiento de un sistema que precariza la vida. Entender que esa precariedad no es "mala suerte", sino una decisión política, es lo que me obliga a no ser indiferente.</p>
+
+          <p>Pero mi historia con la tecnología y el territorio no empezó frente a una pantalla moderna. Nació hace 23 años en la sede social de nuestra población. Nació gracias a un hombre, el fundador de la organización que plantó en mí la primera semilla. Él era la encarnación misma de la militancia territorial; un compañero que andaba siempre corriendo de aquí pa' allá, gestionando proyectos y entregando la vida con un amor tan inmenso que se le transmitía a cualquiera que cruzara palabra con él. Esta página web es también un homenaje eterno a su vida, a su obra y una forma de decirle: Gracias.</p>
+
+          <p>Por eso, este archivo histórico no es un museo del pasado. Es, ante todo, la prueba viva de que el trabajo social de masas con las infancias en los territorios funciona. RETOMAR ese trabajo es fundamental si queremos formar los adultos pensantes, críticos, solidarios y con conciencia social del mañana.</p>
+
+          <p>A través de fotos, videos y relatos reales de las organizaciones de la población, esta plataforma es una evidencia empírica y política: los adultos conscientes, organizados y consecuentes que hoy defienden el territorio son la semilla viva de la organización infantil que hombres como el Jano sembraron en nosotros hace años.</p>
+
+          <p>Como decía el Che, como nos enseñaron con su vida Víctor Jara y la comandante Cecilia Magni, el verdadero revolucionario está guiado por grandes sentimientos de amor. Es ese amor el que me llevó a pasar noches enteras programando. Hice esto porque un pueblo que olvida su historia está condenado, y porque tengo la certeza absoluta de que la memoria viva es el principal enemigo del fascismo.</p>
+
+          <p>Hoy pongo mis conocimientos técnicos al servicio del pueblo, de manera voluntaria, con el corazón desbordante y honrando la memoria de quien me abrió las puertas de la tecnología en la sede del Arca. Porque la informática solo tiene sentido si sirve para emancipar a nuestra clase, rescatar nuestra identidad y proteger el futuro de nuestros niños.</p>
+
+          <div class="text-center pt-8 border-t border-white/10 mt-12">
+            <p class="signature">— Autora y Técnico Analista Programador 🛠️🔥🌹</p>
+          </div>
         </div>
       </div>
     </section>

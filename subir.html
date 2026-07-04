@@ -92,15 +92,24 @@
             <input type="number" id="anio" name="anio" min="1990" max="2026" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
           </div>
           <div>
-            <label for="archivo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Foto, Audio o Video</label>
+            <label for="tipo_contenido" class="block text-sm font-bold text-white/80 mb-1 uppercase">Tipo de contenido</label>
+            <select id="tipo_contenido" name="tipo_contenido" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
+              <option value="foto">Foto (Galería)</option>
+              <option value="relato">Relato</option>
+              <option value="entrevista">Entrevista</option>
+              <option value="legado">Legado</option>
+            </select>
+          </div>
+          <div id="archivo-group">
+            <label for="archivo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Foto, Audio o Video <span id="archivo-required" class="text-mir">*</span></label>
             <input type="file" id="archivo" name="archivo" accept=".jpg,.jpeg,.png,.mp3,.wav,.mp4" class="block w-full text-sm text-white/50 border border-white/20 p-2 bg-black">
             <div id="file-error" class="text-mir text-sm mt-1 hidden"></div>
             <div id="file-info" class="text-white/50 text-sm mt-1 hidden"></div>
-            <p class="text-white/40 text-xs mt-2">Formatos: JPG, PNG, MP3, WAV, MP4 &middot; Máx 50 MB.</p>
+            <p class="text-white/40 text-xs mt-2" id="file-hint">Formatos: JPG, PNG, MP3, WAV, MP4 &middot; Máx 50 MB &middot; Opcional si solo es texto.</p>
           </div>
           <div>
-            <label for="mensaje" class="block text-sm font-bold text-white/80 mb-1 uppercase">Mensaje (opcional)</label>
-            <textarea id="mensaje" name="mensaje" rows="3" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-none"></textarea>
+            <label for="mensaje_largo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Relato o descripción completa</label>
+            <textarea id="mensaje_largo" name="mensaje_largo" rows="10" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-y" placeholder="Escribe aquí tu relato, entrevista o descripción completa..."></textarea>
           </div>
           <button type="submit" id="btn-enviar" class="btn-mir w-full">Subir y compartir recuerdo</button>
           <div id="form-messages" class="text-center text-sm font-medium hidden"></div>
@@ -123,15 +132,34 @@
       var API_BASE = window.API_BASE || '';
       var formArchivo = document.getElementById('form-archivo');
       if (!formArchivo) return;
+      var tipoSelect = document.getElementById('tipo_contenido');
       var fileInput = document.getElementById('archivo');
       var fileError = document.getElementById('file-error');
       var fileInfo = document.getElementById('file-info');
+      var fileRequired = document.getElementById('archivo-required');
+      var fileHint = document.getElementById('file-hint');
       var menuToggle = document.getElementById('menu-toggle');
       var mobileMenu = document.getElementById('mobile-menu');
       if (menuToggle && mobileMenu) {
         menuToggle.addEventListener('click', function () { mobileMenu.classList.toggle('hidden'); });
         mobileMenu.querySelectorAll('a').forEach(function (l) { l.addEventListener('click', function () { mobileMenu.classList.add('hidden'); }); });
       }
+
+      function actualizarRequerimiento() {
+        var tipo = tipoSelect.value;
+        if (tipo === 'foto') {
+          fileInput.required = true;
+          if (fileRequired) fileRequired.style.display = 'inline';
+          if (fileHint) fileHint.textContent = 'Formatos: JPG, PNG &middot; Máx 50 MB &middot; Obligatorio para fotos.';
+        } else {
+          fileInput.required = false;
+          if (fileRequired) fileRequired.style.display = 'none';
+          if (fileHint) fileHint.textContent = 'Formatos: JPG, PNG, MP3, WAV, MP4 &middot; Máx 50 MB &middot; Opcional si solo es texto.';
+        }
+      }
+      if (tipoSelect) tipoSelect.addEventListener('change', actualizarRequerimiento);
+      actualizarRequerimiento();
+
       if (fileInput) {
         fileInput.addEventListener('change', function () {
           var file = fileInput.files[0];

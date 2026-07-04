@@ -16,10 +16,12 @@ Deno.serve(async (req: Request) => {
     const nombre = (formData.get("nombre") as string)?.trim() || "Anónimo";
     const anio = formData.get("anio") as string ?? null;
     const mensaje = formData.get("mensaje") as string ?? null;
+    const mensaje_largo = formData.get("mensaje_largo") as string ?? null;
+    const categoria = formData.get("tipo_contenido") as string || "foto";
     const seccion = (formData.get("seccion") as string) || "general";
     const texto = formData.get("texto") as string ?? null;
 
-    if (!file && !texto) {
+    if ((!file || file.size === 0) && !mensaje_largo && !texto) {
       return new Response(
         JSON.stringify({ success: false, error: "Archivo o texto requerido" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -85,6 +87,8 @@ Deno.serve(async (req: Request) => {
         nombre,
         anio: anio ?? null,
         mensaje,
+        mensaje_largo,
+        categoria,
         url_archivo: urlArchivo,
         storage_path: storagePath,
         tipo_archivo: tipoArchivo,

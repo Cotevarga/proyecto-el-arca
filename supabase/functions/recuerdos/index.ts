@@ -34,6 +34,8 @@ Deno.serve(async (req: Request) => {
       const nombre = (formData.get("nombre") as string)?.trim();
       const anio = formData.get("anio") as string ?? null;
       const mensaje = formData.get("mensaje") as string ?? null;
+      const mensaje_largo = formData.get("mensaje_largo") as string ?? null;
+      const categoria = formData.get("tipo_contenido") as string || "foto";
       const file = formData.get("archivo") as File | null;
 
       if (!nombre) {
@@ -94,6 +96,8 @@ Deno.serve(async (req: Request) => {
           nombre,
           anio,
           mensaje,
+          mensaje_largo,
+          categoria,
           url_archivo: urlArchivo,
           storage_path: storagePath,
           tipo_archivo: tipoArchivo,
@@ -115,11 +119,14 @@ Deno.serve(async (req: Request) => {
     // PUT /recuerdos/:id/aprobar — admin approve
     if (method === "PUT" && pathParts.length === 3 && pathParts[2] === "aprobar") {
       const id = pathParts[1];
-      const { seccion } = await req.json();
+      const { seccion, mensaje_largo } = await req.json();
+
+      const updateData: Record<string, unknown> = { aprobado: true, seccion: seccion ?? "general" };
+      if (mensaje_largo !== undefined) updateData.mensaje_largo = mensaje_largo;
 
       const { data, error } = await supabase
         .from("recuerdos")
-        .update({ aprobado: true, seccion: seccion ?? "general" })
+        .update(updateData)
         .eq("id", id)
         .select()
         .single();
