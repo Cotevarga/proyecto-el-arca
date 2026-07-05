@@ -134,81 +134,14 @@
         <a href="/subir.html" class="inline-block bg-mir hover:bg-resistencia-700 text-white font-bold py-3 px-10 transition-all duration-300 tracking-wider uppercase text-sm border-2 border-mir hover:bg-black hover:text-mir">Comparte tu recuerdo</a>
       </div>
     </section>
-  </main>
 
-<footer class="bg-black text-white/50 py-12 border-t border-mir/20">
-    <div class="max-w-5xl mx-auto px-4 text-center">
-      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
-      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
-      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
-        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
-        <span>|</span>
-        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
-      </nav>
-      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
-    </div>
-</footer>
-
-  <style>
-    .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
-    .hover\:bg-resistencia-700:hover { background-color: #b91c1c !important; }
-
-    /* ─── Relato detalle (SPA) ─── */
-    .relato-detalle { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.2) !important; padding: 2rem; margin-bottom: 2rem; border-radius: 0; }
-    .relato-detalle h2 { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; text-align: left !important; margin: 0 0 0.75rem 0; }
-    .relato-detalle .meta { display: flex; gap: 12px; font-size: 12px; color: #666; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(229,9,20,0.1); flex-wrap: wrap; text-align: left; }
-    .relato-detalle .contenido { font-size: 15px; line-height: 1.8; color: #ddd; text-align: justify; white-space: pre-wrap; }
-    .relato-detalle .contenido b, .relato-detalle .contenido strong { color: white; }
-    .relato-detalle .contenido i, .relato-detalle .contenido em { color: #ddd; }
-    .relato-detalle .contenido u { text-decoration: underline; }
-
-    /* ─── Hardcodeado (textos recuperados de git) ─── */
-    .relato { margin-bottom: 4rem; }
-    .tab-btn { font-family: Arial, Helvetica, sans-serif; font-size: 0.8rem; font-weight: bold; padding: 0.65rem 1.25rem; border: 1px solid rgba(229,9,20,0.3); background: transparent; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
-    .tab-btn:hover { border-color: var(--color-mir); color: white; }
-    .tab-btn.active { background: var(--color-mir); color: white; border-color: var(--color-mir); }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; animation: fadeInUp 0.5s ease-out forwards; }
-    #contenedor-indices .card-mir { margin-bottom: 1rem; }
-
-    /* ─── Índice de relatos ─── */
-    .indice-relatos { max-width: 48rem; margin: 0 auto; }
-    .indice-item { background: var(--color-noche); border: 1px solid rgba(229,9,20,0.25); padding: 1.25rem 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease; text-align: left; }
-    .indice-item:hover { border-color: var(--color-mir); transform: translateX(6px); }
-    .indice-item h3 { font-family: Arial, Helvetica, sans-serif; color: var(--color-mir); text-transform: uppercase; letter-spacing: 0.05em; font-size: 1.15rem; margin: 0 0 0.25rem 0; }
-    .indice-item p { color: rgba(255,255,255,0.45); font-size: 0.85rem; margin: 0; }
-
-    /* ─── Relato individual ─── */
-    .relato-individual { max-width: 60rem; margin: 0 auto; }
-    .btn-volver-indice { background: transparent; border: 1px solid rgba(229,9,20,0.4); color: var(--color-mir); font-family: Arial, Helvetica, sans-serif; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.55rem 1.25rem; cursor: pointer; transition: all 0.3s; margin-bottom: 1.5rem; }
-    .btn-volver-indice:hover { background: var(--color-mir); color: white; }
-
-    /* ─── Layout SPA: sidebar + lector ─── */
-    .layout-relatos { display: flex; gap: 40px; padding: 20px 0; }
-    .sidebar { width: 300px; min-width: 260px; border-right: 1px solid rgba(229,9,20,0.25); padding-right: 20px; }
-    .sidebar .sidebar-titulo { font-family: Arial, Helvetica, sans-serif; color: var(--color-mir); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem; margin: 0 0 1rem 0; text-align: left !important; }
-    .sidebar ul { list-style: none; padding: 0; margin: 0; }
-    .sidebar li { cursor: pointer; color: #ff0000; margin-bottom: 12px; padding: 8px 12px; font-size: 14px; border-left: 2px solid transparent; transition: all 0.3s; text-align: left; }
-    .sidebar li:hover { color: #fff; border-left-color: var(--color-mir); background: rgba(229,9,20,0.05); }
-    .sidebar li.active { color: #fff; border-left-color: var(--color-mir); background: rgba(229,9,20,0.08); }
-    .lector { flex: 1; padding: 0 20px 20px 20px; min-width: 0; }
-    .img-relato { max-width: 100%; height: auto; margin-bottom: 20px; border: 1px solid rgba(229,9,20,0.2); }
-
-    @media (max-width: 768px) {
-      .layout-relatos { flex-direction: column; gap: 20px; }
-      .sidebar { width: 100%; min-width: 0; border-right: none; border-bottom: 1px solid rgba(229,9,20,0.25); padding-right: 0; padding-bottom: 16px; }
-      .sidebar ul { display: flex; flex-wrap: wrap; gap: 6px; }
-      .sidebar li { margin-bottom: 0; padding: 6px 12px; border-left: none; border-bottom: 2px solid transparent; font-size: 13px; }
-      .sidebar li:hover { border-left-color: transparent; border-bottom-color: var(--color-mir); }
-    }
-  </style>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
   <script>
-    window.miSupabase = supabase.createClient(
-      'https://ukpoprkdgezgxlkjjuve.supabase.co',
-      'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi'
-    );
+    if (!window.miSupabase && typeof supabase !== 'undefined') {
+      window.miSupabase = supabase.createClient(
+        'https://ukpoprkdgezgxlkjjuve.supabase.co',
+        'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi'
+      );
+    }
   </script>
 
   <script>
@@ -420,6 +353,75 @@
       }
     })();
   </script>
+  </main>
+
+<footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
+        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
+        <span>|</span>
+        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
+      </nav>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+</footer>
+
+  <style>
+    .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
+    .hover\:bg-resistencia-700:hover { background-color: #b91c1c !important; }
+
+    /* ─── Relato detalle (SPA) ─── */
+    .relato-detalle { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.2) !important; padding: 2rem; margin-bottom: 2rem; border-radius: 0; }
+    .relato-detalle h2 { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; text-align: left !important; margin: 0 0 0.75rem 0; }
+    .relato-detalle .meta { display: flex; gap: 12px; font-size: 12px; color: #666; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(229,9,20,0.1); flex-wrap: wrap; text-align: left; }
+    .relato-detalle .contenido { font-size: 15px; line-height: 1.8; color: #ddd; text-align: justify; white-space: pre-wrap; }
+    .relato-detalle .contenido b, .relato-detalle .contenido strong { color: white; }
+    .relato-detalle .contenido i, .relato-detalle .contenido em { color: #ddd; }
+    .relato-detalle .contenido u { text-decoration: underline; }
+
+    /* ─── Hardcodeado (textos recuperados de git) ─── */
+    .relato { margin-bottom: 4rem; }
+    .tab-btn { font-family: Arial, Helvetica, sans-serif; font-size: 0.8rem; font-weight: bold; padding: 0.65rem 1.25rem; border: 1px solid rgba(229,9,20,0.3); background: transparent; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+    .tab-btn:hover { border-color: var(--color-mir); color: white; }
+    .tab-btn.active { background: var(--color-mir); color: white; border-color: var(--color-mir); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeInUp 0.5s ease-out forwards; }
+    #contenedor-indices .card-mir { margin-bottom: 1rem; }
+
+    /* ─── Índice de relatos ─── */
+    .indice-relatos { max-width: 48rem; margin: 0 auto; }
+    .indice-item { background: var(--color-noche); border: 1px solid rgba(229,9,20,0.25); padding: 1.25rem 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease; text-align: left; }
+    .indice-item:hover { border-color: var(--color-mir); transform: translateX(6px); }
+    .indice-item h3 { font-family: Arial, Helvetica, sans-serif; color: var(--color-mir); text-transform: uppercase; letter-spacing: 0.05em; font-size: 1.15rem; margin: 0 0 0.25rem 0; }
+    .indice-item p { color: rgba(255,255,255,0.45); font-size: 0.85rem; margin: 0; }
+
+    /* ─── Relato individual ─── */
+    .relato-individual { max-width: 60rem; margin: 0 auto; }
+    .btn-volver-indice { background: transparent; border: 1px solid rgba(229,9,20,0.4); color: var(--color-mir); font-family: Arial, Helvetica, sans-serif; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.55rem 1.25rem; cursor: pointer; transition: all 0.3s; margin-bottom: 1.5rem; }
+    .btn-volver-indice:hover { background: var(--color-mir); color: white; }
+
+    /* ─── Layout SPA: sidebar + lector ─── */
+    .layout-relatos { display: flex; gap: 40px; padding: 20px 0; }
+    .sidebar { width: 300px; min-width: 260px; border-right: 1px solid rgba(229,9,20,0.25); padding-right: 20px; }
+    .sidebar .sidebar-titulo { font-family: Arial, Helvetica, sans-serif; color: var(--color-mir); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem; margin: 0 0 1rem 0; text-align: left !important; }
+    .sidebar ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar li { cursor: pointer; color: #ff0000; margin-bottom: 12px; padding: 8px 12px; font-size: 14px; border-left: 2px solid transparent; transition: all 0.3s; text-align: left; }
+    .sidebar li:hover { color: #fff; border-left-color: var(--color-mir); background: rgba(229,9,20,0.05); }
+    .sidebar li.active { color: #fff; border-left-color: var(--color-mir); background: rgba(229,9,20,0.08); }
+    .lector { flex: 1; padding: 0 20px 20px 20px; min-width: 0; }
+    .img-relato { max-width: 100%; height: auto; margin-bottom: 20px; border: 1px solid rgba(229,9,20,0.2); }
+
+    @media (max-width: 768px) {
+      .layout-relatos { flex-direction: column; gap: 20px; }
+      .sidebar { width: 100%; min-width: 0; border-right: none; border-bottom: 1px solid rgba(229,9,20,0.25); padding-right: 0; padding-bottom: 16px; }
+      .sidebar ul { display: flex; flex-wrap: wrap; gap: 6px; }
+      .sidebar li { margin-bottom: 0; padding: 6px 12px; border-left: none; border-bottom: 2px solid transparent; font-size: 13px; }
+      .sidebar li:hover { border-left-color: transparent; border-bottom-color: var(--color-mir); }
+    }
+  </style>
+
   <script src="/app.js"></script>
 </body>
 </html>
