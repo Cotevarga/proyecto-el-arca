@@ -214,7 +214,7 @@
         try {
           var resp = await supabaseClient
             .from('recuerdos')
-            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, nombre_serie')
+            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, nombre_serie, url_archivo, tipo_archivo')
             .eq('seccion', nombreSeccion)
             .eq('aprobado', true)
             .not('titulo_relato', 'is', null)
@@ -226,7 +226,14 @@
                 id: r.id,
                 titulo: r.titulo_relato || 'Sin título',
                 subtitulo: (r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) : '') + (r.nombre_serie ? ' · Serie: ' + r.nombre_serie : '') + ' · por ' + (r.nombre || 'Anónimo'),
-                html: '<div class="relato-detalle"><h2>' + escaparHTML(r.titulo_relato || 'Sin título') + '</h2><div class="meta">' + (r.created_at ? '<span>' + new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) + '</span>' : '') + '<span>por ' + escaparHTML(r.nombre || 'Anónimo') + '</span>' + (r.nombre_serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escaparHTML(r.nombre_serie) + '</span>' : '') + '</div><div class="contenido">' + sanitizarHTML(r.mensaje_largo || r.mensaje || '') + '</div></div>',
+                html: (function() {
+                  var imgHtml = '';
+                  if (r.url_archivo && r.tipo_archivo && r.tipo_archivo.indexOf('image') === 0) {
+                    imgHtml = '<div class="relato-img"><img src="' + r.url_archivo.replace(/"/g, '&quot;') + '" alt="' + escaparHTML(r.titulo_relato || '') + '" loading="lazy"></div>';
+                  }
+                  var metaHtml = (r.created_at ? '<span>' + new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) + '</span>' : '') + '<span>por ' + escaparHTML(r.nombre || 'Anónimo') + '</span>' + (r.nombre_serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escaparHTML(r.nombre_serie) + '</span>' : '');
+                  return '<div class="relato-detalle"><h2>' + escaparHTML(r.titulo_relato || 'Sin título') + '</h2><div class="meta">' + metaHtml + '</div><div class="relato-body">' + imgHtml + '<div class="contenido">' + sanitizarHTML(r.mensaje_largo || r.mensaje || '') + '</div></div></div>';
+                })(),
                 fuente: 'supabase'
               });
             });
@@ -380,6 +387,14 @@
     .relato-detalle .contenido b, .relato-detalle .contenido strong { color: white; }
     .relato-detalle .contenido i, .relato-detalle .contenido em { color: #ddd; }
     .relato-detalle .contenido u { text-decoration: underline; }
+    .relato-detalle .relato-body { display: flex; gap: 24px; align-items: flex-start; }
+    .relato-detalle .relato-img { flex-shrink: 0; width: 200px; }
+    .relato-detalle .relato-img img { width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(229,9,20,0.2); }
+    .relato-detalle .relato-body .contenido { flex: 1; min-width: 0; }
+    @media (max-width: 640px) {
+      .relato-detalle .relato-body { flex-direction: column; }
+      .relato-detalle .relato-img { width: 100%; max-width: 300px; }
+    }
 
     /* ─── Hardcodeado (textos recuperados de git) ─── */
     .relato { margin-bottom: 4rem; }
