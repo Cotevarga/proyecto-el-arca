@@ -27,97 +27,240 @@
     .bg-noche { background-color: var(--color-noche) !important; }
     .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
 
-    /* ─── Gallery Layout ─── */
-    #gallery-layout {
+    /* ─── Gallery Viewer ─── */
+    .gv-layout {
       display: flex;
       gap: 16px;
       align-items: flex-start;
-      min-height: 65vh;
     }
-    #thumb-col {
-      width: 120px;
+    .gv-thumb-rail {
+      width: 110px;
       flex-shrink: 0;
       max-height: 70vh;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      padding-right: 8px;
+      padding-right: 6px;
       scrollbar-width: thin;
-      scrollbar-color: rgba(229,9,20,0.3) transparent;
+      scrollbar-color: rgba(229,9,20,0.25) transparent;
     }
-    #thumb-col::-webkit-scrollbar { width: 4px; }
-    #thumb-col::-webkit-scrollbar-thumb { background: rgba(229,9,20,0.3); border-radius: 2px; }
-    .gallery-thumb {
+    .gv-thumb-rail::-webkit-scrollbar { width: 4px; }
+    .gv-thumb-rail::-webkit-scrollbar-thumb { background: rgba(229,9,20,0.25); border-radius: 2px; }
+    .gv-thumb {
       width: 100%;
       aspect-ratio: 4/3;
       object-fit: cover;
       border-radius: 4px;
       cursor: pointer;
-      opacity: 0.5;
-      transition: all 0.2s;
+      opacity: 0.45;
+      transition: opacity 0.25s, border-color 0.25s;
       border: 2px solid transparent;
     }
-    .gallery-thumb:hover { opacity: 0.8; }
-    .gallery-thumb.active { opacity: 1; border-color: var(--color-mir); }
+    .gv-thumb:hover { opacity: 0.8; }
+    .gv-thumb.active { opacity: 1; border-color: var(--color-mir); }
 
-    #viewer-col {
+    .gv-viewer {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       background: var(--color-noche);
-      border: 1px solid rgba(229,9,20,0.15);
+      border: 1px solid rgba(229,9,20,0.12);
       border-radius: 8px;
       min-height: 60vh;
       position: relative;
       overflow: hidden;
     }
-    #main-viewer-img {
+    .gv-stage {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+    }
+    .gv-image {
       max-width: 100%;
       max-height: 70vh;
       object-fit: contain;
       transition: opacity 0.3s ease;
       cursor: zoom-in;
+      user-select: none;
+      -webkit-user-drag: none;
     }
-    #viewer-loader {
+    .gv-empty {
+      color: rgba(255,255,255,0.2);
+      font-size: 14px;
+      text-align: center;
+      padding: 40px;
+    }
+    .gv-loader {
       position: absolute;
       top: 50%; left: 50%;
-      width: 40px; height: 40px;
-      margin: -20px 0 0 -20px;
-      border: 3px solid rgba(255,255,255,0.05);
+      width: 36px; height: 36px;
+      margin: -18px 0 0 -18px;
+      border: 3px solid rgba(255,255,255,0.04);
       border-top-color: var(--color-mir);
       border-radius: 50%;
-      animation: spin 0.7s linear infinite;
+      animation: gv-spin 0.7s linear infinite;
+      z-index: 2;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes gv-spin { to { transform: rotate(360deg); } }
 
-    .viewer-arrow {
+    .gv-nav {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
       z-index: 5;
       background: rgba(0,0,0,0.5);
-      color: rgba(255,255,255,0.6);
+      color: rgba(255,255,255,0.5);
       border: none;
-      font-size: 28px;
-      padding: 20px 10px;
+      font-size: 30px;
+      padding: 18px 10px;
       cursor: pointer;
       transition: all 0.2s;
       line-height: 1;
       border-radius: 4px;
+      opacity: 0;
+      pointer-events: none;
     }
-    .viewer-arrow:hover { background: rgba(229,9,20,0.4); color: #fff; }
-    .viewer-arrow-left { left: 8px; }
-    .viewer-arrow-right { right: 8px; }
+    .gv-viewer:hover .gv-nav { opacity: 1; pointer-events: auto; }
+    .gv-nav:hover { background: rgba(229,9,20,0.4); color: #fff; }
+    .gv-nav-prev { left: 8px; }
+    .gv-nav-next { right: 8px; }
+    .gv-nav.visible { opacity: 1; pointer-events: auto; }
 
-    .galeria-grid img {
-      cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    .gv-counter {
+      position: absolute;
+      bottom: 12px;
+      right: 16px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+      font-family: monospace;
+      letter-spacing: 0.05em;
+      z-index: 5;
+      background: rgba(0,0,0,0.5);
+      padding: 4px 10px;
+      border-radius: 12px;
     }
-    .galeria-grid img:hover {
-      transform: scale(1.02);
-      box-shadow: 0 8px 30px rgba(229,9,20,0.15);
+
+    /* ─── Lightbox ─── */
+    .gv-lightbox {
+      position: fixed;
+      z-index: 99999;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.96);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .gv-lightbox.open { display: flex; }
+    .gv-lb-close {
+      position: absolute;
+      top: 16px; right: 20px;
+      color: rgba(255,255,255,0.4);
+      font-size: 36px;
+      cursor: pointer;
+      z-index: 10;
+      transition: color 0.2s;
+      line-height: 1;
+      background: none;
+      border: none;
+      padding: 8px;
+    }
+    .gv-lb-close:hover { color: var(--color-mir); }
+    .gv-lb-prev, .gv-lb-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.25);
+      font-size: 40px;
+      cursor: pointer;
+      z-index: 10;
+      padding: 20px 14px;
+      transition: all 0.2s;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      border: none;
+      line-height: 1;
+    }
+    .gv-lb-prev:hover, .gv-lb-next:hover { color: #fff; background: rgba(229,9,20,0.25); }
+    .gv-lb-prev { left: 12px; }
+    .gv-lb-next { right: 12px; }
+    .gv-lb-stage {
+      position: relative;
+      max-width: 88vw;
+      max-height: 85vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gv-lb-image {
+      max-width: 100%;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 4px;
+      transition: opacity 0.25s ease;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .gv-lb-loader {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(255,255,255,0.04);
+      border-top-color: var(--color-mir);
+      border-radius: 50%;
+      animation: gv-spin 0.7s linear infinite;
+      position: absolute;
+      top: 50%; left: 50%;
+      margin: -20px 0 0 -20px;
+    }
+
+    /* ─── Mobile ─── */
+    @media (max-width: 768px) {
+      .gv-layout {
+        flex-direction: column-reverse;
+        gap: 10px;
+      }
+      .gv-thumb-rail {
+        width: 100%;
+        max-height: 90px;
+        flex-direction: row;
+        overflow-y: hidden;
+        overflow-x: auto;
+        padding-right: 0;
+        padding-bottom: 4px;
+        gap: 6px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .gv-thumb {
+        width: 80px;
+        min-width: 80px;
+        aspect-ratio: 4/3;
+        flex-shrink: 0;
+      }
+      .gv-viewer {
+        min-height: 45vh;
+      }
+      .gv-stage {
+        min-height: 45vh;
+      }
+      .gv-image {
+        max-height: 55vh;
+      }
+      .gv-nav {
+        padding: 14px 8px;
+        font-size: 24px;
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .gv-lb-prev, .gv-lb-next {
+        font-size: 30px;
+        padding: 16px 10px;
+      }
     }
   </style>
   <script>
@@ -175,45 +318,40 @@
       </div>
     </header>
 
-    <section class="py-8" style="background-color:#111111">
+    <!-- ─── Galería Viewer ─── -->
+    <section id="galeria-viewer" class="py-8" style="background-color:#111111">
       <div class="max-w-6xl mx-auto px-4">
-        <div id="gallery-layout">
-          <div id="thumb-col">
-            <div id="thumb-loader" style="text-align:center;padding:24px;">
-              <div style="display:inline-block;width:24px;height:24px;border:2px solid rgba(255,255,255,0.05);border-top-color:#E50914;border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+        <div class="gv-layout">
+          <div class="gv-thumb-rail" id="gv-thumb-list">
+            <div style="text-align:center;padding:20px;">
+              <div style="display:inline-block;width:22px;height:22px;border:2px solid rgba(255,255,255,0.04);border-top-color:#E50914;border-radius:50%;animation:gv-spin 0.7s linear infinite;"></div>
             </div>
           </div>
-          <div id="viewer-col">
-            <div id="viewer-loader" style="display:none;"></div>
-            <button id="viewer-prev" class="viewer-arrow viewer-arrow-left" title="Anterior">&#10094;</button>
-            <img id="main-viewer-img" src="" alt="Galería El Arca" style="opacity:0;">
-            <button id="viewer-next" class="viewer-arrow viewer-arrow-right" title="Siguiente">&#10095;</button>
-            <p id="viewer-empty" class="text-white/20 text-sm">Selecciona una imagen</p>
+          <div class="gv-viewer">
+            <div class="gv-loader" id="gv-loader" style="display:none;"></div>
+            <div class="gv-stage">
+              <img id="gv-image" class="gv-image" src="" alt="Galería El Arca" style="opacity:0;">
+              <p id="gv-empty" class="gv-empty">Cargando galería...</p>
+            </div>
+            <button class="gv-nav gv-nav-prev" id="gv-prev" title="Anterior">&#10094;</button>
+            <button class="gv-nav gv-nav-next" id="gv-next" title="Siguiente">&#10095;</button>
+            <div class="gv-counter" id="gv-counter"></div>
           </div>
         </div>
       </div>
     </section>
-  <script>
-    (function () {
-      var thumbCol = document.getElementById('thumb-col');
-      if (!thumbCol) return;
 
-      window._galeriaImages = window._galeriaImages || [];
-      window._galeriaCurrentIndex = window._galeriaCurrentIndex || 0;
-    })();
-  </script>
-  </main>
-
-  <!-- ─── LIGHTBOX (full-screen overlay) ─── -->
-  <div id="arca-lightbox">
-    <button class="lb-close" id="lb-close">&times;</button>
-    <button class="lb-prev" id="lb-prev">&#10094;</button>
-    <button class="lb-next" id="lb-next">&#10095;</button>
-    <div class="lb-img-wrapper">
-      <div class="lb-loader" id="lb-loader" style="display:none;"></div>
-      <img class="lb-main-img" id="lb-main-img" src="" alt="Galería El Arca">
+    <!-- ─── Lightbox ─── -->
+    <div id="gv-lightbox" class="gv-lightbox">
+      <button class="gv-lb-close" id="gv-lb-close">&times;</button>
+      <button class="gv-lb-prev" id="gv-lb-prev">&#10094;</button>
+      <button class="gv-lb-next" id="gv-lb-next">&#10095;</button>
+      <div class="gv-lb-stage">
+        <div class="gv-lb-loader" id="gv-lb-loader" style="display:none;"></div>
+        <img class="gv-lb-image" id="gv-lb-image" src="" alt="Galería El Arca">
+      </div>
     </div>
-  </div>
+  </main>
 
   <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
     <div class="max-w-5xl mx-auto px-4 text-center">
@@ -234,33 +372,11 @@
       menuToggle.addEventListener('click', function () {
         document.getElementById('mobile-menu').classList.toggle('hidden');
       });
-    } else {
-      console.warn('[Nav] menu-toggle no encontrado');
     }
     document.querySelectorAll('#mobile-menu a').forEach(function (l) {
       l.addEventListener('click', function () { document.getElementById('mobile-menu').classList.add('hidden'); });
     });
   </script>
-
-  <style>
-    #arca-lightbox {
-      position:fixed;z-index:99999;top:0;left:0;width:100%;height:100%;
-      background:rgba(0,0,0,0.96);display:none;align-items:center;justify-content:center;
-      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity 0.3s ease;
-    }
-    #arca-lightbox.open{display:flex;opacity:1}
-    #arca-lightbox .lb-close{position:absolute;top:20px;right:24px;color:rgba(255,255,255,0.5);font-size:32px;cursor:pointer;z-index:10;transition:color 0.2s;line-height:1;background:none;border:none}
-    #arca-lightbox .lb-close:hover{color:var(--color-mir)}
-    #arca-lightbox .lb-prev,#arca-lightbox .lb-next{position:absolute;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);font-size:36px;cursor:pointer;z-index:10;padding:16px 12px;transition:all 0.2s;background:rgba(0,0,0,0.3);border-radius:8px;border:none;line-height:1}
-    #arca-lightbox .lb-prev:hover,#arca-lightbox .lb-next:hover{color:#fff;background:rgba(229,9,20,0.3)}
-    #arca-lightbox .lb-prev{left:12px}
-    #arca-lightbox .lb-next{right:12px}
-    #arca-lightbox .lb-img-wrapper{position:relative;max-width:85vw;max-height:80vh;display:flex;align-items:center;justify-content:center}
-    #arca-lightbox .lb-main-img{max-width:100%;max-height:80vh;object-fit:contain;border-radius:4px;box-shadow:0 0 60px rgba(229,9,20,0.08);transition:transform 0.3s ease;transform:scale(0.95)}
-    #arca-lightbox.open .lb-main-img{transform:scale(1)}
-    .lb-loader{width:40px;height:40px;border:3px solid rgba(255,255,255,0.05);border-top-color:var(--color-mir);border-radius:50%;animation:lb-spin 0.7s linear infinite;position:absolute;top:50%;left:50%;margin:-20px 0 0 -20px}
-    @keyframes lb-spin{to{transform:rotate(360deg)}}
-  </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
   <script>
@@ -269,6 +385,345 @@
       'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi'
     );
   </script>
+
+  <!-- ─── Galería Engine (auto-contenido, SPA-safe) ─── -->
+  <script>
+  (function () {
+    'use strict';
+
+    /* ─── Fallback ─── */
+    var FALLBACK = [
+      { url: '/images/FB_IMG_1782701605358.jpg' },
+      { url: '/images/FB_IMG_1782701655071.jpg' },
+      { url: '/images/FB_IMG_1782701775498.jpg' },
+      { url: '/images/FB_IMG_1782701859802.jpg' },
+      { url: '/images/FB_IMG_1782701766075.jpg' },
+      { url: '/images/FB_IMG_1782701826979.jpg' },
+      { url: '/images/jano_inicio.jpg' },
+      { url: '/images/navidad_popular.jpg' },
+      { url: '/images/companeros_melon.jpg' },
+      { url: '/images/radio_libre.jpg' },
+      { url: '/images/antupeni.jpg' }
+    ];
+
+    /* ─── Estado local (se reinicia en cada init) ─── */
+    var images = [];
+    var currentIdx = 0;
+
+    /* ─── Referencias DOM (se refrescan cada vez) ─── */
+    var $ = function (id) { return document.getElementById(id); };
+
+    /* ─── Init principal ─── */
+    function init() {
+      var thumbList = $('gv-thumb-list');
+      var viewerImg = $('gv-image');
+      var viewerEmpty = $('gv-empty');
+      var counter = $('gv-counter');
+      var loader = $('gv-loader');
+      if (!thumbList || !viewerImg) return;
+
+      images = [];
+      currentIdx = 0;
+
+      if (loader) loader.style.display = 'block';
+      if (viewerImg) { viewerImg.src = ''; viewerImg.style.opacity = '0'; }
+      if (viewerEmpty) viewerEmpty.style.display = '';
+      if (counter) counter.textContent = '';
+
+      var client = window.miSupabase;
+      if (!client) {
+        images = FALLBACK.slice();
+        render();
+        return;
+      }
+
+      client
+        .from('galeria')
+        .select('url_imagen, titulo')
+        .eq('activo', true)
+        .order('orden', { ascending: true })
+        .then(function (resp) {
+          if (!resp.error && resp.data && resp.data.length > 0) {
+            images = resp.data.map(function (item) {
+              return { url: item.url_imagen, titulo: item.titulo || '' };
+            });
+          } else {
+            images = FALLBACK.slice();
+          }
+          render();
+        })
+        .catch(function () {
+          images = FALLBACK.slice();
+          render();
+        });
+    }
+
+    /* ─── Renderizar thumbs + mostrar primera ─── */
+    function render() {
+      var thumbList = $('gv-thumb-list');
+      var viewerImg = $('gv-image');
+      var viewerEmpty = $('gv-empty');
+      var counter = $('gv-counter');
+      var loader = $('gv-loader');
+      if (!thumbList || !viewerImg) return;
+
+      if (loader) loader.style.display = 'none';
+
+      if (images.length === 0) {
+        thumbList.innerHTML = '';
+        if (viewerEmpty) viewerEmpty.textContent = 'No hay imágenes disponibles.';
+        if (viewerEmpty) viewerEmpty.style.display = '';
+        if (counter) counter.textContent = '';
+        return;
+      }
+
+      thumbList.innerHTML = images.map(function (img, i) {
+        return '<img src="' + img.url.replace(/"/g, '&quot;') + '" class="gv-thumb' + (i === 0 ? ' active' : '') + '" data-idx="' + i + '" alt="' + (img.titulo || '') + '" loading="lazy">';
+      }).join('');
+
+      show(0);
+      bindEvents();
+    }
+
+    /* ─── Mostrar imagen por índice ─── */
+    function show(idx) {
+      var viewerImg = $('gv-image');
+      var viewerEmpty = $('gv-empty');
+      var counter = $('gv-counter');
+      var loader = $('gv-loader');
+      if (!viewerImg) return;
+
+      if (!images[idx]) return;
+      currentIdx = idx;
+
+      if (viewerEmpty) viewerEmpty.style.display = 'none';
+      if (loader) loader.style.display = 'block';
+      viewerImg.style.opacity = '0';
+
+      var img = new Image();
+      img.onload = function () {
+        viewerImg.src = images[idx].url;
+        viewerImg.style.opacity = '1';
+        if (loader) loader.style.display = 'none';
+        updateThumbs();
+        updateCounter();
+      };
+      img.onerror = function () {
+        viewerImg.src = images[idx].url;
+        viewerImg.style.opacity = '1';
+        if (loader) loader.style.display = 'none';
+        updateThumbs();
+        updateCounter();
+      };
+      img.src = images[idx].url;
+    }
+
+    /* ─── Actualizar thumbs activas ─── */
+    function updateThumbs() {
+      var thumbs = document.querySelectorAll('.gv-thumb');
+      thumbs.forEach(function (t, i) {
+        t.classList.toggle('active', i === currentIdx);
+      });
+    }
+
+    /* ─── Actualizar contador ─── */
+    function updateCounter() {
+      var counter = $('gv-counter');
+      if (counter && images.length > 0) {
+        counter.textContent = (currentIdx + 1) + ' / ' + images.length;
+      }
+    }
+
+    /* ─── Navegación ─── */
+    function prev() {
+      if (images.length === 0) return;
+      show((currentIdx - 1 + images.length) % images.length);
+    }
+    function next() {
+      if (images.length === 0) return;
+      show((currentIdx + 1) % images.length);
+    }
+
+    /* ─── Lightbox ─── */
+    function openLb() {
+      var lb = $('gv-lightbox');
+      var lbImg = $('gv-lb-image');
+      var lbLoader = $('gv-lb-loader');
+      if (!lb || !lbImg || !images[currentIdx]) return;
+
+      if (lbLoader) lbLoader.style.display = 'block';
+      lbImg.style.opacity = '0';
+
+      var img = new Image();
+      img.onload = function () {
+        lbImg.src = images[currentIdx].url;
+        lbImg.style.opacity = '1';
+        if (lbLoader) lbLoader.style.display = 'none';
+      };
+      img.onerror = function () {
+        lbImg.src = images[currentIdx].url;
+        lbImg.style.opacity = '1';
+        if (lbLoader) lbLoader.style.display = 'none';
+      };
+      img.src = images[currentIdx].url;
+
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLb() {
+      var lb = $('gv-lightbox');
+      if (!lb) return;
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function lbPrev() {
+      prev();
+      var lbImg = $('gv-lb-image');
+      var lbLoader = $('gv-lb-loader');
+      if (!lbImg || !images[currentIdx]) return;
+      if (lbLoader) lbLoader.style.display = 'block';
+      lbImg.style.opacity = '0';
+
+      var img = new Image();
+      img.onload = function () {
+        lbImg.src = images[currentIdx].url;
+        lbImg.style.opacity = '1';
+        if (lbLoader) lbLoader.style.display = 'none';
+      };
+      img.onerror = function () {
+        lbImg.src = images[currentIdx].url;
+        lbImg.style.opacity = '1';
+        if (lbLoader) lbLoader.style.display = 'none';
+      };
+      img.src = images[currentIdx].url;
+    }
+
+    function lbNext() {
+      next();
+      var lbImg = $('gv-lb-image');
+      var lbLoader = $('gv-lb-loader');
+      if (!lbImg || !images[currentIdx]) return;
+      if (lbLoader) lbLoader.style.display = 'block';
+      lbImg.style.opacity = '0';
+
+      var img = new Image();
+      img.onload = function () {
+        lbImg.src = images[currentIdx].url;
+        lbImg.style.opacity = '1';
+        if (lbLoader) lbLoader.style.display = 'none';
+      };
+      img.onerror = function () {
+        lbImg.src = images[currentIdx].url;
+        lbImg.style.opacity = '1';
+        if (lbLoader) lbLoader.style.display = 'none';
+      };
+      img.src = images[currentIdx].url;
+    }
+
+    /* ─── Vincular eventos (se llama en cada render) ─── */
+    var eventsBound = false;
+
+    function bindEvents() {
+      if (eventsBound) return;
+
+      var thumbList = $('gv-thumb-list');
+      var viewerImg = $('gv-image');
+      var prevBtn = $('gv-prev');
+      var nextBtn = $('gv-next');
+      var lb = $('gv-lightbox');
+      var lbClose = $('gv-lb-close');
+      var lbPrevBtn = $('gv-lb-prev');
+      var lbNextBtn = $('gv-lb-next');
+
+      /* Thumbnail clicks (delegación) */
+      if (thumbList) {
+        thumbList.addEventListener('click', function (e) {
+          var thumb = e.target.closest('.gv-thumb');
+          if (!thumb) return;
+          var idx = parseInt(thumb.getAttribute('data-idx'), 10);
+          if (!isNaN(idx)) show(idx);
+        });
+      }
+
+      /* Viewer image click → lightbox */
+      if (viewerImg) {
+        viewerImg.addEventListener('click', function () {
+          if (images.length > 0) openLb();
+        });
+      }
+
+      /* Prev / Next buttons */
+      if (prevBtn) prevBtn.addEventListener('click', function (e) { e.stopPropagation(); prev(); });
+      if (nextBtn) nextBtn.addEventListener('click', function (e) { e.stopPropagation(); next(); });
+
+      /* Lightbox close */
+      if (lbClose) lbClose.addEventListener('click', closeLb);
+      if (lb) {
+        lb.addEventListener('click', function (e) {
+          if (e.target === lb) closeLb();
+        });
+      }
+
+      /* Lightbox prev/next */
+      if (lbPrevBtn) lbPrevBtn.addEventListener('click', function (e) { e.stopPropagation(); lbPrev(); });
+      if (lbNextBtn) lbNextBtn.addEventListener('click', function (e) { e.stopPropagation(); lbNext(); });
+
+      /* Keyboard (solo una vez, seguro para SPA) */
+      if (!window._gvKeydown) {
+        window._gvKeydown = true;
+        document.addEventListener('keydown', function (e) {
+          var lb = $('gv-lightbox');
+          if (lb && lb.classList.contains('open')) {
+            if (e.key === 'Escape') closeLb();
+            if (e.key === 'ArrowLeft') lbPrev();
+            if (e.key === 'ArrowRight') lbNext();
+            return;
+          }
+          if (e.key === 'ArrowLeft') prev();
+          if (e.key === 'ArrowRight') next();
+        });
+      }
+
+      /* Touch swipe on viewer */
+      var touchStartX = 0;
+      var touchStartY = 0;
+      var viewerCol = document.querySelector('.gv-viewer');
+      if (viewerCol) {
+        viewerCol.addEventListener('touchstart', function (e) {
+          touchStartX = e.changedTouches[0].screenX;
+          touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+        viewerCol.addEventListener('touchend', function (e) {
+          var dx = touchStartX - e.changedTouches[0].screenX;
+          var dy = touchStartY - e.changedTouches[0].screenY;
+          if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+            if (dx > 0) next(); else prev();
+          }
+        }, { passive: true });
+      }
+
+      document.addEventListener('keydown', onKeydown);
+
+      eventsBound = true;
+    }
+
+    /* ─── Arranque ─── */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+  })();
+  </script>
+
   <script src="/app.js"></script>
+
+  <!-- Cleanup: if app.js SPA sets _galeriaEventsVinculados, reset it -->
+  <script>
+    window._galeriaEventsVinculados = true;
+  </script>
 </body>
 </html>

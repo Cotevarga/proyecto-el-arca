@@ -274,9 +274,12 @@
             var imgSrc = item.url_archivo && item.tipo_archivo && item.tipo_archivo.indexOf('image') === 0 ? item.url_archivo : '';
             var seccionLabel = NOMBRES_SECCION[item.seccion] || item.seccion || 'General';
             var seccionUrl = SECCION_URLS[item.seccion] || '/relatos.html';
+            var esRelato = item.seccion && item.seccion.indexOf('Relatos:') === 0;
             var fecha = item.created_at ? new Date(item.created_at).toLocaleDateString('es-CL') : '';
 
-            var cardLink = 'relatos.html?id=' + item.id + '&seccion=' + encodeURIComponent(item.seccion);
+            var cardLink = esRelato
+              ? 'relatos.html?id=' + item.id + '&seccion=' + encodeURIComponent(item.seccion)
+              : seccionUrl;
             html += '<a href="' + cardLink + '" class="vitrina-card" style="text-decoration:none;color:inherit;display:block;">';
             if (imgSrc) {
               html += '<img src="' + imgSrc.replace(/"/g, '&quot;') + '" alt="' + titulo.replace(/"/g, '&quot;') + '" loading="lazy">';
