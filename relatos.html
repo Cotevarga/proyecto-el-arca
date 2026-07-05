@@ -158,10 +158,28 @@
     .relato-body b, .relato-body strong { color: white; }
     .relato-body i, .relato-body em { color: #ddd; }
     .relato-body u { text-decoration: underline; }
-    @media (max-width: 768px) {
-      .relato-layout {
-        flex-direction: column !important;
-      }
+    .seccion-tab {
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: #888;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      letter-spacing: 0.03em;
+    }
+    .seccion-tab:hover:not(:disabled) { color: #fff; background: rgba(229,9,20,0.04); }
+    .seccion-tab.active {
+      color: var(--color-mir);
+      border-bottom-color: var(--color-mir);
+    }
+      @media (max-width: 768px) {
+        .relato-layout {
+          flex-direction: column !important;
+        }
       .relato-index {
         width: 100% !important;
         border-right: none !important;
@@ -198,10 +216,18 @@
 
       // ─── Flat list of all relatos for lookup ───
       var allRelatos = [];
+      var SECCIONES_ORDEN = ['Relatos: El Jano', 'Relatos: El Arca', 'Relatos: Otras organizaciones'];
+      var seccionLabels = { 'Relatos: El Jano': 'El Jano', 'Relatos: El Arca': 'El Arca', 'Relatos: Otras organizaciones': 'Otras Org.' };
+      var activeSeccion = null;
 
       async function cargarRelatos() {
         var container = document.getElementById('relatos-container');
         if (!container) return;
+
+        // Read URL params
+        var urlParams = new URLSearchParams(window.location.search);
+        var highlightId = urlParams.get('id') || null;
+        var highlightSeccion = urlParams.get('seccion') || null;
 
         container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#666;">Cargando relatos...</div>';
 
@@ -230,95 +256,172 @@
             return;
           }
 
-          // ─── Group relatos by nombre_serie ───
-          var groups = [];
-          var groupMap = {};
-
+          // ─── Group relatos by seccion ───
+          var secciones = {};
+          SECCIONES_ORDEN.forEach(function(sec) { secciones[sec] = []; });
           relatos.forEach(function(r) {
-            var serie = r.nombre_serie ? r.nombre_serie.trim() : '';
-            if (!serie) serie = '—';
-            if (!groupMap[serie]) {
-              groupMap[serie] = { nombre: serie, relatos: [] };
-              groups.push(groupMap[serie]);
+            if (secciones[r.seccion]) secciones[r.seccion].push(r);
+          });
+
+          // Determine active seccion from URL or fallback to first non-empty
+          if (highlightSeccion && secciones[highlightSeccion] && secciones[highlightSeccion].length > 0) {
+            activeSeccion = highlightSeccion;
+          } else {
+            for (var i = 0; i < SECCIONES_ORDEN.length; i++) {
+              if (secciones[SECCIONES_ORDEN[i]].length > 0) {
+                activeSeccion = SECCIONES_ORDEN[i];
+                break;
+              }
             }
-            groupMap[serie].relatos.push(r);
-          });
+          }
 
-          // Sort groups: unnamed series ("—") goes last
-          groups.sort(function(a, b) {
-            if (a.nombre === '—' && b.nombre !== '—') return 1;
-            if (b.nombre === '—' && a.nombre !== '—') return -1;
-            return a.nombre.localeCompare(b.nombre, 'es');
-          });
-
-          var seccionLabels = { 'Relatos: El Jano': 'El Jano', 'Relatos: El Arca': 'El Arca', 'Relatos: Otras organizaciones': 'Otras Org.' };
-
-          // ─── Build layout ───
+          // ─── Build Tabs ───
           var html =
-            '<div class="relato-layout" style="display:flex;gap:0;max-width:1200px;margin:0 auto;">' +
-              '<div class="relato-index" style="width:300px;flex-shrink:0;border-right:1px solid rgba(229,9,20,0.15);max-height:600px;overflow-y:auto;">' +
-                '<div style="padding:16px 20px;border-bottom:1px solid rgba(229,9,20,0.1);">' +
-                  '<h3 style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin:0;font-weight:700;font-family:Arial,Helvetica,sans-serif;">Índice de relatos</h3>' +
-                  '<span style="font-size:10px;color:#555;">' + relatos.length + ' relatos' +
-                    (groups.length > 1 ? ' · ' + groups.length + ' series' : '') +
-                  '</span>' +
-                '</div>';
+            '<div style="max-width:1200px;margin:0 auto;">' +
+              '<div style="display:flex;gap:4px;border-bottom:1px solid rgba(229,9,20,0.15);padding:0 4px;margin-bottom:0;">';
 
-          var firstRelato = null;
-
-          groups.forEach(function(group) {
-            var isUnnamed = (group.nombre === '—');
+          SECCIONES_ORDEN.forEach(function(sec) {
+            var count = secciones[sec].length;
+            var label = seccionLabels[sec] || sec;
+            var isActive = sec === activeSeccion;
             html +=
-              '<div role="heading" aria-level="3" style="padding:10px 16px 2px 16px;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#555;font-weight:700;font-family:Arial,Helvetica,sans-serif;border-top:1px solid rgba(229,9,20,0.08);">' +
-                (isUnnamed ? 'Sin serie' : escapeHtml(group.nombre)) +
-                ' <span style="color:#444;font-weight:400;">(' + group.relatos.length + ')</span>' +
-              '</div>';
-
-            group.relatos.forEach(function(r) {
-              if (!firstRelato) firstRelato = r;
-              var titulo = r.titulo_relato || 'Sin título';
-              html +=
-                '<button class="relato-index-item' + (firstRelato === r ? ' active' : '') + '" data-id="' + r.id + '">' +
-                  '<div style="font-size:10px;color:var(--color-mir);margin-bottom:1px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">' + (seccionLabels[r.seccion] || 'Relato') + '</div>' +
-                  '<span style="font-weight:600;font-size:13px;">' + escapeHtml(titulo) + '</span>' +
-                  '<div style="font-size:11px;color:#666;margin-top:2px;">por ' + escapeHtml(r.nombre || 'Anónimo') + '</div>' +
-                '</button>';
-            });
+              '<button class="seccion-tab' + (isActive ? ' active' : '') + '" data-seccion="' + sec + '"' +
+                (count === 0 ? ' style="opacity:0.35;cursor:default;" disabled' : '') + '>' +
+                label + ' <span style="font-weight:400;opacity:0.7;">(' + count + ')</span>' +
+              '</button>';
           });
 
           html += '</div>';
 
-          // Main content area
-          html += '<div class="relato-body" style="flex:1;padding:32px 40px;min-height:500px;overflow-y:auto;">';
+          // ─── Layout container (sidebar + content) ───
+          html += '<div class="relato-layout" style="display:flex;gap:0;max-width:1200px;margin:0 auto;">';
 
-          // Render first relato by default
-          if (firstRelato) html += renderRelatoBody(firstRelato);
+          // ─── Sidebar ───
+          html +=
+            '<div class="relato-index" id="relato-index" style="width:300px;flex-shrink:0;border-right:1px solid rgba(229,9,20,0.15);max-height:600px;overflow-y:auto;">' +
+              '<div style="padding:16px 20px;border-bottom:1px solid rgba(229,9,20,0.1);">' +
+                '<h3 style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin:0;font-weight:700;font-family:Arial,Helvetica,sans-serif;">Índice de relatos</h3>' +
+                '<span id="relato-count" style="font-size:10px;color:#555;"></span>' +
+              '</div>';
 
-          html += '</div></div>';
+          // Build sidebar items for each seccion (only active is visible via JS)
+          SECCIONES_ORDEN.forEach(function(sec) {
+            var relatosDeSeccion = secciones[sec] || [];
+
+            // Group by nombre_serie within this seccion
+            var groups = [];
+            var groupMap = {};
+            relatosDeSeccion.forEach(function(r) {
+              var serie = r.nombre_serie ? r.nombre_serie.trim() : '';
+              if (!serie) serie = '—';
+              if (!groupMap[serie]) {
+                groupMap[serie] = { nombre: serie, relatos: [] };
+                groups.push(groupMap[serie]);
+              }
+              groupMap[serie].relatos.push(r);
+            });
+            groups.sort(function(a, b) {
+              if (a.nombre === '—' && b.nombre !== '—') return 1;
+              if (b.nombre === '—' && a.nombre !== '—') return -1;
+              return a.nombre.localeCompare(b.nombre, 'es');
+            });
+
+            var panelId = 'idx-' + sec.replace(/[^a-zA-Z0-9]/g, '');
+            var isVisible = sec === activeSeccion;
+            html += '<div class="idx-panel" id="' + panelId + '"' + (isVisible ? '' : ' style="display:none;"') + '>';
+
+            groups.forEach(function(group) {
+              var isUnnamed = (group.nombre === '—');
+              html +=
+                '<div role="heading" aria-level="3" style="padding:10px 16px 2px 16px;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#555;font-weight:700;font-family:Arial,Helvetica,sans-serif;border-top:1px solid rgba(229,9,20,0.08);">' +
+                  (isUnnamed ? 'Sin serie' : escapeHtml(group.nombre)) +
+                  ' <span style="color:#444;font-weight:400;">(' + group.relatos.length + ')</span>' +
+                '</div>';
+
+              group.relatos.forEach(function(r) {
+                var titulo = r.titulo_relato || 'Sin título';
+                var isHighlight = String(r.id) === String(highlightId);
+                html +=
+                  '<button class="relato-index-item' + (isHighlight ? ' active' : '') + '" data-id="' + r.id + '" data-seccion="' + sec + '">' +
+                    '<span style="font-weight:600;font-size:13px;">' + escapeHtml(titulo) + '</span>' +
+                    '<div style="font-size:11px;color:#666;margin-top:2px;">por ' + escapeHtml(r.nombre || 'Anónimo') + '</div>' +
+                  '</button>';
+              });
+            });
+
+            html += '</div>'; // idx-panel
+          });
+
+          html += '</div>'; // relato-index (sidebar)
+
+          // ─── Main content area ───
+          html += '<div class="relato-body" id="relato-body" style="flex:1;padding:32px 40px;min-height:500px;overflow-y:auto;">';
+
+          // Find the first relato to show
+          var targetRelato = null;
+
+          // Try highlightId first
+          if (highlightId) {
+            targetRelato = relatos.filter(function(r) { return String(r.id) === String(highlightId); })[0];
+          }
+
+          // Fallback to first relato in active seccion
+          if (!targetRelato && activeSeccion) {
+            var activeRelatos = secciones[activeSeccion] || [];
+            targetRelato = activeRelatos[0] || null;
+          }
+
+          // Absolute fallback
+          if (!targetRelato) targetRelato = relatos[0] || null;
+
+          if (targetRelato) html += renderRelatoBody(targetRelato);
+
+          html += '</div></div></div>'; // body, layout, container
 
           container.innerHTML = html;
 
-          // Add click handlers
+          // ─── Update count ───
+          updateRelatoCount();
+
+          // ─── Tab click handlers ───
+          container.querySelectorAll('.seccion-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+              if (this.disabled) return;
+              var sec = this.getAttribute('data-seccion');
+              if (sec === activeSeccion) return;
+              switchTab(sec);
+            });
+          });
+
+          // ─── Index click handlers ───
           container.querySelectorAll('.relato-index-item').forEach(function(btn) {
             btn.addEventListener('click', function() {
               var id = this.getAttribute('data-id');
+              var sec = this.getAttribute('data-seccion');
               var relato = allRelatos.filter(function(r) { return String(r.id) === String(id); })[0];
               if (!relato) return;
 
-              // Update active state
-              container.querySelectorAll('.relato-index-item').forEach(function(b) {
-                b.classList.remove('active');
-              });
-              this.classList.add('active');
-
-              // Update body
-              var bodyEl = container.querySelector('.relato-body');
-              if (bodyEl) {
-                bodyEl.innerHTML = renderRelatoBody(relato);
-                bodyEl.scrollTop = 0;
+              // If relato belongs to a different seccion, switch tab first
+              if (sec && sec !== activeSeccion) {
+                switchTab(sec, function() {
+                  selectRelato(id);
+                });
+              } else {
+                selectRelato(id);
               }
             });
           });
+
+          // ─── After render: scroll to highlight if present ───
+          if (highlightId && targetRelato) {
+            // Use a short delay to let DOM paint
+            setTimeout(function() {
+              var activeBtn = container.querySelector('.relato-index-item.active');
+              if (activeBtn) {
+                activeBtn.scrollIntoView({ block: 'center', behavior: 'smooth' });
+              }
+            }, 200);
+          }
 
         } catch (err) {
           console.error('[Relatos] Error:', err);
@@ -327,6 +430,75 @@
               '<p style="color:var(--color-mir);">Error al cargar los relatos. Intenta de nuevo más tarde.</p>' +
             '</div>';
         }
+      }
+
+      function switchTab(sec, callback) {
+        var container = document.getElementById('relatos-container');
+        if (!container || sec === activeSeccion) { if (callback) callback(); return; }
+
+        activeSeccion = sec;
+
+        // Update tab active states
+        container.querySelectorAll('.seccion-tab').forEach(function(t) {
+          t.classList.toggle('active', t.getAttribute('data-seccion') === sec);
+        });
+
+        // Show/hide index panels
+        container.querySelectorAll('.idx-panel').forEach(function(panel) {
+          var panelSeccion = null;
+          // Derive seccion from id attribute (reverse of what we built)
+          SECCIONES_ORDEN.forEach(function(s) {
+            if (panel.id === 'idx-' + s.replace(/[^a-zA-Z0-9]/g, '')) panelSeccion = s;
+          });
+          panel.style.display = (panelSeccion === sec) ? '' : 'none';
+        });
+
+        // Find first relato in this seccion and show it
+        var firstInTab = allRelatos.filter(function(r) { return r.seccion === sec; })[0];
+        var bodyEl = document.getElementById('relato-body');
+        if (firstInTab && bodyEl) {
+          bodyEl.innerHTML = renderRelatoBody(firstInTab);
+          bodyEl.scrollTop = 0;
+        }
+
+        // Update active state in index
+        container.querySelectorAll('.relato-index-item').forEach(function(b) {
+          b.classList.toggle('active', b.getAttribute('data-seccion') === sec && String(b.getAttribute('data-id')) === String(firstInTab ? firstInTab.id : null));
+        });
+
+        updateRelatoCount();
+
+        if (callback) callback();
+      }
+
+      function selectRelato(id) {
+        var container = document.getElementById('relatos-container');
+        if (!container) return;
+
+        var relato = allRelatos.filter(function(r) { return String(r.id) === String(id); })[0];
+        if (!relato) return;
+
+        // If seccion changed, switchTab was already called before this
+        // Update active state in index
+        container.querySelectorAll('.relato-index-item').forEach(function(b) {
+          b.classList.toggle('active', String(b.getAttribute('data-id')) === String(id));
+        });
+
+        // Update body
+        var bodyEl = document.getElementById('relato-body');
+        if (bodyEl) {
+          bodyEl.innerHTML = renderRelatoBody(relato);
+          bodyEl.scrollTop = 0;
+        }
+      }
+
+      function updateRelatoCount() {
+        var container = document.getElementById('relatos-container');
+        if (!container) return;
+        var countEl = document.getElementById('relato-count');
+        if (!countEl) return;
+        var activeCount = allRelatos.filter(function(r) { return r.seccion === activeSeccion; }).length;
+        countEl.textContent = activeCount + ' relatos';
       }
 
       function renderRelatoBody(r) {

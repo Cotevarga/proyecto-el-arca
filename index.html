@@ -274,7 +274,8 @@
             var seccionUrl = SECCION_URLS[item.seccion] || '/relatos.html';
             var fecha = item.created_at ? new Date(item.created_at).toLocaleDateString('es-CL') : '';
 
-            html += '<div class="vitrina-card">';
+            var cardLink = 'relatos.html?id=' + item.id + '&seccion=' + encodeURIComponent(item.seccion);
+            html += '<a href="' + cardLink + '" class="vitrina-card" style="text-decoration:none;color:inherit;display:block;">';
             if (imgSrc) {
               html += '<img src="' + imgSrc.replace(/"/g, '&quot;') + '" alt="' + titulo.replace(/"/g, '&quot;') + '" loading="lazy">';
             } else {
@@ -284,13 +285,13 @@
               '<h3>' + titulo.replace(/</g, '&lt;') + '</h3>' +
               '<p>' + descripcion.replace(/</g, '&lt;') + '</p>';
             if (needsLink) {
-              html += '<a href="' + seccionUrl + '" class="text-mir hover:underline" style="font-size:12px;font-weight:600;display:inline-block;margin-top:8px;">Leer relato completo →</a>';
+              html += '<span class="text-mir" style="font-size:12px;font-weight:600;display:inline-block;margin-top:8px;">Leer relato completo →</span>';
             }
             html += '</div>';
             html += '<div class="vitrina-footer">' +
               '<span class="badge-seccion">' + seccionLabel + '</span>' +
               (fecha ? '<span>' + fecha + '</span>' : '') +
-            '</div></div>';
+            '</div></a>';
           });
 
           grid.innerHTML = html;
