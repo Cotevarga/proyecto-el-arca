@@ -157,7 +157,7 @@
 
       if (fileInput) {
         fileInput.addEventListener('change', function () {
-          var file = fileInput.files[0];
+          var file = fileInput.files ? fileInput.files[0] : null;
           if (!file) { fileError.classList.add('hidden'); fileInfo.classList.add('hidden'); return; }
           var valids = ['image/jpeg', 'image/png', 'audio/mpeg', 'audio/wav', 'video/mp4'];
           if (valids.indexOf(file.type) === -1) {
@@ -232,7 +232,7 @@
           var nombre = document.getElementById('nombre').value.trim();
           var anio = document.getElementById('anio').value.trim();
           var relato = document.getElementById('relato').value.trim();
-          var file = fileInput ? fileInput.files[0] : null;
+          var file = fileInput && fileInput.files ? fileInput.files[0] : null;
 
           if (!file && !relato) {
             messages.textContent = 'Agrega un archivo o escribe un relato.';

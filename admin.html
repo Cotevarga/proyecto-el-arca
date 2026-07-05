@@ -2165,7 +2165,7 @@
 
     musicUploadArea.addEventListener('click', function() { musicFileInput.click(); });
     musicFileInput.addEventListener('change', function() {
-      var file = musicFileInput.files[0];
+      var file = musicFileInput.files ? musicFileInput.files[0] : null;
       if (file) {
         if (file.type !== 'audio/mpeg' && !file.name.toLowerCase().endsWith('.mp3')) {
           musicFileInfo.textContent = 'Formato no válido. Solo MP3.';
@@ -2189,7 +2189,7 @@
       e.preventDefault();
       var titulo = document.getElementById('music-titulo').value.trim();
       var artista = document.getElementById('music-artista').value.trim() || 'El Arca';
-      var file = musicFileInput.files[0];
+      var file = musicFileInput && musicFileInput.files ? musicFileInput.files[0] : null;
       if (!file) { showToast('Selecciona un archivo MP3', 'error'); return; }
       if (!titulo) { showToast('Ingresa el título', 'error'); return; }
 
@@ -2360,7 +2360,7 @@
 
       area.onclick = function() { input.click(); };
       input.onchange = function() {
-        var file = input.files[0];
+        var file = input.files ? input.files[0] : null;
         if (!file) { if (info) info.textContent = ''; return; }
         if (file.size > 50 * 1024 * 1024) {
           if (info) { info.textContent = 'El archivo supera los 50 MB.'; info.style.color = '#E50914'; }
@@ -2422,7 +2422,7 @@
       var textoLargo = isRelato ? (document.getElementById('admin-upload-textolargo') ? document.getElementById('admin-upload-textolargo').value.trim() : '') : '';
       var nombreSerie = isRelato ? (document.getElementById('admin-upload-serie') ? document.getElementById('admin-upload-serie').value.trim() : '') : '';
       var fileInput = document.getElementById('admin-upload-file');
-      var file = fileInput ? fileInput.files[0] : null;
+      var file = fileInput && fileInput.files ? fileInput.files[0] : null;
       var destacado = document.getElementById('admin-upload-destacado').checked;
 
       // ─── Sanitizar HTML (solo b, i, u) ───

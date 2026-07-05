@@ -452,7 +452,7 @@
     </section>
 
     <!-- ===== ARCHIVO COMUNITARIO ===== -->
-    <section id="archivo" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
+    <section id="seccion-archivo" class="py-20 bg-black border-t border-t-[rgba(229,9,20,0.2)]">
       <div class="max-w-3xl mx-auto px-4">
         <div style="display: flex !important; justify-content: center !important; text-align: center !important; margin: 0 auto !important; width: 100% !important;">
           <span class="text-mir font-bold text-xs tracking-widest uppercase" style="text-align: center !important;">Participa</span>
@@ -532,7 +532,7 @@
 
       if (fileInput) {
         fileInput.addEventListener('change', function () {
-          var file = fileInput.files[0];
+          var file = fileInput.files ? fileInput.files[0] : null;
           if (!file) { fileError.classList.add('hidden'); fileInfo.classList.add('hidden'); return; }
           var valids = ['image/jpeg', 'image/png', 'audio/mpeg', 'audio/wav', 'video/mp4'];
           if (valids.indexOf(file.type) === -1) {
@@ -558,7 +558,7 @@
         var nombre = document.getElementById('nombre').value.trim();
         var anio = document.getElementById('anio').value.trim();
         var mensaje = document.getElementById('mensaje').value.trim();
-        var file = fileInput ? fileInput.files[0] : null;
+        var file = fileInput && fileInput.files ? fileInput.files[0] : null;
 
         var autorizacion = document.getElementById('autorizacion');
         if (!nombre) { mostrarFeedback(messages, 'Escribe tu nombre o pseud\u00f3nimo.', 'error'); return; }
