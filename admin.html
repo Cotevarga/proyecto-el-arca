@@ -754,6 +754,7 @@
                     <option value="Relatos: El Jano">Relatos: El Jano</option>
                     <option value="Relatos: El Arca">Relatos: El Arca</option>
                     <option value="Relatos: Otras organizaciones">Relatos: Otras organizaciones</option>
+                    <option value="Relatos: Anecdotas">Relatos: Anecdotas</option>
                   </select>
                 </div>
 
@@ -817,6 +818,7 @@
           <option value="Relatos: El Jano">Relatos: El Jano</option>
           <option value="Relatos: El Arca">Relatos: El Arca</option>
           <option value="Relatos: Otras organizaciones">Relatos: Otras organizaciones</option>
+          <option value="Relatos: Anecdotas">Relatos: Anecdotas</option>
         </select>
       </div>
       <div class="form-group">
@@ -1278,6 +1280,7 @@
       'Relatos: El Jano': 'Relatos: El Jano',
       'Relatos: El Arca': 'Relatos: El Arca',
       'Relatos: Otras organizaciones': 'Relatos: Otras organizaciones',
+      'Relatos: Anecdotas': 'Relatos: Anecdotas',
       'musica': 'Música'
     };
 
@@ -1560,7 +1563,7 @@
 
     function toggleApprovalRelatoFields() {
       var val = approvalSeccion ? approvalSeccion.value : '';
-      if (val === 'Relatos: El Jano' || val === 'Relatos: El Arca' || val === 'Relatos: Otras organizaciones') {
+      if (val === 'Relatos: El Jano' || val === 'Relatos: El Arca' || val === 'Relatos: Otras organizaciones' || val === 'Relatos: Anecdotas') {
         approvalRelatoFields.style.display = 'block';
         approvalStdFields.style.display = 'none';
       } else {
@@ -1583,7 +1586,7 @@
       }
       if (approvalSeccion) {
         var seccionActual = (record && record.seccion) || 'Galeria';
-        var validSections = ['Galeria','Videos y Audios','Relatos: El Jano','Relatos: El Arca','Relatos: Otras organizaciones'];
+        var validSections = ['Galeria','Videos y Audios','Relatos: El Jano','Relatos: El Arca','Relatos: Otras organizaciones','Relatos: Anecdotas'];
         if (validSections.indexOf(seccionActual) !== -1) {
           approvalSeccion.value = seccionActual;
         }
@@ -1621,7 +1624,7 @@
         var textoLargo = '';
         var tituloRelato = '';
         var nombreSerie = '';
-        if (seccion === 'Relatos: El Jano' || seccion === 'Relatos: El Arca' || seccion === 'Relatos: Otras organizaciones') {
+        if (seccion === 'Relatos: El Jano' || seccion === 'Relatos: El Arca' || seccion === 'Relatos: Otras organizaciones' || seccion === 'Relatos: Anecdotas') {
           textoLargo = approvalTextoLargo ? approvalTextoLargo.value.trim() : '';
           tituloRelato = approvalTitulo ? approvalTitulo.value.trim() : '';
           nombreSerie = approvalSerie ? approvalSerie.value.trim() : '';
@@ -1952,7 +1955,8 @@
 
     var SECCIONES_VALIDAS = [
       'Galeria', 'Videos y Audios',
-      'Relatos: El Jano', 'Relatos: El Arca', 'Relatos: Otras organizaciones'
+      'Relatos: El Jano', 'Relatos: El Arca', 'Relatos: Otras organizaciones',
+      'Relatos: Anecdotas'
     ];
 
     function validarSeccion(seccion) {
@@ -1990,6 +1994,12 @@
       },
       'Relatos: Otras organizaciones': {
         label: 'Relatos: Otras organizaciones',
+        fields: ['archivo_opcional', 'texto_largo'],
+        requireFile: false,
+        requireTexto: true
+      },
+      'Relatos: Anecdotas': {
+        label: 'Relatos: Anecdotas',
         fields: ['archivo_opcional', 'texto_largo'],
         requireFile: false,
         requireTexto: true

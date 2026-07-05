@@ -83,7 +83,7 @@
     <!-- ─── Sub-secciones (card landing) ─── -->
     <section id="navegacion-subsecciones" class="py-16" style="background-color:#111111">
       <div class="max-w-5xl mx-auto px-4">
-        <div class="grid md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
           <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="renderizarPorSeccion('Relatos: El Jano')">
             <div class="text-6xl mb-4 opacity-70">👤</div>
             <h2 class="text-mir font-title text-2xl uppercase mb-3">El Jano</h2>
@@ -98,6 +98,11 @@
             <div class="text-6xl mb-4 opacity-70">🤝</div>
             <h2 class="text-mir font-title text-2xl uppercase mb-3">Otras Organizaciones Sociales</h2>
             <p class="text-white/50 text-sm leading-relaxed max-w-xs">El tejido histórico de nuestro barrio: memorias de Antupeñi, grupos juveniles y las raíces del trabajo territorial.</p>
+          </button>
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="renderizarPorSeccion('Relatos: Anecdotas')">
+            <div class="text-6xl mb-4 opacity-70">💬</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">Anécdotas</h2>
+            <p class="text-white/50 text-sm leading-relaxed max-w-xs">Momentos espontáneos, recuerdos breves y pequeñas historias que construyen la memoria colectiva del barrio.</p>
           </button>
         </div>
       </div>
@@ -155,6 +160,18 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; animation: fadeInUp 0.5s ease-out forwards; }
     #contenedor-indices .card-mir { margin-bottom: 1rem; }
+
+    /* ─── Índice de relatos ─── */
+    .indice-relatos { max-width: 48rem; margin: 0 auto; }
+    .indice-item { background: var(--color-noche); border: 1px solid rgba(229,9,20,0.25); padding: 1.25rem 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease; text-align: left; }
+    .indice-item:hover { border-color: var(--color-mir); transform: translateX(6px); }
+    .indice-item h3 { font-family: Arial, Helvetica, sans-serif; color: var(--color-mir); text-transform: uppercase; letter-spacing: 0.05em; font-size: 1.15rem; margin: 0 0 0.25rem 0; }
+    .indice-item p { color: rgba(255,255,255,0.45); font-size: 0.85rem; margin: 0; }
+
+    /* ─── Relato individual ─── */
+    .relato-individual { max-width: 60rem; margin: 0 auto; }
+    .btn-volver-indice { background: transparent; border: 1px solid rgba(229,9,20,0.4); color: var(--color-mir); font-family: Arial, Helvetica, sans-serif; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.55rem 1.25rem; cursor: pointer; transition: all 0.3s; margin-bottom: 1.5rem; }
+    .btn-volver-indice:hover { background: var(--color-mir); color: white; }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
@@ -166,192 +183,49 @@
   </script>
 
   <script>
-    /* ─── Contenido hardcodeado recuperado de relatos/jano.html, arca.html, organizaciones.html ─── */
-    var CONTENIDO_HARDCODEADO = {
-      'Relatos: El Jano': `
-<section class="py-16 bg-noche">
-  <div class="max-w-4xl mx-auto px-4">
-    <article class="relato">
-      <div class="flex items-center gap-3 mb-4">
-        <span class="text-mir font-title text-4xl">01</span>
-        <div>
-          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">El Sueño del Jano</h2>
-          <p class="text-white/40 text-sm">Los inicios en La Goya — Mediados de los 90</p>
-        </div>
-      </div>
-      <div class="grid md:grid-cols-2 gap-6 items-start">
-        <div class="space-y-4 text-white/70 leading-relaxed">
-          <p>Pedro Alejandro González Reyes llegó a la Población Francisco de Goya con una convicción: la cultura popular era la herramienta más poderosa para transformar la realidad. En un territorio golpeado por la exclusión, el narcotráfico y el abandono estatal, el Jano no vino a prometer: vino a hacer.</p>
-          <p>"Me acuerdo cuando llegó con un parlante viejo y un micrófono —recuerda Sonia, vecina del pasaje —. Dijo que iba a montar un centro cultural y todos pensamos que estaba loco. Pero a la semana siguiente ya había doce niños sentados en el suelo de la sede, aprendiendo a tocar la batería con tarros vacíos."</p>
-          <p>Así nació El Arca: sin plata, sin auspicios, sin permiso de nadie. Solo con la fuerza de la comunidad organizada y la convicción de un hombre que se negaba a aceptar que el destino de los niños pobres estuviera escrito.</p>
-          <p>Pedagogía popular, amor por la comunidad y una convicción inquebrantable: <strong class="text-white">solo el pueblo salva al pueblo</strong>. El Jano no daba discursos desde un escritorio; estaba en la cancha, en la sede, en la marcha, en las radios, hombro con hombro con su gente.</p>
-        </div>
-        <div class="space-y-4">
-          <div class="card-mir"><img src="images/jano_inicio.jpg" alt="El Cabezón Jano" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">"El Jano nos enseñó que la cultura no era un lujo, era una trinchera."</p></div>
-          <div class="card-mir"><img src="images/FB_IMG_1782701775498.jpg" alt="Jano pintando la sede" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">Jano pintando la sede de El Arca con sus propias manos.</p></div>
-        </div>
-      </div>
-    </article>
-    <article class="relato">
-      <div class="flex items-center gap-3 mb-4">
-        <span class="text-mir font-title text-4xl">02</span>
-        <div>
-          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La TV del Pueblo</h2>
-          <p class="text-white/40 text-sm">El sueño de comunicación popular del Jano</p>
-        </div>
-      </div>
-      <div class="grid md:grid-cols-2 gap-6 items-start">
-        <div class="card-mir md:order-2"><img src="images/FB_IMG_1782701826979.jpg" alt="Jano planificando TV Comunitaria" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">Planificando la comunicación popular, cámara en mano.</p></div>
-        <div class="space-y-4 text-white/70 leading-relaxed md:order-1">
-          <p>"El Jano tenía una obsesión: que la población se viera a sí misma en pantalla. Decía que mientras la tele mostrara solo realidades ajenas, el pueblo nunca iba a creerse capaz de contar su propia historia."</p>
-          <p>Con una cámara prestada y cables que conseguía de aquí y allá, el Jano comenzó a grabar: las ollas comunes, los talleres, las marchas, los carnavales. Cada grabación era un acto de soberanía. No importaba la calidad técnica: importaba el contenido, la verdad, la mirada del pueblo.</p>
-          <p>Ese sueño de comunicación popular —la televisión comunitaria— fue el germen de la Radio Libre 90.1 / 100.5 FM. Donde no llegó la pantalla, llegó la frecuencia. El micrófono siempre fue del pueblo.</p>
-        </div>
-      </div>
-    </article>
-    <article class="relato">
-      <div class="flex items-center gap-3 mb-4">
-        <span class="text-mir font-title text-4xl">03</span>
-        <div>
-          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Tragedia y la Memoria</h2>
-          <p class="text-white/40 text-sm">Cuesta El Melón — 24 de Mayo de 2006.</p>
-        </div>
-      </div>
-      <div class="grid md:grid-cols-2 gap-6 items-start">
-        <div class="space-y-4 text-white/70 leading-relaxed">
-          <p>El 24 de Mayo del 2006, el destino golpeó con la crueldad que solo el azar sabe tener. En la Cuesta El Melón, un accidente de tránsito arrebató físicamente al Jano, al Nino y al Carlos. La comunidad quedó en shock. El Arca perdió a tres de sus hijos más queridos.</p>
-          <p>"Cuando supimos, nadie podía creerlo —recuerda Patricia, vecina del sector—. El Jano era tan inmenso que parecía indestructible. Pero esa noche entendimos que los gigantes también caen. Lo que no sabíamos es que sus sueños eran más grandes que su partida."</p>
-          <p>El dolor paralizó a La Goya. Pero la comunidad se organizó para mantener vivo el legado. Porque el Jano no había construido una obra personal: había sembrado conciencia colectiva. Y la conciencia colectiva no muere con un accidente de tránsito.</p>
-        </div>
-        <div class="card-mir"><img src="images/companeros_melon.jpg" alt="Compañeros de El Arca" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">"No están muertos quienes viven en el corazón del pueblo."</p></div>
-      </div>
-    </article>
-  </div>
-</section>`,
+    /* ─── Relatos hardcodeados (por artículo individual) ─── */
+    var RELATOS_HARDCODEADOS = {
+      'Relatos: El Jano': [
+        { id:'hc-jano-1', titulo:'El Sueño del Jano', subtitulo:'Los inicios en La Goya — Mediados de los 90',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><span class="text-mir font-title text-4xl">01</span><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">El Sueño del Jano</h2><p class="text-white/40 text-sm">Los inicios en La Goya — Mediados de los 90</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="space-y-4 text-white/70 leading-relaxed"><p>Pedro Alejandro González Reyes llegó a la Población Francisco de Goya con una convicción: la cultura popular era la herramienta más poderosa para transformar la realidad. En un territorio golpeado por la exclusión, el narcotráfico y el abandono estatal, el Jano no vino a prometer: vino a hacer.</p><p>"Me acuerdo cuando llegó con un parlante viejo y un micrófono —recuerda Sonia, vecina del pasaje —. Dijo que iba a montar un centro cultural y todos pensamos que estaba loco. Pero a la semana siguiente ya había doce niños sentados en el suelo de la sede, aprendiendo a tocar la batería con tarros vacíos."</p><p>Así nació El Arca: sin plata, sin auspicios, sin permiso de nadie. Solo con la fuerza de la comunidad organizada y la convicción de un hombre que se negaba a aceptar que el destino de los niños pobres estuviera escrito.</p><p>Pedagogía popular, amor por la comunidad y una convicción inquebrantable: <strong class="text-white">solo el pueblo salva al pueblo</strong>. El Jano no daba discursos desde un escritorio; estaba en la cancha, en la sede, en la marcha, en las radios, hombro con hombro con su gente.</p></div><div class="space-y-4"><div class="card-mir"><img src="images/jano_inicio.jpg" alt="El Cabezón Jano" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">"El Jano nos enseñó que la cultura no era un lujo, era una trinchera."</p></div><div class="card-mir"><img src="images/FB_IMG_1782701775498.jpg" alt="Jano pintando la sede" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">Jano pintando la sede de El Arca con sus propias manos.</p></div></div></div></article>' },
+        { id:'hc-jano-2', titulo:'La TV del Pueblo', subtitulo:'El sueño de comunicación popular del Jano',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><span class="text-mir font-title text-4xl">02</span><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La TV del Pueblo</h2><p class="text-white/40 text-sm">El sueño de comunicación popular del Jano</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="card-mir md:order-2"><img src="images/FB_IMG_1782701826979.jpg" alt="Jano planificando TV Comunitaria" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">Planificando la comunicación popular, cámara en mano.</p></div><div class="space-y-4 text-white/70 leading-relaxed md:order-1"><p>"El Jano tenía una obsesión: que la población se viera a sí misma en pantalla. Decía que mientras la tele mostrara solo realidades ajenas, el pueblo nunca iba a creerse capaz de contar su propia historia."</p><p>Con una cámara prestada y cables que conseguía de aquí y allá, el Jano comenzó a grabar: las ollas comunes, los talleres, las marchas, los carnavales. Cada grabación era un acto de soberanía. No importaba la calidad técnica: importaba el contenido, la verdad, la mirada del pueblo.</p><p>Ese sueño de comunicación popular —la televisión comunitaria— fue el germen de la Radio Libre 90.1 / 100.5 FM. Donde no llegó la pantalla, llegó la frecuencia. El micrófono siempre fue del pueblo.</p></div></div></article>' },
+        { id:'hc-jano-3', titulo:'La Tragedia y la Memoria', subtitulo:'Cuesta El Melón — 24 de Mayo de 2006.',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><span class="text-mir font-title text-4xl">03</span><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Tragedia y la Memoria</h2><p class="text-white/40 text-sm">Cuesta El Melón — 24 de Mayo de 2006.</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="space-y-4 text-white/70 leading-relaxed"><p>El 24 de Mayo del 2006, el destino golpeó con la crueldad que solo el azar sabe tener. En la Cuesta El Melón, un accidente de tránsito arrebató físicamente al Jano, al Nino y al Carlos. La comunidad quedó en shock. El Arca perdió a tres de sus hijos más queridos.</p><p>"Cuando supimos, nadie podía creerlo —recuerda Patricia, vecina del sector—. El Jano era tan inmenso que parecía indestructible. Pero esa noche entendimos que los gigantes también caen. Lo que no sabíamos es que sus sueños eran más grandes que su partida."</p><p>El dolor paralizó a La Goya. Pero la comunidad se organizó para mantener vivo el legado. Porque el Jano no había construido una obra personal: había sembrado conciencia colectiva. Y la conciencia colectiva no muere con un accidente de tránsito.</p></div><div class="card-mir"><img src="images/companeros_melon.jpg" alt="Compañeros de El Arca" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">"No están muertos quienes viven en el corazón del pueblo."</p></div></div></article>' }
+      ],
+      'Relatos: El Arca': [
+        { id:'hc-arca-1', titulo:'La Mística del Trabajo Territorial', subtitulo:'Infancias, Navidad Popular y resistencia',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><span class="text-mir font-title text-4xl">01</span><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Mística del Trabajo Territorial</h2><p class="text-white/40 text-sm">Infancias, Navidad Popular y resistencia</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="card-mir md:order-2"><img src="images/FB_IMG_1782701859802.jpg" alt="Navidad Popular" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La Navidad Popular: ningún niño sin celebrar en La Goya.</p></div><div class="space-y-4 text-white/70 leading-relaxed md:order-1"><p>El Arca no fue solo un centro cultural. Fue la demostración palpable de que el trabajo de masas con las niñeces es la tarea más revolucionaria que puede emprender un pueblo. En cada taller, en cada navidad popular, en cada programa de radio, el Jano y su comunidad tejieron una red de contención, dignidad y conciencia que arrancó a cientos de niños y niñas de las garras de la delincuencia, del consumismo y del sometimiento del sistema.</p><p>"El Jano decía que la delincuencia no se combatía con más carabineros, sino con oportunidades —cuenta Carlos, ex monitor de El Arca—. Por eso los talleres no eran un pasatiempo: eran una alternativa real al destino que el sistema tenía preparado para nuestros niños."</p><p>La música, el arte, la comunicación: cada actividad era una semilla plantada en tierra fértil. De aquellos niños, algunos hoy son dirigentes sociales, comunicadores, educadores populares. La siembra dio frutos. Porque la transformación real no se juega en las urnas ni en los titulares: se juega en la cancha, en la sede vecinal, en la mirada de un niño que descubre que puede ser alguien. Esa es la apuesta de El Arca, y sigue siendo la apuesta de los pueblos que se niegan a doblegarse.</p><p><strong class="text-white">MEDIOS DE EMANCIPACIÓN, INFANCIAS DE LIBERACIÓN:</strong> Disputar las infancias al capitalismo no es una tarea local, es el deber histórico de los pueblos del mundo. Que la memoria viva sea el puente para recuperar el territorio a través del arte, la cultura y la organización comunitaria.</p><p class="text-mir font-bold mt-6 text-center text-xl">¡A sembrar el mañana, porque el futuro le pertenece a los pueblos libres! 🌍✊</p></div></div></article>' },
+        { id:'hc-arca-2', titulo:'La Goya en las Calles', subtitulo:'Organización, marchas y lucha popular',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><span class="text-mir font-title text-4xl">02</span><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Goya en las Calles</h2><p class="text-white/40 text-sm">Organización, marchas y lucha popular</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="space-y-4 text-white/70 leading-relaxed"><p>El Arca no era solo un espacio físico: era un movimiento. Cuando la comunidad necesitaba organizarse, la sede se convertía en asamblea. Cuando había que salir a la calle, el Jano estaba al frente, con su cámara al hombro y su megáfono en la mano.</p><p>"La marcha comunitaria no se improvisaba: se construía en las reuniones, en los talleres, en la radio —dice Marta, dirigenta vecinal—. El Jano nos enseñó que la queja sin organización es ruido, pero la organización sin calle es letra muerta."</p><p>La lucha por Av. Violeta Parra, el Carnaval del 30, las tomas culturales: cada acción era una lección de pedagogía popular. Herencia del Jano. El pueblo aprendía haciendo, organizándose, enfrentándose al sistema con la frente en alto.</p></div><div class="card-mir"><img src="images/FB_IMG_1782701766075.jpg" alt="Marcha comunitaria en La Goya" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La comunidad organizada en las calles de La Pintana.</p></div></div></article>' },
+        { id:'hc-arca-3', titulo:'El Legado que Camina', subtitulo:'Radio, Preuniversitario, Carnaval y lucha vigente',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><span class="text-mir font-title text-4xl">03</span><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">El Legado que Camina</h2><p class="text-white/40 text-sm">Radio, Preuniversitario, Carnaval y lucha vigente</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="card-mir md:order-2"><img src="images/radio_libre.jpg" alt="Radio Libre" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La Radio Libre 90.1 / 100.5 FM: el sueño hecho frecuencia.</p></div><div class="space-y-4 text-white/70 leading-relaxed md:order-1"><p>El Arca no se cerró. El Arca se multiplicó. La Radio Libre 90.1 / 100.5 FM salió al aire, con programas como "El Sartén por el Mango", "La Gozadera" y espacios informativos que mantenían viva la comunicación popular.</p><p>El Preuniversitario Popular "Pedro Alejandro González" abrió las puertas de la educación superior a los jóvenes de La Pintana. La nivelación de estudios recuperó a quienes el sistema expulsó. El Carnaval del 30 llenó de colores y comparsas el Paradero 30 de Santa Rosa.</p><p>"El Jano nos enseñó que la lucha no termina con la muerte de un compañero —dice un monitor de El Arca—. La lucha termina cuando el pueblo deja de soñar. Y nosotros seguimos soñando."</p><p class="text-mir font-bold mt-4">El legado vive. La memoria resiste. El Arca es el pueblo.</p></div></div></article>' },
+        { id:'hc-arca-4', titulo:'Medios de Emancipación', subtitulo:'Radio, comunicación popular y la voz del territorio',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><span class="text-mir font-title text-4xl">04</span><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">Medios de Emancipación</h2><p class="text-white/40 text-sm">Radio, comunicación popular y la voz del territorio</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="space-y-4 text-white/70 leading-relaxed"><p>La Radio Libre 90.1 / 100.5 FM no fue solo un proyecto de comunicación: fue un <strong class="text-white">acto de soberanía popular</strong>. En un territorio donde las grandes cadenas dictan lo que se debe pensar, El Arca tomó la palabra y le dio micrófono a la comunidad. Programas como "El Sartén por el Mango" y "La Gozadera" no entretenían: concientizaban.</p><p>La comunicación popular era, para el Jano y los compañeros, una <strong class="text-white">herramienta de emancipación</strong> tan poderosa como los talleres o las navidades. Porque quien controla el relato, controla la realidad. Y la comunidad de La Goya se negó a que otros contaran su historia por ellos.</p><p>Hoy, este archivo digital es la continuación de esa lucha: <strong class="text-white">la memoria como medio de emancipación</strong>. Cada fotografía, cada relato, cada programa de radio rescatado es un fusil cargado de pasado y futuro. Porque mientras el pueblo recuerde, el poder no podrá reescribir la historia.</p></div><div class="card-mir"><img src="images/antupeni.jpg" alt="Antupení" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La comunicación popular construye identidad y libera conciencias.</p></div></div></article>' }
+      ],
+      'Relatos: Otras organizaciones': [
+        { id:'hc-org-1', titulo:'La Caleta y Antupeñi', subtitulo:'1998 — 2003 · Organización territorial en La Pintana',
+          html:'<div class="tab-menu-relatos"><div class="flex flex-wrap gap-2 mb-6 border-b border-mir/20 pb-4 overflow-x-auto"><button class="tab-btn active" data-tab="caleta">La Caleta y Antupeñi (1998-2003)</button></div><div id="tab-caleta" class="tab-content active"><article><div class="flex items-center gap-3 mb-6"><span class="text-mir font-title text-4xl">01</span><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Caleta y Antupeñi</h2><p class="text-white/40 text-sm">1998 — 2003 · Organización territorial en La Pintana</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="space-y-4 text-white/70 leading-relaxed"><p class="font-bold text-white uppercase text-sm tracking-wider">Los primeros pasos y la llegada a La Caleta (1998)</p><p>El compromiso social de Carlos comenzó formalmente a finales de la década de los noventa, cuando apenas tenía 19 años. "Comencé el 98 en La Caleta y supe de la ONG por la Universidad donde estudiaba", recuerda. Su inserción territorial se dio de manera natural gracias a su ubicación, en el sector de Antumapu (paradero 32 de Santa Rosa): "como vivía cerca, me acerqué porque consideré interesante el proyecto".</p><p>La Corporación La Caleta poseía ya una trayectoria histórica. Según explica, "era una ONG chilena fundada el 85 y en sus orígenes estuvo ligado a educadores y agentes pastorales que trabajaban con niños en extrema vulneralidad durante la dictadura".</p><p class="font-bold text-white uppercase text-sm tracking-wider">Filosofía de trabajo y el verdadero objetivo preventivo</p><p>El enfoque institucional era moderno e integral. "La filosofía de La Caleta se basaba en la educación popular, trabajo comunitario y enfoque en los derechos de la niñez", detalla. La metodología priorizaba el trabajo territorial, "fortaleciendo las organizaciones comunitarias en lugar de intervenir solo de forma asistencial", viendo a los menores como "sujetos de derechos" y buscando incidir en las políticas públicas mediante el fomento del "\'Buen Vivir\', la diversidad cultural y el empoderamiento de los sectores populares".</p><p>Sin embargo, detrás del trabajo infantil existía una profunda y estratégica misión enfocada en la juventud. "Muchos piensan que nuestro trabajo iba enfocado a los niños, porque recibíamos niños desde 3 años, pero nuestro objetivo base era atacar la entrada de drogas en los jóvenes desde los 13 hasta los 18 y más", revela Carlos.</p><p>El método de prevención consistía en dotar de sentido y deber a los adolescentes locales, "Dándoles responsabilidades visibles dentro de la comunidad a hacerse cargo de niños que veían a diario, evitando así que ellos tuvieran acceso enlace misma población o sector a las drogas duras". Sumar a los jóvenes se lograba del "boca a boca", ya que "es una edad donde están dispuestos a conocer a otros y buscar una identidad en común".</p><p class="font-bold text-white uppercase text-sm tracking-wider">El territorio, los espacios y la labor comunitaria</p><p>El despliegue en la zona sur de Santiago era extenso. "La Caleta actuaba en 5 puntos de la comuna. El Bosque, Santo Tomás, El Castillo, Villa Colombia y (no recuerdo el nombre de la 5ta que estaba ahi mismo donde esta la Muni...)". Para asegurar un point de reunión fijo en su sector, Carlos relata que "El grupo se juntaba en una de las salas de la iglesia que estaba en la Villa El Bosque y se consiguió hablando con el cura". Este acuerdo fue un beneficio mutuo que "Justo coincidió con un Encuentro Latinoamericano de Jovenes y la iglesia requería de nuevos jóvenes en ella".</p><p>La capacitación de la ONG permitió entregar herramientas culturales y de liderazgo. "La Caleta nos aportó talleres de recreación para niños, batucadas (en esos años era la moda), zancos, pinta caras, circo teatro, talleres de monitores infantiles, pintura de murales", enumera. Estos aprendizajes se llevaban a la práctica mediante el modelo de prevención: "Y nosotros hacíamos talleres y aplicabamos lo aprendido con los niños desde 3 a 12 años con tíos desde los 13 a los 18 o más".</p><p>La dedicación era constante, abarcando "todos los fines de semana y durante el verano se hacían las colonias de verano donde comentábamos con un cupo de 150 niños y terminábamos con cerca de 300", apoyados por una sólida base humana donde "Los tios o monitores eran cerca de 30 jóvenes del sector".</p><p class="font-bold text-white uppercase text-sm tracking-wider">El fin del financiamiento y el nacimiento de "Antupeñi" (2000 - 2003)</p><p>El apoyo institucional no fue permanente. "Esta ONG nos apoyó por cerca de 2 años y luego se retiró por falta de recursos", narra Carlos. Frente a la ausencia de la Corporación original (alrededor del año 2000), los dirigentes barriales tomaron una decisión fundamental basada en el vínculo creado: "El tema es que no podíamos darle la espalda a los jóvenes y niños que habíamos acogido".</p><p>Fue la propia juventud empoderada la que salvó la iniciativa. "El mismo grupo de tíos a los que iba dirigido el proyecto se hizo cargo de la continuidad del mismo", señala con orgullo, marcando el origen de una nueva etapa puramente autogestionada: "Así nació el grupo Antupeñi \'Niños de la tierra\' hasta por el 2003".</p><p class="font-bold text-white uppercase text-sm tracking-wider">Reflexiones y el impacto en una generación</p><p>Al mirar hacia atrás y evaluar aquellos años de labor territorial ininterrumpida, Carlos aterriza las expectativas frente a un contexto adverso. "No se pretendia una efectividad total, pero sí hacer una mudanza en el pensamiento social de cada uno de ellos respecto a su entorno".</p><p>Reconoce abiertamente que "Muchos chicos se perdieron en la droga", pero rescata el legado invaluable y principal logro de la organización: "una gran mayoría consiguieron crear pensamiento crítico y razonamiento social".</p></div><div class="card-mir"><img src="images/antupeni.jpg" alt="Antupeñi" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">"La semilla de la organización territorial germina en la memoria del pueblo."</p></div></div></article></div></div>' }
+      ]
+    };
 
-      'Relatos: El Arca': `
-<section class="py-16 bg-noche">
-  <div class="max-w-4xl mx-auto px-4">
-    <article class="relato">
-      <div class="flex items-center gap-3 mb-4">
-        <span class="text-mir font-title text-4xl">01</span>
-        <div>
-          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Mística del Trabajo Territorial</h2>
-          <p class="text-white/40 text-sm">Infancias, Navidad Popular y resistencia</p>
-        </div>
-      </div>
-      <div class="grid md:grid-cols-2 gap-6 items-start">
-        <div class="card-mir md:order-2"><img src="images/FB_IMG_1782701859802.jpg" alt="Navidad Popular" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La Navidad Popular: ningún niño sin celebrar en La Goya.</p></div>
-        <div class="space-y-4 text-white/70 leading-relaxed md:order-1">
-          <p>El Arca no fue solo un centro cultural. Fue la demostración palpable de que el trabajo de masas con las niñeces es la tarea más revolucionaria que puede emprender un pueblo. En cada taller, en cada navidad popular, en cada programa de radio, el Jano y su comunidad tejieron una red de contención, dignidad y conciencia que arrancó a cientos de niños y niñas de las garras de la delincuencia, del consumismo y del sometimiento del sistema.</p>
-          <p>"El Jano decía que la delincuencia no se combatía con más carabineros, sino con oportunidades —cuenta Carlos, ex monitor de El Arca—. Por eso los talleres no eran un pasatiempo: eran una alternativa real al destino que el sistema tenía preparado para nuestros niños."</p>
-          <p>La música, el arte, la comunicación: cada actividad era una semilla plantada en tierra fértil. De aquellos niños, algunos hoy son dirigentes sociales, comunicadores, educadores populares. La siembra dio frutos. Porque la transformación real no se juega en las urnas ni en los titulares: se juega en la cancha, en la sede vecinal, en la mirada de un niño que descubre que puede ser alguien. Esa es la apuesta de El Arca, y sigue siendo la apuesta de los pueblos que se niegan a doblegarse.</p>
-          <p><strong class="text-white">MEDIOS DE EMANCIPACIÓN, INFANCIAS DE LIBERACIÓN:</strong> Disputar las infancias al capitalismo no es una tarea local, es el deber histórico de los pueblos del mundo. Que la memoria viva sea el puente para recuperar el territorio a través del arte, la cultura y la organización comunitaria.</p>
-          <p class="text-mir font-bold mt-6 text-center text-xl">¡A sembrar el mañana, porque el futuro le pertenece a los pueblos libres! 🌍✊</p>
-        </div>
-      </div>
-    </article>
-    <article class="relato">
-      <div class="flex items-center gap-3 mb-4">
-        <span class="text-mir font-title text-4xl">02</span>
-        <div>
-          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Goya en las Calles</h2>
-          <p class="text-white/40 text-sm">Organización, marchas y lucha popular</p>
-        </div>
-      </div>
-      <div class="grid md:grid-cols-2 gap-6 items-start">
-        <div class="space-y-4 text-white/70 leading-relaxed">
-          <p>El Arca no era solo un espacio físico: era un movimiento. Cuando la comunidad necesitaba organizarse, la sede se convertía en asamblea. Cuando había que salir a la calle, el Jano estaba al frente, con su cámara al hombro y su megáfono en la mano.</p>
-          <p>"La marcha comunitaria no se improvisaba: se construía en las reuniones, en los talleres, en la radio —dice Marta, dirigenta vecinal—. El Jano nos enseñó que la queja sin organización es ruido, pero la organización sin calle es letra muerta."</p>
-          <p>La lucha por Av. Violeta Parra, el Carnaval del 30, las tomas culturales: cada acción era una lección de pedagogía popular. Herencia del Jano. El pueblo aprendía haciendo, organizándose, enfrentándose al sistema con la frente en alto.</p>
-        </div>
-        <div class="card-mir"><img src="images/FB_IMG_1782701766075.jpg" alt="Marcha comunitaria en La Goya" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La comunidad organizada en las calles de La Pintana.</p></div>
-      </div>
-    </article>
-    <article class="relato">
-      <div class="flex items-center gap-3 mb-4">
-        <span class="text-mir font-title text-4xl">03</span>
-        <div>
-          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">El Legado que Camina</h2>
-          <p class="text-white/40 text-sm">Radio, Preuniversitario, Carnaval y lucha vigente</p>
-        </div>
-      </div>
-      <div class="grid md:grid-cols-2 gap-6 items-start">
-        <div class="card-mir md:order-2"><img src="images/radio_libre.jpg" alt="Radio Libre" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La Radio Libre 90.1 / 100.5 FM: el sueño hecho frecuencia.</p></div>
-        <div class="space-y-4 text-white/70 leading-relaxed md:order-1">
-          <p>El Arca no se cerró. El Arca se multiplicó. La Radio Libre 90.1 / 100.5 FM salió al aire, con programas como "El Sartén por el Mango", "La Gozadera" y espacios informativos que mantenían viva la comunicación popular.</p>
-          <p>El Preuniversitario Popular "Pedro Alejandro González" abrió las puertas de la educación superior a los jóvenes de La Pintana. La nivelación de estudios recuperó a quienes el sistema expulsó. El Carnaval del 30 llenó de colores y comparsas el Paradero 30 de Santa Rosa.</p>
-          <p>"El Jano nos enseñó que la lucha no termina con la muerte de un compañero —dice un monitor de El Arca—. La lucha termina cuando el pueblo deja de soñar. Y nosotros seguimos soñando."</p>
-          <p class="text-mir font-bold mt-4">El legado vive. La memoria resiste. El Arca es el pueblo.</p>
-        </div>
-      </div>
-    </article>
-    <article class="relato">
-      <div class="flex items-center gap-3 mb-4">
-        <span class="text-mir font-title text-4xl">04</span>
-        <div>
-          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">Medios de Emancipación</h2>
-          <p class="text-white/40 text-sm">Radio, comunicación popular y la voz del territorio</p>
-        </div>
-      </div>
-      <div class="grid md:grid-cols-2 gap-6 items-start">
-        <div class="space-y-4 text-white/70 leading-relaxed">
-          <p>La Radio Libre 90.1 / 100.5 FM no fue solo un proyecto de comunicación: fue un <strong class="text-white">acto de soberanía popular</strong>. En un territorio donde las grandes cadenas dictan lo que se debe pensar, El Arca tomó la palabra y le dio micrófono a la comunidad. Programas como "El Sartén por el Mango" y "La Gozadera" no entretenían: concientizaban.</p>
-          <p>La comunicación popular era, para el Jano y los compañeros, una <strong class="text-white">herramienta de emancipación</strong> tan poderosa como los talleres o las navidades. Porque quien controla el relato, controla la realidad. Y la comunidad de La Goya se negó a que otros contaran su historia por ellos.</p>
-          <p>Hoy, este archivo digital es la continuación de esa lucha: <strong class="text-white">la memoria como medio de emancipación</strong>. Cada fotografía, cada relato, cada programa de radio rescatado es un fusil cargado de pasado y futuro. Porque mientras el pueblo recuerde, el poder no podrá reescribir la historia.</p>
-        </div>
-        <div class="card-mir"><img src="images/antupeni.jpg" alt="Antupení" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La comunicación popular construye identidad y libera conciencias.</p></div>
-      </div>
-    </article>
-  </div>
-</section>`,
+    /* ─── Config: qué secciones usan índice y cuáles son planas ─── */
+    var SECCIONES_RELATOS = {
+      'Relatos: El Jano': { tipo: 'indice', titulo: 'Relatos: El Jano' },
+      'Relatos: El Arca': { tipo: 'indice', titulo: 'Relatos: El Arca' },
+      'Relatos: Otras organizaciones': { tipo: 'indice', titulo: 'Relatos: Otras organizaciones' },
+      'Relatos: Anecdotas': { tipo: 'plana', titulo: 'Relatos: Anecdotas' }
+    };
 
-      'Relatos: Otras organizaciones': `
-<section class="py-16 bg-noche">
-  <div class="max-w-5xl mx-auto px-4">
-    <div class="flex flex-wrap gap-2 mb-10 border-b border-mir/20 pb-4 overflow-x-auto" id="tab-menu">
-      <button class="tab-btn active" data-tab="caleta">La Caleta y Antupeñi (1998-2003)</button>
-    </div>
-    <div id="tab-caleta" class="tab-content active">
-      <div class="max-w-4xl mx-auto">
-        <article>
-          <div class="flex items-center gap-3 mb-6">
-            <span class="text-mir font-title text-4xl">01</span>
-            <div>
-              <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Caleta y Antupeñi</h2>
-              <p class="text-white/40 text-sm">1998 — 2003 · Organización territorial en La Pintana</p>
-            </div>
-          </div>
-          <div class="grid md:grid-cols-2 gap-6 items-start">
-            <div class="space-y-4 text-white/70 leading-relaxed">
-              <p class="font-bold text-white uppercase text-sm tracking-wider">Los primeros pasos y la llegada a La Caleta (1998)</p>
-              <p>El compromiso social de Carlos comenzó formalmente a finales de la década de los noventa, cuando apenas tenía 19 años. "Comencé el 98 en La Caleta y supe de la ONG por la Universidad donde estudiaba", recuerda. Su inserción territorial se dio de manera natural gracias a su ubicación, en el sector de Antumapu (paradero 32 de Santa Rosa): "como vivía cerca, me acerqué porque consideré interesante el proyecto".</p>
-              <p>La Corporación La Caleta poseía ya una trayectoria histórica. Según explica, "era una ONG chilena fundada el 85 y en sus orígenes estuvo ligado a educadores y agentes pastorales que trabajaban con niños en extrema vulneralidad durante la dictadura".</p>
-              <p class="font-bold text-white uppercase text-sm tracking-wider">Filosofía de trabajo y el verdadero objetivo preventivo</p>
-              <p>El enfoque institucional era moderno e integral. "La filosofía de La Caleta se basaba en la educación popular, trabajo comunitario y enfoque en los derechos de la niñez", detalla. La metodología priorizaba el trabajo territorial, "fortaleciendo las organizaciones comunitarias en lugar de intervenir solo de forma asistencial", viendo a los menores como "sujetos de derechos" y buscando incidir en las políticas públicas mediante el fomento del "'Buen Vivir', la diversidad cultural y el empoderamiento de los sectores populares".</p>
-              <p>Sin embargo, detrás del trabajo infantil existía una profunda y estratégica misión enfocada en la juventud. "Muchos piensan que nuestro trabajo iba enfocado a los niños, porque recibíamos niños desde 3 años, pero nuestro objetivo base era atacar la entrada de drogas en los jóvenes desde los 13 hasta los 18 y más", revela Carlos.</p>
-              <p>El método de prevención consistía en dotar de sentido y deber a los adolescentes locales, "Dándoles responsabilidades visibles dentro de la comunidad a hacerse cargo de niños que veían a diario, evitando así que ellos tuvieran acceso enlace misma población o sector a las drogas duras". Sumar a los jóvenes se lograba del "boca a boca", ya que "es una edad donde están dispuestos a conocer a otros y buscar una identidad en común".</p>
-              <p class="font-bold text-white uppercase text-sm tracking-wider">El territorio, los espacios y la labor comunitaria</p>
-              <p>El despliegue en la zona sur de Santiago era extenso. "La Caleta actuaba en 5 puntos de la comuna. El Bosque, Santo Tomás, El Castillo, Villa Colombia y (no recuerdo el nombre de la 5ta que estaba ahi mismo donde esta la Muni...)". Para asegurar un point de reunión fijo en su sector, Carlos relata que "El grupo se juntaba en una de las salas de la iglesia que estaba en la Villa El Bosque y se consiguió hablando con el cura". Este acuerdo fue un beneficio mutuo que "Justo coincidió con un Encuentro Latinoamericano de Jovenes y la iglesia requería de nuevos jóvenes en ella".</p>
-              <p>La capacitación de la ONG permitió entregar herramientas culturales y de liderazgo. "La Caleta nos aportó talleres de recreación para niños, batucadas (en esos años era la moda), zancos, pinta caras, circo teatro, talleres de monitores infantiles, pintura de murales", enumera. Estos aprendizajes se llevaban a la práctica mediante el modelo de prevención: "Y nosotros hacíamos talleres y aplicabamos lo aprendido con los niños desde 3 a 12 años con tíos desde los 13 a los 18 o más".</p>
-              <p>La dedicación era constante, abarcando "todos los fines de semana y durante el verano se hacían las colonias de verano donde comentábamos con un cupo de 150 niños y terminábamos con cerca de 300", apoyados por una sólida base humana donde "Los tios o monitores eran cerca de 30 jóvenes del sector".</p>
-              <p class="font-bold text-white uppercase text-sm tracking-wider">El fin del financiamiento y el nacimiento de "Antupeñi" (2000 - 2003)</p>
-              <p>El apoyo institucional no fue permanente. "Esta ONG nos apoyó por cerca de 2 años y luego se retiró por falta de recursos", narra Carlos. Frente a la ausencia de la Corporación original (alrededor del año 2000), los dirigentes barriales tomaron una decisión fundamental basada en el vínculo creado: "El tema es que no podíamos darle la espalda a los jóvenes y niños que habíamos acogido".</p>
-              <p>Fue la propia juventud empoderada la que salvó la iniciativa. "El mismo grupo de tíos a los que iba dirigido el proyecto se hizo cargo de la continuidad del mismo", señala con orgullo, marcando el origen de una nueva etapa puramente autogestionada: "Así nació el grupo Antupeñi 'Niños de la tierra' hasta por el 2003".</p>
-              <p class="font-bold text-white uppercase text-sm tracking-wider">Reflexiones y el impacto en una generación</p>
-              <p>Al mirar hacia atrás y evaluar aquellos años de labor territorial ininterrumpida, Carlos aterriza las expectativas frente a un contexto adverso. "No se pretendia una efectividad total, pero sí hacer una mudanza en el pensamiento social de cada uno de ellos respecto a su entorno".</p>
-              <p>Reconoce abiertamente que "Muchos chicos se perdieron en la droga", pero rescata el legado invaluable y principal logro de la organización: "una gran mayoría consiguieron crear pensamiento crítico y razonamiento social".</p>
-            </div>
-            <div class="card-mir"><img src="images/antupeni.jpg" alt="Antupeñi" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">"La semilla de la organización territorial germina en la memoria del pueblo."</p></div>
-          </div>
-        </article>
-      </div>
-    </div>
-  </div>
-</section>`
+    /* ─── Estado global de navegación ─── */
+    var estadoRelatos = {
+      seccion: null,
+      items: [],     // todos los relatos (hardcodeados + DB) para la sección actual
+      modo: 'index'  // 'index' | 'individual'
     };
 
     /* ─── Funciones globales SPA ─── */
+    /* ─── Cargar sección (índice o plana según configuración) ─── */
     function renderizarPorSeccion(nombreSeccion) {
       var nav = document.getElementById('navegacion-subsecciones');
       var section = document.getElementById('contenedor-indices-section');
@@ -361,19 +235,24 @@
       if (section) section.style.display = '';
       contenedor.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#666;">Cargando relatos...</div>';
 
-      // Render hardcoded content if available
-      var html = '';
-      var hard = CONTENIDO_HARDCODEADO[nombreSeccion];
-      if (hard) {
-        html += '<div class="hardcodeado-wrapper">' + hard + '</div>';
-      } else {
-        html = '';
-      }
+      var cfg = SECCIONES_RELATOS[nombreSeccion];
+      if (!cfg) { contenedor.innerHTML = '<p style="color:var(--color-mir);text-align:center;">Sección no encontrada.</p>'; return; }
 
-      // Also fetch from Supabase (user-submitted relatos)
+      // Recolectar hardcodeados
+      var items = [];
+      var hard = RELATOS_HARDCODEADOS[nombreSeccion] || [];
+      hard.forEach(function(a) {
+        items.push({ id: a.id, titulo: a.titulo, subtitulo: a.subtitulo, html: a.html, fuente: 'hardcodeado' });
+      });
+
+      // Fetch de Supabase
       var supabaseClient = window.miSupabase;
       if (!supabaseClient) {
-        if (!hard) { contenedor.innerHTML = '<p style="color:var(--color-mir);text-align:center;">Error de conexión.</p>'; }
+        if (items.length === 0) { contenedor.innerHTML = '<p style="color:var(--color-mir);text-align:center;">Error de conexión.</p>'; return; }
+        estadoRelatos.seccion = nombreSeccion;
+        estadoRelatos.items = items;
+        if (cfg.tipo === 'indice') { mostrarIndice(); procesarDeepLink(); }
+        else { mostrarPlana(); procesarDeepLink(); }
         return;
       }
 
@@ -386,53 +265,65 @@
         .neq('titulo_relato', '')
         .order('created_at', { ascending: false })
         .then(function(resp) {
-          if (resp.error) {
-            if (!hard) { contenedor.innerHTML = '<p style="color:var(--color-mir);text-align:center;">Error al cargar relatos.</p>'; }
-            return;
+          if (!resp.error) {
+            (resp.data || []).forEach(function(r) {
+              var cuerpo = sanitizarHTML(r.mensaje_largo || r.mensaje || '');
+              var serie = r.nombre_serie || '';
+              items.push({
+                id: 'db-' + r.id,
+                titulo: r.titulo_relato || 'Sin título',
+                subtitulo: (r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) : '') + (serie ? ' · Serie: ' + serie : '') + ' · por ' + (r.nombre || 'Anónimo'),
+                html: '<div class="relato-detalle" id="relato-' + r.id + '"><h2>' + escaparHTML(r.titulo_relato || 'Sin título') + '</h2><div class="meta">' + (r.created_at ? '<span>' + new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) + '</span>' : '') + '<span>por ' + escaparHTML(r.nombre || 'Anónimo') + '</span>' + (serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escaparHTML(serie) + '</span>' : '') + '</div><div class="contenido">' + cuerpo + '</div></div>',
+                fuente: 'supabase'
+              });
+            });
           }
-          var data = resp.data || [];
-          if (hard && data.length === 0) {
-            // Only hardcoded content, no DB relatos
-            contenedor.innerHTML = html;
-            finalizarRender(nombreSeccion);
-            return;
-          }
-          if (!hard && data.length === 0) {
+          estadoRelatos.seccion = nombreSeccion;
+          estadoRelatos.items = items;
+          if (items.length === 0) {
             contenedor.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="font-size:48px;opacity:0.3;margin-bottom:12px;">📖</div><p style="color:#666;">No hay relatos en esta sección aún.</p></div>';
             return;
           }
-          if (data.length > 0) {
-            html += '<div style="margin-top:2rem;"><h3 class="text-mir font-title text-xl uppercase mb-4" style="text-align:center;">Relatos de la comunidad</h3>';
-            data.forEach(function(r) {
-              var titulo = r.titulo_relato || 'Sin título';
-              var cuerpo = sanitizarHTML(r.mensaje_largo || r.mensaje || '');
-              var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) : '';
-              var serie = r.nombre_serie || '';
-              html +=
-                '<div class="relato-detalle" id="relato-' + r.id + '">' +
-                  '<h2>' + escaparHTML(titulo) + '</h2>' +
-                  '<div class="meta">' +
-                    (fecha ? '<span>' + fecha + '</span>' : '') +
-                    '<span>por ' + escaparHTML(r.nombre || 'Anónimo') + '</span>' +
-                    (serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escaparHTML(serie) + '</span>' : '') +
-                  '</div>' +
-                  '<div class="contenido">' + cuerpo + '</div>' +
-                '</div>';
-            });
-            html += '</div>';
-          }
-          contenedor.innerHTML = html;
-          finalizarRender(nombreSeccion);
+          if (cfg.tipo === 'indice') { mostrarIndice(); procesarDeepLink(); }
+          else { mostrarPlana(); procesarDeepLink(); }
         })
         .catch(function(err) {
           console.error('[Relatos] Error:', err);
-          if (!hard) { contenedor.innerHTML = '<p style="color:var(--color-mir);text-align:center;">Error al cargar relatos.</p>'; }
+          if (items.length > 0) {
+            estadoRelatos.seccion = nombreSeccion;
+            estadoRelatos.items = items;
+            if (cfg.tipo === 'indice') mostrarIndice();
+            else mostrarPlana();
+          } else {
+            contenedor.innerHTML = '<p style="color:var(--color-mir);text-align:center;">Error al cargar relatos.</p>';
+          }
         });
     }
 
-    function finalizarRender(nombreSeccion) {
-      // Re-init tabs for "Otras organizaciones"
-      if (nombreSeccion === 'Relatos: Otras organizaciones') {
+    /* ─── Mostrar índice (lista de títulos) ─── */
+    function mostrarIndice() {
+      var contenedor = document.getElementById('contenedor-indices');
+      if (!contenedor) return;
+      estadoRelatos.modo = 'index';
+      var html = '<div class="indice-relatos"><h3 class="heading-mir text-2xl md:text-3xl mb-6" style="text-align:center;">Índice de relatos</h3>';
+      estadoRelatos.items.forEach(function(item, i) {
+        html += '<div class="indice-item" onclick="mostrarRelatoIndividual(' + i + ')"><h3>' + escaparHTML(item.titulo) + '</h3><p>' + escaparHTML(item.subtitulo) + '</p></div>';
+      });
+      html += '</div>';
+      contenedor.innerHTML = html;
+    }
+
+    /* ─── Mostrar un relato individual ─── */
+    function mostrarRelatoIndividual(indice) {
+      var contenedor = document.getElementById('contenedor-indices');
+      if (!contenedor) return;
+      var item = estadoRelatos.items[indice];
+      if (!item) return;
+      estadoRelatos.modo = 'individual';
+      var html = '<div class="relato-individual"><button class="btn-volver-indice" onclick="mostrarIndice()">← Volver al índice</button>' + item.html + '</div>';
+      contenedor.innerHTML = html;
+      // Re-init tabs if this is Otras organizaciones
+      if (estadoRelatos.seccion === 'Relatos: Otras organizaciones') {
         var btns = document.querySelectorAll('#contenedor-indices .tab-btn');
         btns.forEach(function(btn) {
           btn.addEventListener('click', function() {
@@ -445,10 +336,37 @@
           });
         });
       }
-      // Scroll al relato destacado si viene de la vitrina
+    }
+
+    /* ─── Mostrar sección plana (todo apilado, sin índice) ─── */
+    function mostrarPlana() {
+      var contenedor = document.getElementById('contenedor-indices');
+      if (!contenedor) return;
+      estadoRelatos.modo = 'plana';
+      var html = '';
+      estadoRelatos.items.forEach(function(item) {
+        html += item.html;
+      });
+      contenedor.innerHTML = html;
+    }
+
+    /* ─── Deep-link: auto-abrir relato destacado desde vitrina ─── */
+    function procesarDeepLink() {
       var urlParams = new URLSearchParams(window.location.search);
       var highlightId = urlParams.get('id');
-      if (highlightId) {
+      if (!highlightId) return;
+      var idx = -1;
+      estadoRelatos.items.forEach(function(item, i) {
+        if (item.id === 'db-' + highlightId || item.id === highlightId) idx = i;
+      });
+      if (idx === -1) return;
+      if (estadoRelatos.modo === 'index') {
+        mostrarRelatoIndividual(idx);
+        setTimeout(function() {
+          var el = document.querySelector('#contenedor-indices .relato-individual');
+          if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        }, 300);
+      } else if (estadoRelatos.modo === 'plana') {
         setTimeout(function() {
           var el = document.getElementById('relato-' + highlightId);
           if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
