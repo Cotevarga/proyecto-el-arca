@@ -550,7 +550,7 @@
         });
       }
 
-      formArchivo.addEventListener('submit', function (e) {
+      formArchivo.addEventListener('submit', async function (e) {
         e.preventDefault();
         var btn = document.getElementById('btn-enviar');
         messages.classList.add('hidden');
@@ -560,42 +560,83 @@
         var mensaje = document.getElementById('mensaje').value.trim();
         var file = fileInput && fileInput.files ? fileInput.files[0] : null;
 
-        var autorizacion = document.getElementById('autorizacion');
         if (!nombre) { mostrarFeedback(messages, 'Escribe tu nombre o pseud\u00f3nimo.', 'error'); return; }
+        if (!file && !mensaje) { mostrarFeedback(messages, 'Agrega un archivo o escribe un mensaje.', 'error'); return; }
+
+        var autorizacion = document.getElementById('autorizacion');
         if (!autorizacion || !autorizacion.checked) { mostrarFeedback(messages, 'Debes autorizar el resguardo y publicaci\u00f3n de tu aporte.', 'error'); return; }
+
+        var supabaseClient = window.miSupabase;
+        if (!supabaseClient) { mostrarFeedback(messages, 'Error de conexi\u00f3n. Recarga la p\u00e1gina.', 'error'); return; }
 
         btn.textContent = 'Enviando\u2026'; btn.disabled = true;
 
-        var fd = new FormData();
-        fd.append('nombre', nombre);
-        if (anio) fd.append('anio', anio);
-        if (mensaje) fd.append('mensaje', mensaje);
-        if (file) fd.append('archivo', file);
+        try {
+          var meta = {};
+          var geo = document.getElementById('geolocalizacion');
+          if (geo && geo.value.trim()) meta.geolocalizacion = geo.value.trim();
+          var fechaArch = document.getElementById('fecha-creacion-archivo');
+          if (fechaArch && fechaArch.value) meta.fecha_creacion_archivo = fechaArch.value;
+          var tagsEl = document.getElementById('tags');
+          if (tagsEl && tagsEl.value.trim()) {
+            meta.tags = tagsEl.value.trim().split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t.length > 0; });
+          }
 
-        // Metadatos opcionales
-        var geo = document.getElementById('geolocalizacion');
-        if (geo && geo.value.trim()) fd.append('geolocalizacion', geo.value.trim());
-        var fechaArch = document.getElementById('fecha-creacion-archivo');
-        if (fechaArch && fechaArch.value) fd.append('fecha_creacion_archivo', fechaArch.value);
-        var tags = document.getElementById('tags');
-        if (tags && tags.value.trim()) fd.append('tags', tags.value.trim());
+          if (file && file.size > 0) {
+            var fileName = Date.now() + '_' + file.name;
+            var { error: uploadError } = await supabaseClient.storage
+              .from('elarca-uploads')
+              .upload('recuerdos/' + fileName, file);
+            if (uploadError) throw uploadError;
 
-        var uploadUrl = window.fnUrl ? window.fnUrl('upload') : (API_BASE + '/api/v1/subir');
-        fetch(uploadUrl, { method: 'POST', body: fd })
-          .then(function (r) {
-            if (!r.ok) return r.json().then(function (d) { throw new Error(d.error || 'Error del servidor'); });
-            return r.json();
-          })
-          .then(function () {
-            mostrarFeedback(messages, '\u00a1Gracias por compartir tu recuerdo!', 'success');
-            formArchivo.reset();
-            if (fileInfo) fileInfo.classList.add('hidden');
-          })
-          .catch(function (err) {
-            console.error('[FormPublico] Error:', err);
-            mostrarFeedback(messages, 'Error al subir: ' + (err.message || 'Intenta de nuevo o escribe a contacto@elarca.cl'), 'error');
-          })
-          .finally(function () { btn.textContent = 'Subir y compartir recuerdo'; btn.disabled = false; });
+            var { data: { publicUrl } } = supabaseClient.storage
+              .from('elarca-uploads')
+              .getPublicUrl('recuerdos/' + fileName);
+
+            var { error: dbError } = await supabaseClient
+              .from('recuerdos')
+              .insert({
+                nombre: nombre,
+                anio: anio || null,
+                url_archivo: publicUrl,
+                storage_path: 'recuerdos/' + fileName,
+                tipo_archivo: file.type,
+                nombre_original: file.name,
+                tamanio_bytes: file.size,
+                mensaje_largo: mensaje || null,
+                aprobado: false,
+                consentimiento: true,
+                geolocalizacion: meta.geolocalizacion || null,
+                tags: meta.tags || null,
+                fecha_creacion_archivo: meta.fecha_creacion_archivo || null
+              });
+            if (dbError) throw dbError;
+          } else {
+            var { error: dbError } = await supabaseClient
+              .from('recuerdos')
+              .insert({
+                nombre: nombre,
+                anio: anio || null,
+                mensaje_largo: mensaje || null,
+                aprobado: false,
+                consentimiento: true,
+                geolocalizacion: meta.geolocalizacion || null,
+                tags: meta.tags || null,
+                fecha_creacion_archivo: meta.fecha_creacion_archivo || null
+              });
+            if (dbError) throw dbError;
+          }
+
+          mostrarFeedback(messages, '\u00a1Gracias por compartir tu recuerdo!', 'success');
+          formArchivo.reset();
+          if (fileInfo) fileInfo.classList.add('hidden');
+        } catch (err) {
+          console.error('[FormPublico] Error:', err);
+          mostrarFeedback(messages, 'Error al subir: ' + (err.message || 'Intenta de nuevo o escribe a contacto@elarca.cl'), 'error');
+        } finally {
+          btn.textContent = 'Subir y compartir recuerdo';
+          btn.disabled = false;
+        }
       });
     })();
     </script>
