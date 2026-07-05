@@ -749,11 +749,11 @@
                 <div class="form-group">
                   <label>Sección / Subsección</label>
                   <select id="admin-upload-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" aria-label="Seleccionar sección del archivo">
-                    <option value="galeria">Galería</option>
-                    <option value="videos">Videos y Audios</option>
-                    <option value="relatos_jano">Relatos: El Jano</option>
-                    <option value="relatos_arca">Relatos: El Arca</option>
-                    <option value="relatos_organizaciones">Relatos: Otras organizaciones</option>
+                    <option value="Galeria">Galería</option>
+                    <option value="Videos y Audios">Videos y Audios</option>
+                    <option value="Relatos: El Jano">Relatos: El Jano</option>
+                    <option value="Relatos: El Arca">Relatos: El Arca</option>
+                    <option value="Relatos: Otras organizaciones">Relatos: Otras organizaciones</option>
                   </select>
                 </div>
 
@@ -812,11 +812,11 @@
       <div class="form-group">
         <label>Sección / Categoría</label>
         <select id="approval-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" aria-label="Seleccionar sección del archivo">
-          <option value="galeria">Galería</option>
-          <option value="videos">Videos y Audios</option>
-          <option value="relatos_jano">Relatos: El Jano</option>
-          <option value="relatos_arca">Relatos: El Arca</option>
-          <option value="relatos_organizaciones">Relatos: Otras organizaciones</option>
+          <option value="Galeria">Galería</option>
+          <option value="Videos y Audios">Videos y Audios</option>
+          <option value="Relatos: El Jano">Relatos: El Jano</option>
+          <option value="Relatos: El Arca">Relatos: El Arca</option>
+          <option value="Relatos: Otras organizaciones">Relatos: Otras organizaciones</option>
         </select>
       </div>
       <div class="form-group">
@@ -1055,7 +1055,10 @@
 
       var bucket = 'elarca-uploads';
 
+      if (!validarSeccion(seccion)) throw new Error('Sección inválida');
+
       // ─── 1. Insertar registro primero para obtener ID ───
+      var now = new Date().toISOString();
       var insertData = {
         nombre: extraData.nombre || 'Admin',
         mensaje: extraData.descripcion || null,
@@ -1066,6 +1069,7 @@
         aprobado: true,
         destacado: extraData.destacado === true,
         es_efimero: extraData.es_efimero === true,
+        fecha_subida: now,
         geolocalizacion: extraData.geolocalizacion || null,
         tags: extraData.tags || null,
         fecha_creacion_archivo: extraData.fecha_creacion_archivo || null
@@ -1269,11 +1273,11 @@
     // ═══════════════════════════════════════════════
 
     var NOMBRES_SECCION = {
-      'galeria': 'Galería',
-      'videos': 'Videos y Audios',
-      'relatos_jano': 'Relatos: El Jano',
-      'relatos_arca': 'Relatos: El Arca',
-      'relatos_organizaciones': 'Relatos: Otras organizaciones',
+      'Galeria': 'Galería',
+      'Videos y Audios': 'Videos y Audios',
+      'Relatos: El Jano': 'Relatos: El Jano',
+      'Relatos: El Arca': 'Relatos: El Arca',
+      'Relatos: Otras organizaciones': 'Relatos: Otras organizaciones',
       'musica': 'Música'
     };
 
@@ -1556,7 +1560,7 @@
 
     function toggleApprovalRelatoFields() {
       var val = approvalSeccion ? approvalSeccion.value : '';
-      if (val === 'relatos_jano' || val === 'relatos_arca' || val === 'relatos_organizaciones') {
+      if (val === 'Relatos: El Jano' || val === 'Relatos: El Arca' || val === 'Relatos: Otras organizaciones') {
         approvalRelatoFields.style.display = 'block';
         approvalStdFields.style.display = 'none';
       } else {
@@ -1578,8 +1582,8 @@
         }
       }
       if (approvalSeccion) {
-        var seccionActual = (record && record.seccion) || 'galeria';
-        var validSections = ['galeria','videos','relatos_jano','relatos_arca','relatos_organizaciones'];
+        var seccionActual = (record && record.seccion) || 'Galeria';
+        var validSections = ['Galeria','Videos y Audios','Relatos: El Jano','Relatos: El Arca','Relatos: Otras organizaciones'];
         if (validSections.indexOf(seccionActual) !== -1) {
           approvalSeccion.value = seccionActual;
         }
@@ -1612,11 +1616,12 @@
         var id = _approvalTargetId;
         if (!id) { closeApprovalModal(); return; }
 
-        var seccion = approvalSeccion ? approvalSeccion.value : 'galeria';
+        var seccion = approvalSeccion ? approvalSeccion.value : 'Galeria';
+        if (!validarSeccion(seccion)) return;
         var textoLargo = '';
         var tituloRelato = '';
         var nombreSerie = '';
-        if (seccion === 'relatos_jano' || seccion === 'relatos_arca' || seccion === 'relatos_organizaciones') {
+        if (seccion === 'Relatos: El Jano' || seccion === 'Relatos: El Arca' || seccion === 'Relatos: Otras organizaciones') {
           textoLargo = approvalTextoLargo ? approvalTextoLargo.value.trim() : '';
           tituloRelato = approvalTitulo ? approvalTitulo.value.trim() : '';
           nombreSerie = approvalSerie ? approvalSerie.value.trim() : '';
@@ -1945,32 +1950,45 @@
     // FORMULARIO DINÁMICO — Subida Manual
     // ═══════════════════════════════════════════════
 
+    var SECCIONES_VALIDAS = [
+      'Galeria', 'Videos y Audios',
+      'Relatos: El Jano', 'Relatos: El Arca', 'Relatos: Otras organizaciones'
+    ];
+
+    function validarSeccion(seccion) {
+      if (!seccion || SECCIONES_VALIDAS.indexOf(seccion) === -1) {
+        alert('Error: Categoría no válida. Selecciona una sección correcta.');
+        return false;
+      }
+      return true;
+    }
+
     var SECCIONES_CONFIG = {
-      galeria: {
+      'Galeria': {
         label: 'Galería',
         fields: ['imagen'],
         requireFile: true,
         requireTexto: false
       },
-      videos: {
+      'Videos y Audios': {
         label: 'Videos y Audios',
         fields: ['multimedia'],
         requireFile: true,
         requireTexto: false
       },
-      relatos_jano: {
+      'Relatos: El Jano': {
         label: 'Relatos: El Jano',
         fields: ['archivo_opcional', 'texto_largo'],
         requireFile: false,
         requireTexto: true
       },
-      relatos_arca: {
+      'Relatos: El Arca': {
         label: 'Relatos: El Arca',
         fields: ['archivo_opcional', 'texto_largo'],
         requireFile: false,
         requireTexto: true
       },
-      relatos_organizaciones: {
+      'Relatos: Otras organizaciones': {
         label: 'Relatos: Otras organizaciones',
         fields: ['archivo_opcional', 'texto_largo'],
         requireFile: false,
@@ -1988,10 +2006,10 @@
       var html = '';
 
       // ─── Archivo (obligatorio para galeria/videos, opcional para relatos) ───
-      var isRelato = val.indexOf('relatos_') === 0;
+      var isRelato = val.indexOf('Relatos:') === 0;
       var fileRequired = cfg.requireFile;
-      var acceptAttr = val === 'galeria' ? '.jpg,.jpeg,.png,.webp' : '.jpg,.jpeg,.png,.webp,.mp4,.mp3,.wav';
-      var hintText = val === 'galeria' ? 'JPG, PNG, WebP · Máximo 50 MB' : (val === 'videos' ? 'MP4, MP3, WAV, JPG, PNG · Máximo 50 MB' : 'JPG, PNG, MP4, MP3, WAV · Opcional · Máximo 50 MB');
+      var acceptAttr = val === 'Galeria' ? '.jpg,.jpeg,.png,.webp' : '.jpg,.jpeg,.png,.webp,.mp4,.mp3,.wav';
+      var hintText = val === 'Galeria' ? 'JPG, PNG, WebP · Máximo 50 MB' : (val === 'Videos y Audios' ? 'MP4, MP3, WAV, JPG, PNG · Máximo 50 MB' : 'JPG, PNG, MP4, MP3, WAV · Opcional · Máximo 50 MB');
 
       html += '<div class="form-group">' +
         '<label>Archivo' + (fileRequired ? ' <span style="color:var(--color-mir);">*</span>' : ' (opcional)') + '</label>' +
@@ -2106,7 +2124,7 @@
 
       var seccion = adminUploadSeccion.value;
       var cfg = SECCIONES_CONFIG[seccion];
-      var isRelato = seccion.indexOf('relatos_') === 0;
+      var isRelato = seccion.indexOf('Relatos:') === 0;
 
       var titulo = document.getElementById('admin-upload-titulo').value.trim();
       var descripcion = isRelato ? '' : (document.getElementById('admin-upload-descripcion') ? document.getElementById('admin-upload-descripcion').value.trim() : '');
@@ -2157,9 +2175,11 @@
       }
 
       procesarSubida(btn, async function() {
+        if (!validarSeccion(seccion)) throw new Error('Sección inválida');
         if (file && file.size > 0) {
           await subirArchivo(file, seccion, extraData);
         } else {
+          var now = new Date().toISOString();
           var insertData = {
             nombre: 'Admin',
             titulo_relato: titulo || null,
@@ -2170,6 +2190,7 @@
             aprobado: true,
             destacado: destacado,
             es_efimero: destacado,
+            fecha_subida: now,
             geolocalizacion: extraData.geolocalizacion || null,
             tags: extraData.tags || null,
             fecha_creacion_archivo: extraData.fecha_creacion_archivo || null

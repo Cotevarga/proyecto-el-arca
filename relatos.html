@@ -210,7 +210,7 @@
             .from('recuerdos')
             .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, seccion, nombre_serie')
             .eq('aprobado', true)
-            .in('seccion', ['relatos_jano', 'relatos_arca', 'relatos_organizaciones'])
+            .in('seccion', ['Relatos: El Jano', 'Relatos: El Arca', 'Relatos: Otras organizaciones'])
             .not('titulo_relato', 'is', null)
             .neq('titulo_relato', '')
             .order('nombre_serie', { ascending: true, nullsFirst: false })
@@ -251,7 +251,7 @@
             return a.nombre.localeCompare(b.nombre, 'es');
           });
 
-          var seccionLabels = { relatos_jano: 'El Jano', relatos_arca: 'El Arca', relatos_organizaciones: 'Otras Org.' };
+          var seccionLabels = { 'Relatos: El Jano': 'El Jano', 'Relatos: El Arca': 'El Arca', 'Relatos: Otras organizaciones': 'Otras Org.' };
 
           // ─── Build layout ───
           var html =
