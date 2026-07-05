@@ -27,240 +27,248 @@
     .bg-noche { background-color: var(--color-noche) !important; }
     .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
 
-    /* ─── Gallery Viewer ─── */
-    .gv-layout {
+    /* ─── Galería moderna ─── */
+    .gal-wrap {
       display: flex;
-      gap: 16px;
+      gap: 20px;
       align-items: flex-start;
     }
-    .gv-thumb-rail {
-      width: 110px;
+    .gal-thumbs {
+      width: 100px;
       flex-shrink: 0;
-      max-height: 70vh;
+      max-height: 68vh;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       padding-right: 6px;
       scrollbar-width: thin;
-      scrollbar-color: rgba(229,9,20,0.25) transparent;
+      scrollbar-color: rgba(229,9,20,0.2) transparent;
     }
-    .gv-thumb-rail::-webkit-scrollbar { width: 4px; }
-    .gv-thumb-rail::-webkit-scrollbar-thumb { background: rgba(229,9,20,0.25); border-radius: 2px; }
-    .gv-thumb {
+    .gal-thumbs::-webkit-scrollbar { width: 4px; }
+    .gal-thumbs::-webkit-scrollbar-thumb { background: rgba(229,9,20,0.2); border-radius: 3px; }
+    .gal-thumb {
       width: 100%;
-      aspect-ratio: 4/3;
+      aspect-ratio: 1;
       object-fit: cover;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
-      opacity: 0.45;
-      transition: opacity 0.25s, border-color 0.25s;
+      opacity: 0.4;
+      transition: opacity 0.3s, box-shadow 0.3s, transform 0.2s;
       border: 2px solid transparent;
+      transform: scale(0.96);
     }
-    .gv-thumb:hover { opacity: 0.8; }
-    .gv-thumb.active { opacity: 1; border-color: var(--color-mir); }
+    .gal-thumb:hover { opacity: 0.8; transform: scale(1); }
+    .gal-thumb.active {
+      opacity: 1;
+      border-color: var(--color-mir);
+      box-shadow: 0 0 12px rgba(229,9,20,0.25);
+      transform: scale(1);
+    }
 
-    .gv-viewer {
+    .gal-viewer {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--color-noche);
-      border: 1px solid rgba(229,9,20,0.12);
-      border-radius: 8px;
+      background: #0a0a0a;
+      border: 1px solid rgba(229,9,20,0.1);
+      border-radius: 10px;
       min-height: 60vh;
       position: relative;
       overflow: hidden;
     }
-    .gv-stage {
+    .gal-stage {
       width: 100%;
-      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 60vh;
+      padding: 12px;
     }
-    .gv-image {
+    .gal-img {
       max-width: 100%;
-      max-height: 70vh;
+      max-height: 68vh;
       object-fit: contain;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.35s ease;
       cursor: zoom-in;
       user-select: none;
       -webkit-user-drag: none;
+      border-radius: 4px;
     }
-    .gv-empty {
-      color: rgba(255,255,255,0.2);
+    .gal-empty {
+      color: rgba(255,255,255,0.15);
       font-size: 14px;
-      text-align: center;
       padding: 40px;
+      text-align: center;
     }
-    .gv-loader {
+    .gal-loader {
       position: absolute;
       top: 50%; left: 50%;
-      width: 36px; height: 36px;
-      margin: -18px 0 0 -18px;
+      width: 32px; height: 32px;
+      margin: -16px 0 0 -16px;
       border: 3px solid rgba(255,255,255,0.04);
       border-top-color: var(--color-mir);
       border-radius: 50%;
-      animation: gv-spin 0.7s linear infinite;
+      animation: gal-spin 0.7s linear infinite;
       z-index: 2;
     }
-    @keyframes gv-spin { to { transform: rotate(360deg); } }
+    @keyframes gal-spin { to { transform: rotate(360deg); } }
 
-    .gv-nav {
+    .gal-btn {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
       z-index: 5;
-      background: rgba(0,0,0,0.5);
-      color: rgba(255,255,255,0.5);
+      background: rgba(0,0,0,0.55);
+      color: rgba(255,255,255,0.45);
       border: none;
-      font-size: 30px;
-      padding: 18px 10px;
+      font-size: 26px;
+      padding: 16px 10px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.25s;
       line-height: 1;
-      border-radius: 4px;
+      border-radius: 6px;
       opacity: 0;
       pointer-events: none;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
-    .gv-viewer:hover .gv-nav { opacity: 1; pointer-events: auto; }
-    .gv-nav:hover { background: rgba(229,9,20,0.4); color: #fff; }
-    .gv-nav-prev { left: 8px; }
-    .gv-nav-next { right: 8px; }
-    .gv-nav.visible { opacity: 1; pointer-events: auto; }
+    .gal-viewer:hover .gal-btn { opacity: 1; pointer-events: auto; }
+    .gal-btn:hover { background: rgba(229,9,20,0.35); color: #fff; }
+    .gal-btn-prev { left: 10px; }
+    .gal-btn-next { right: 10px; }
 
-    .gv-counter {
+    .gal-counter {
       position: absolute;
-      bottom: 12px;
+      bottom: 14px;
       right: 16px;
       font-size: 12px;
-      color: rgba(255,255,255,0.3);
-      font-family: monospace;
-      letter-spacing: 0.05em;
+      color: rgba(255,255,255,0.25);
+      font-family: 'Inter', monospace;
+      letter-spacing: 0.08em;
       z-index: 5;
-      background: rgba(0,0,0,0.5);
-      padding: 4px 10px;
-      border-radius: 12px;
+      background: rgba(0,0,0,0.6);
+      padding: 4px 12px;
+      border-radius: 14px;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
 
     /* ─── Lightbox ─── */
-    .gv-lightbox {
+    .gal-lb {
       position: fixed;
       z-index: 99999;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.96);
+      background: rgba(0,0,0,0.95);
       display: none;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
     }
-    .gv-lightbox.open { display: flex; }
-    .gv-lb-close {
+    .gal-lb.open { display: flex; }
+    .gal-lb-close {
       position: absolute;
-      top: 16px; right: 20px;
-      color: rgba(255,255,255,0.4);
-      font-size: 36px;
+      top: 18px; right: 22px;
+      color: rgba(255,255,255,0.3);
+      font-size: 34px;
       cursor: pointer;
       z-index: 10;
-      transition: color 0.2s;
+      transition: color 0.2s, transform 0.2s;
       line-height: 1;
       background: none;
       border: none;
-      padding: 8px;
+      padding: 6px 10px;
     }
-    .gv-lb-close:hover { color: var(--color-mir); }
-    .gv-lb-prev, .gv-lb-next {
+    .gal-lb-close:hover { color: var(--color-mir); transform: scale(1.1); }
+    .gal-lb-prev, .gal-lb-next {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      color: rgba(255,255,255,0.25);
-      font-size: 40px;
+      color: rgba(255,255,255,0.2);
+      font-size: 38px;
       cursor: pointer;
       z-index: 10;
-      padding: 20px 14px;
-      transition: all 0.2s;
-      background: rgba(0,0,0,0.3);
+      padding: 18px 12px;
+      transition: all 0.25s;
+      background: rgba(0,0,0,0.25);
       border-radius: 8px;
       border: none;
       line-height: 1;
     }
-    .gv-lb-prev:hover, .gv-lb-next:hover { color: #fff; background: rgba(229,9,20,0.25); }
-    .gv-lb-prev { left: 12px; }
-    .gv-lb-next { right: 12px; }
-    .gv-lb-stage {
+    .gal-lb-prev:hover, .gal-lb-next:hover { color: #fff; background: rgba(229,9,20,0.2); }
+    .gal-lb-prev { left: 14px; }
+    .gal-lb-next { right: 14px; }
+    .gal-lb-stage {
       position: relative;
       max-width: 88vw;
-      max-height: 85vh;
+      max-height: 84vh;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .gv-lb-image {
+    .gal-lb-img {
       max-width: 100%;
-      max-height: 85vh;
+      max-height: 84vh;
       object-fit: contain;
       border-radius: 4px;
       transition: opacity 0.25s ease;
       user-select: none;
       -webkit-user-drag: none;
     }
-    .gv-lb-loader {
-      width: 40px; height: 40px;
+    .gal-lb-loader {
+      width: 36px; height: 36px;
       border: 3px solid rgba(255,255,255,0.04);
       border-top-color: var(--color-mir);
       border-radius: 50%;
-      animation: gv-spin 0.7s linear infinite;
+      animation: gal-spin 0.7s linear infinite;
       position: absolute;
       top: 50%; left: 50%;
-      margin: -20px 0 0 -20px;
+      margin: -18px 0 0 -18px;
+    }
+    .gal-lb-counter {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.2);
+      font-size: 13px;
+      font-family: 'Inter', monospace;
+      letter-spacing: 0.1em;
+      background: rgba(0,0,0,0.5);
+      padding: 4px 14px;
+      border-radius: 14px;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
 
     /* ─── Mobile ─── */
     @media (max-width: 768px) {
-      .gv-layout {
-        flex-direction: column-reverse;
-        gap: 10px;
-      }
-      .gv-thumb-rail {
+      .gal-wrap { flex-direction: column-reverse; gap: 8px; }
+      .gal-thumbs {
         width: 100%;
-        max-height: 90px;
+        max-height: 82px;
         flex-direction: row;
         overflow-y: hidden;
         overflow-x: auto;
         padding-right: 0;
         padding-bottom: 4px;
-        gap: 6px;
+        gap: 8px;
         -webkit-overflow-scrolling: touch;
       }
-      .gv-thumb {
-        width: 80px;
-        min-width: 80px;
-        aspect-ratio: 4/3;
+      .gal-thumb {
+        width: 72px;
+        min-width: 72px;
+        aspect-ratio: 1;
         flex-shrink: 0;
       }
-      .gv-viewer {
-        min-height: 45vh;
-      }
-      .gv-stage {
-        min-height: 45vh;
-      }
-      .gv-image {
-        max-height: 55vh;
-      }
-      .gv-nav {
-        padding: 14px 8px;
-        font-size: 24px;
-        opacity: 1;
-        pointer-events: auto;
-      }
-      .gv-lb-prev, .gv-lb-next {
-        font-size: 30px;
-        padding: 16px 10px;
-      }
+      .gal-viewer { min-height: 40vh; }
+      .gal-stage { min-height: 40vh; padding: 8px; }
+      .gal-img { max-height: 50vh; }
+      .gal-btn { opacity: 1; pointer-events: auto; padding: 14px 8px; font-size: 22px; }
+      .gal-lb-prev, .gal-lb-next { font-size: 28px; padding: 14px 10px; }
     }
   </style>
   <script>
@@ -308,6 +316,9 @@
     </div>
   </nav>
 
+  <!-- ============================================================ -->
+  <!-- ===== MAIN (todo lo que viaja con SPA va DENTRO) ===== -->
+  <!-- ============================================================ -->
   <main id="main-content">
     <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
       <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
@@ -318,40 +329,298 @@
       </div>
     </header>
 
-    <!-- ─── Galería Viewer ─── -->
-    <section id="galeria-viewer" class="py-8" style="background-color:#111111">
+    <!-- ─── Visor ─── -->
+    <section id="gal-seccion" class="py-8" style="background-color:#0d0d0d">
       <div class="max-w-6xl mx-auto px-4">
-        <div class="gv-layout">
-          <div class="gv-thumb-rail" id="gv-thumb-list">
+        <div class="gal-wrap">
+          <div class="gal-thumbs" id="gal-thumbs">
             <div style="text-align:center;padding:20px;">
-              <div style="display:inline-block;width:22px;height:22px;border:2px solid rgba(255,255,255,0.04);border-top-color:#E50914;border-radius:50%;animation:gv-spin 0.7s linear infinite;"></div>
+              <div style="display:inline-block;width:22px;height:22px;border:2px solid rgba(255,255,255,0.04);border-top-color:#E50914;border-radius:50%;animation:gal-spin 0.7s linear infinite;"></div>
             </div>
           </div>
-          <div class="gv-viewer">
-            <div class="gv-loader" id="gv-loader" style="display:none;"></div>
-            <div class="gv-stage">
-              <img id="gv-image" class="gv-image" src="" alt="Galería El Arca" style="opacity:0;">
-              <p id="gv-empty" class="gv-empty">Cargando galería...</p>
+          <div class="gal-viewer">
+            <div class="gal-loader" id="gal-loader" style="display:none;"></div>
+            <div class="gal-stage">
+              <img id="gal-img" class="gal-img" src="" alt="Galería El Arca" style="opacity:0;">
+              <p id="gal-empty" class="gal-empty">Cargando galería…</p>
             </div>
-            <button class="gv-nav gv-nav-prev" id="gv-prev" title="Anterior">&#10094;</button>
-            <button class="gv-nav gv-nav-next" id="gv-next" title="Siguiente">&#10095;</button>
-            <div class="gv-counter" id="gv-counter"></div>
+            <button class="gal-btn gal-btn-prev" id="gal-prev" title="Anterior">&#10094;</button>
+            <button class="gal-btn gal-btn-next" id="gal-next" title="Siguiente">&#10095;</button>
+            <span class="gal-counter" id="gal-counter"></span>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ─── Lightbox ─── -->
-    <div id="gv-lightbox" class="gv-lightbox">
-      <button class="gv-lb-close" id="gv-lb-close">&times;</button>
-      <button class="gv-lb-prev" id="gv-lb-prev">&#10094;</button>
-      <button class="gv-lb-next" id="gv-lb-next">&#10095;</button>
-      <div class="gv-lb-stage">
-        <div class="gv-lb-loader" id="gv-lb-loader" style="display:none;"></div>
-        <img class="gv-lb-image" id="gv-lb-image" src="" alt="Galería El Arca">
+    <div id="gal-lb" class="gal-lb">
+      <button class="gal-lb-close" id="gal-lb-close">&times;</button>
+      <button class="gal-lb-prev" id="gal-lb-prev">&#10094;</button>
+      <button class="gal-lb-next" id="gal-lb-next">&#10095;</button>
+      <div class="gal-lb-stage">
+        <div class="gal-lb-loader" id="gal-lb-loader" style="display:none;"></div>
+        <img class="gal-lb-img" id="gal-lb-img" src="" alt="">
       </div>
+      <span class="gal-lb-counter" id="gal-lb-counter"></span>
     </div>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- SCRIPT: menú móvil (también dentro para que funcione en SPA) -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <script>
+    (function () {
+      var btn = document.getElementById('menu-toggle');
+      var menu = document.getElementById('mobile-menu');
+      if (btn && menu) {
+        btn.addEventListener('click', function () { menu.classList.toggle('hidden'); });
+        menu.querySelectorAll('a').forEach(function (a) {
+          a.addEventListener('click', function () { menu.classList.add('hidden'); });
+        });
+      }
+    })();
+    </script>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- SCRIPT: Asegurar Supabase (el CDN ya está en <head> vía supabase.js) -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <script>
+    if (!window.miSupabase && typeof supabase !== 'undefined') {
+      window.miSupabase = supabase.createClient(
+        'https://ukpoprkdgezgxlkjjuve.supabase.co',
+        'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi'
+      );
+    }
+    </script>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- SCRIPT: Motor de Galería (se re-ejecuta en cada SPA) -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <script>
+    (function () {
+      'use strict';
+
+      /* ─── Fallback ─── */
+      var FALLBACK = [
+        { url: '/images/FB_IMG_1782701605358.jpg' },
+        { url: '/images/FB_IMG_1782701655071.jpg' },
+        { url: '/images/FB_IMG_1782701775498.jpg' },
+        { url: '/images/FB_IMG_1782701859802.jpg' },
+        { url: '/images/FB_IMG_1782701766075.jpg' },
+        { url: '/images/FB_IMG_1782701826979.jpg' },
+        { url: '/images/jano_inicio.jpg' },
+        { url: '/images/navidad_popular.jpg' },
+        { url: '/images/companeros_melon.jpg' },
+        { url: '/images/radio_libre.jpg' },
+        { url: '/images/antupeni.jpg' }
+      ];
+
+      /* ─── Estado ─── */
+      var images = [];
+      var idx = 0;
+
+      var $ = function (id) { return document.getElementById(id); };
+
+      /* ─── Arranque ─── */
+      function init() {
+        var thumbs = $('gal-thumbs');
+        var img = $('gal-img');
+        var empty = $('gal-empty');
+        var counter = $('gal-counter');
+        var loader = $('gal-loader');
+        if (!thumbs || !img) return;
+
+        images = []; idx = 0;
+
+        if (loader) loader.style.display = 'block';
+        if (img) { img.src = ''; img.style.opacity = '0'; }
+        if (empty) empty.style.display = '';
+        if (counter) counter.textContent = '';
+
+        var client = window.miSupabase;
+        if (!client) { images = FALLBACK.slice(); render(); return; }
+
+        client
+          .from('galeria')
+          .select('url_imagen, titulo')
+          .eq('activo', true)
+          .order('orden', { ascending: true })
+          .then(function (r) {
+            if (!r.error && r.data && r.data.length > 0) {
+              images = r.data.map(function (d) { return { url: d.url_imagen, titulo: d.titulo || '' }; });
+            } else {
+              images = FALLBACK.slice();
+            }
+            render();
+          })
+          .catch(function () { images = FALLBACK.slice(); render(); });
+      }
+
+      /* ─── Render ─── */
+      function render() {
+        var thumbs = $('gal-thumbs');
+        var img = $('gal-img');
+        var empty = $('gal-empty');
+        var counter = $('gal-counter');
+        var loader = $('gal-loader');
+        if (!thumbs || !img) return;
+
+        if (loader) loader.style.display = 'none';
+
+        if (images.length === 0) {
+          thumbs.innerHTML = '';
+          if (empty) { empty.textContent = 'No hay imágenes disponibles.'; empty.style.display = ''; }
+          if (counter) counter.textContent = '';
+          return;
+        }
+
+        thumbs.innerHTML = images.map(function (im, i) {
+          return '<img src="' + im.url.replace(/"/g, '&quot;') + '" class="gal-thumb' + (i === 0 ? ' active' : '') + '" data-idx="' + i + '" alt="' + (im.titulo || '') + '" loading="lazy">';
+        }).join('');
+
+        show(0);
+      }
+
+      /* ─── Mostrar ─── */
+      function show(n) {
+        var v = $('gal-img');
+        var empty = $('gal-empty');
+        var counter = $('gal-counter');
+        var loader = $('gal-loader');
+        if (!v || !images[n]) return;
+
+        idx = n;
+        if (empty) empty.style.display = 'none';
+        if (loader) loader.style.display = 'block';
+        v.style.opacity = '0';
+
+        var im = new Image();
+        im.onload = function () { done(v, im.src); };
+        im.onerror = function () { done(v, im.src); };
+        im.src = images[n].url;
+
+        function done(vv, src) {
+          vv.src = src;
+          vv.style.opacity = '1';
+          if (loader) loader.style.display = 'none';
+          document.querySelectorAll('.gal-thumb').forEach(function (t, i) { t.classList.toggle('active', i === idx); });
+          if (counter && images.length) counter.textContent = (idx + 1) + ' / ' + images.length;
+        }
+      }
+
+      function prev() { if (images.length) show((idx - 1 + images.length) % images.length); }
+      function next() { if (images.length) show((idx + 1) % images.length); }
+
+      /* ─── Lightbox ─── */
+      function abrirLB() {
+        var lb = $('gal-lb');
+        var lbImg = $('gal-lb-img');
+        var lbLoader = $('gal-lb-loader');
+        var lbCounter = $('gal-lb-counter');
+        if (!lb || !lbImg || !images[idx]) return;
+
+        if (lbLoader) lbLoader.style.display = 'block';
+        lbImg.style.opacity = '0';
+
+        var im = new Image();
+        im.onload = function () { lbDone(lbImg, im.src); };
+        im.onerror = function () { lbDone(lbImg, im.src); };
+        im.src = images[idx].url;
+
+        function lbDone(vv, src) {
+          vv.src = src;
+          vv.style.opacity = '1';
+          if (lbLoader) lbLoader.style.display = 'none';
+          if (lbCounter && images.length) lbCounter.textContent = (idx + 1) + ' / ' + images.length;
+        }
+
+        lb.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function cerrarLB() {
+        var lb = $('gal-lb');
+        if (!lb) return;
+        lb.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      function lbPrev() { prev(); sincLB(); }
+      function lbNext() { next(); sincLB(); }
+
+      function sincLB() {
+        var lbImg = $('gal-lb-img');
+        var lbLoader = $('gal-lb-loader');
+        var lbCounter = $('gal-lb-counter');
+        if (!lbImg || !images[idx]) return;
+        if (lbLoader) lbLoader.style.display = 'block';
+        lbImg.style.opacity = '0';
+        var im = new Image();
+        im.onload = function () { lbImg.src = im.src; lbImg.style.opacity = '1'; if (lbLoader) lbLoader.style.display = 'none'; };
+        im.onerror = function () { lbImg.src = im.src; lbImg.style.opacity = '1'; if (lbLoader) lbLoader.style.display = 'none'; };
+        im.src = images[idx].url;
+        if (lbCounter && images.length) lbCounter.textContent = (idx + 1) + ' / ' + images.length;
+      }
+
+      /* ─── Eventos ─── */
+      function bind() {
+        var thumbs = $('gal-thumbs');
+        var v = $('gal-img');
+        var p = $('gal-prev');
+        var n = $('gal-next');
+        var lb = $('gal-lb');
+        var lbC = $('gal-lb-close');
+        var lbP = $('gal-lb-prev');
+        var lbN = $('gal-lb-next');
+
+        if (thumbs) thumbs.addEventListener('click', function (e) {
+          var t = e.target.closest('.gal-thumb');
+          if (t) { var i = parseInt(t.getAttribute('data-idx'), 10); if (!isNaN(i)) show(i); }
+        });
+        if (v) v.addEventListener('click', function () { if (images.length) abrirLB(); });
+        if (p) p.addEventListener('click', function (e) { e.stopPropagation(); prev(); });
+        if (n) n.addEventListener('click', function (e) { e.stopPropagation(); next(); });
+        if (lbC) lbC.addEventListener('click', cerrarLB);
+        if (lb) lb.addEventListener('click', function (e) { if (e.target === lb) cerrarLB(); });
+        if (lbP) lbP.addEventListener('click', function (e) { e.stopPropagation(); lbPrev(); });
+        if (lbN) lbN.addEventListener('click', function (e) { e.stopPropagation(); lbNext(); });
+
+        /* Touch swipe */
+        var viewer = document.querySelector('.gal-viewer');
+        var tx = 0, ty = 0;
+        if (viewer) {
+          viewer.addEventListener('touchstart', function (e) { tx = e.changedTouches[0].screenX; ty = e.changedTouches[0].screenY; }, { passive: true });
+          viewer.addEventListener('touchend', function (e) {
+            var dx = tx - e.changedTouches[0].screenX;
+            var dy = ty - e.changedTouches[0].screenY;
+            if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) { if (dx > 0) next(); else prev(); }
+          }, { passive: true });
+        }
+
+        /* Keyboard (solo una vez) */
+        if (!window._galKb) {
+          window._galKb = true;
+          document.addEventListener('keydown', function (e) {
+            var lb = $('gal-lb');
+            if (lb && lb.classList.contains('open')) {
+              if (e.key === 'Escape') cerrarLB();
+              else if (e.key === 'ArrowLeft') lbPrev();
+              else if (e.key === 'ArrowRight') lbNext();
+            } else {
+              if (e.key === 'ArrowLeft') prev();
+              else if (e.key === 'ArrowRight') next();
+            }
+          });
+        }
+      }
+
+      /* ─── Init ─── */
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { init(); bind(); });
+      else { init(); bind(); }
+    })();
+    </script>
   </main>
+
+  <!-- ===== FIN main-content ===== -->
 
   <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
     <div class="max-w-5xl mx-auto px-4 text-center">
@@ -366,364 +635,9 @@
     </div>
   </footer>
 
-  <script>
-    var menuToggle = document.getElementById('menu-toggle');
-    if (menuToggle) {
-      menuToggle.addEventListener('click', function () {
-        document.getElementById('mobile-menu').classList.toggle('hidden');
-      });
-    }
-    document.querySelectorAll('#mobile-menu a').forEach(function (l) {
-      l.addEventListener('click', function () { document.getElementById('mobile-menu').classList.add('hidden'); });
-    });
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
-  <script>
-    window.miSupabase = supabase.createClient(
-      'https://ukpoprkdgezgxlkjjuve.supabase.co',
-      'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi'
-    );
-  </script>
-
-  <!-- ─── Galería Engine (auto-contenido, SPA-safe) ─── -->
-  <script>
-  (function () {
-    'use strict';
-
-    /* ─── Fallback ─── */
-    var FALLBACK = [
-      { url: '/images/FB_IMG_1782701605358.jpg' },
-      { url: '/images/FB_IMG_1782701655071.jpg' },
-      { url: '/images/FB_IMG_1782701775498.jpg' },
-      { url: '/images/FB_IMG_1782701859802.jpg' },
-      { url: '/images/FB_IMG_1782701766075.jpg' },
-      { url: '/images/FB_IMG_1782701826979.jpg' },
-      { url: '/images/jano_inicio.jpg' },
-      { url: '/images/navidad_popular.jpg' },
-      { url: '/images/companeros_melon.jpg' },
-      { url: '/images/radio_libre.jpg' },
-      { url: '/images/antupeni.jpg' }
-    ];
-
-    /* ─── Estado local (se reinicia en cada init) ─── */
-    var images = [];
-    var currentIdx = 0;
-
-    /* ─── Referencias DOM (se refrescan cada vez) ─── */
-    var $ = function (id) { return document.getElementById(id); };
-
-    /* ─── Init principal ─── */
-    function init() {
-      var thumbList = $('gv-thumb-list');
-      var viewerImg = $('gv-image');
-      var viewerEmpty = $('gv-empty');
-      var counter = $('gv-counter');
-      var loader = $('gv-loader');
-      if (!thumbList || !viewerImg) return;
-
-      images = [];
-      currentIdx = 0;
-
-      if (loader) loader.style.display = 'block';
-      if (viewerImg) { viewerImg.src = ''; viewerImg.style.opacity = '0'; }
-      if (viewerEmpty) viewerEmpty.style.display = '';
-      if (counter) counter.textContent = '';
-
-      var client = window.miSupabase;
-      if (!client) {
-        images = FALLBACK.slice();
-        render();
-        return;
-      }
-
-      client
-        .from('galeria')
-        .select('url_imagen, titulo')
-        .eq('activo', true)
-        .order('orden', { ascending: true })
-        .then(function (resp) {
-          if (!resp.error && resp.data && resp.data.length > 0) {
-            images = resp.data.map(function (item) {
-              return { url: item.url_imagen, titulo: item.titulo || '' };
-            });
-          } else {
-            images = FALLBACK.slice();
-          }
-          render();
-        })
-        .catch(function () {
-          images = FALLBACK.slice();
-          render();
-        });
-    }
-
-    /* ─── Renderizar thumbs + mostrar primera ─── */
-    function render() {
-      var thumbList = $('gv-thumb-list');
-      var viewerImg = $('gv-image');
-      var viewerEmpty = $('gv-empty');
-      var counter = $('gv-counter');
-      var loader = $('gv-loader');
-      if (!thumbList || !viewerImg) return;
-
-      if (loader) loader.style.display = 'none';
-
-      if (images.length === 0) {
-        thumbList.innerHTML = '';
-        if (viewerEmpty) viewerEmpty.textContent = 'No hay imágenes disponibles.';
-        if (viewerEmpty) viewerEmpty.style.display = '';
-        if (counter) counter.textContent = '';
-        return;
-      }
-
-      thumbList.innerHTML = images.map(function (img, i) {
-        return '<img src="' + img.url.replace(/"/g, '&quot;') + '" class="gv-thumb' + (i === 0 ? ' active' : '') + '" data-idx="' + i + '" alt="' + (img.titulo || '') + '" loading="lazy">';
-      }).join('');
-
-      show(0);
-      bindEvents();
-    }
-
-    /* ─── Mostrar imagen por índice ─── */
-    function show(idx) {
-      var viewerImg = $('gv-image');
-      var viewerEmpty = $('gv-empty');
-      var counter = $('gv-counter');
-      var loader = $('gv-loader');
-      if (!viewerImg) return;
-
-      if (!images[idx]) return;
-      currentIdx = idx;
-
-      if (viewerEmpty) viewerEmpty.style.display = 'none';
-      if (loader) loader.style.display = 'block';
-      viewerImg.style.opacity = '0';
-
-      var img = new Image();
-      img.onload = function () {
-        viewerImg.src = images[idx].url;
-        viewerImg.style.opacity = '1';
-        if (loader) loader.style.display = 'none';
-        updateThumbs();
-        updateCounter();
-      };
-      img.onerror = function () {
-        viewerImg.src = images[idx].url;
-        viewerImg.style.opacity = '1';
-        if (loader) loader.style.display = 'none';
-        updateThumbs();
-        updateCounter();
-      };
-      img.src = images[idx].url;
-    }
-
-    /* ─── Actualizar thumbs activas ─── */
-    function updateThumbs() {
-      var thumbs = document.querySelectorAll('.gv-thumb');
-      thumbs.forEach(function (t, i) {
-        t.classList.toggle('active', i === currentIdx);
-      });
-    }
-
-    /* ─── Actualizar contador ─── */
-    function updateCounter() {
-      var counter = $('gv-counter');
-      if (counter && images.length > 0) {
-        counter.textContent = (currentIdx + 1) + ' / ' + images.length;
-      }
-    }
-
-    /* ─── Navegación ─── */
-    function prev() {
-      if (images.length === 0) return;
-      show((currentIdx - 1 + images.length) % images.length);
-    }
-    function next() {
-      if (images.length === 0) return;
-      show((currentIdx + 1) % images.length);
-    }
-
-    /* ─── Lightbox ─── */
-    function openLb() {
-      var lb = $('gv-lightbox');
-      var lbImg = $('gv-lb-image');
-      var lbLoader = $('gv-lb-loader');
-      if (!lb || !lbImg || !images[currentIdx]) return;
-
-      if (lbLoader) lbLoader.style.display = 'block';
-      lbImg.style.opacity = '0';
-
-      var img = new Image();
-      img.onload = function () {
-        lbImg.src = images[currentIdx].url;
-        lbImg.style.opacity = '1';
-        if (lbLoader) lbLoader.style.display = 'none';
-      };
-      img.onerror = function () {
-        lbImg.src = images[currentIdx].url;
-        lbImg.style.opacity = '1';
-        if (lbLoader) lbLoader.style.display = 'none';
-      };
-      img.src = images[currentIdx].url;
-
-      lb.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeLb() {
-      var lb = $('gv-lightbox');
-      if (!lb) return;
-      lb.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    function lbPrev() {
-      prev();
-      var lbImg = $('gv-lb-image');
-      var lbLoader = $('gv-lb-loader');
-      if (!lbImg || !images[currentIdx]) return;
-      if (lbLoader) lbLoader.style.display = 'block';
-      lbImg.style.opacity = '0';
-
-      var img = new Image();
-      img.onload = function () {
-        lbImg.src = images[currentIdx].url;
-        lbImg.style.opacity = '1';
-        if (lbLoader) lbLoader.style.display = 'none';
-      };
-      img.onerror = function () {
-        lbImg.src = images[currentIdx].url;
-        lbImg.style.opacity = '1';
-        if (lbLoader) lbLoader.style.display = 'none';
-      };
-      img.src = images[currentIdx].url;
-    }
-
-    function lbNext() {
-      next();
-      var lbImg = $('gv-lb-image');
-      var lbLoader = $('gv-lb-loader');
-      if (!lbImg || !images[currentIdx]) return;
-      if (lbLoader) lbLoader.style.display = 'block';
-      lbImg.style.opacity = '0';
-
-      var img = new Image();
-      img.onload = function () {
-        lbImg.src = images[currentIdx].url;
-        lbImg.style.opacity = '1';
-        if (lbLoader) lbLoader.style.display = 'none';
-      };
-      img.onerror = function () {
-        lbImg.src = images[currentIdx].url;
-        lbImg.style.opacity = '1';
-        if (lbLoader) lbLoader.style.display = 'none';
-      };
-      img.src = images[currentIdx].url;
-    }
-
-    /* ─── Vincular eventos (se llama en cada render) ─── */
-    var eventsBound = false;
-
-    function bindEvents() {
-      if (eventsBound) return;
-
-      var thumbList = $('gv-thumb-list');
-      var viewerImg = $('gv-image');
-      var prevBtn = $('gv-prev');
-      var nextBtn = $('gv-next');
-      var lb = $('gv-lightbox');
-      var lbClose = $('gv-lb-close');
-      var lbPrevBtn = $('gv-lb-prev');
-      var lbNextBtn = $('gv-lb-next');
-
-      /* Thumbnail clicks (delegación) */
-      if (thumbList) {
-        thumbList.addEventListener('click', function (e) {
-          var thumb = e.target.closest('.gv-thumb');
-          if (!thumb) return;
-          var idx = parseInt(thumb.getAttribute('data-idx'), 10);
-          if (!isNaN(idx)) show(idx);
-        });
-      }
-
-      /* Viewer image click → lightbox */
-      if (viewerImg) {
-        viewerImg.addEventListener('click', function () {
-          if (images.length > 0) openLb();
-        });
-      }
-
-      /* Prev / Next buttons */
-      if (prevBtn) prevBtn.addEventListener('click', function (e) { e.stopPropagation(); prev(); });
-      if (nextBtn) nextBtn.addEventListener('click', function (e) { e.stopPropagation(); next(); });
-
-      /* Lightbox close */
-      if (lbClose) lbClose.addEventListener('click', closeLb);
-      if (lb) {
-        lb.addEventListener('click', function (e) {
-          if (e.target === lb) closeLb();
-        });
-      }
-
-      /* Lightbox prev/next */
-      if (lbPrevBtn) lbPrevBtn.addEventListener('click', function (e) { e.stopPropagation(); lbPrev(); });
-      if (lbNextBtn) lbNextBtn.addEventListener('click', function (e) { e.stopPropagation(); lbNext(); });
-
-      /* Keyboard (solo una vez, seguro para SPA) */
-      if (!window._gvKeydown) {
-        window._gvKeydown = true;
-        document.addEventListener('keydown', function (e) {
-          var lb = $('gv-lightbox');
-          if (lb && lb.classList.contains('open')) {
-            if (e.key === 'Escape') closeLb();
-            if (e.key === 'ArrowLeft') lbPrev();
-            if (e.key === 'ArrowRight') lbNext();
-            return;
-          }
-          if (e.key === 'ArrowLeft') prev();
-          if (e.key === 'ArrowRight') next();
-        });
-      }
-
-      /* Touch swipe on viewer */
-      var touchStartX = 0;
-      var touchStartY = 0;
-      var viewerCol = document.querySelector('.gv-viewer');
-      if (viewerCol) {
-        viewerCol.addEventListener('touchstart', function (e) {
-          touchStartX = e.changedTouches[0].screenX;
-          touchStartY = e.changedTouches[0].screenY;
-        }, { passive: true });
-        viewerCol.addEventListener('touchend', function (e) {
-          var dx = touchStartX - e.changedTouches[0].screenX;
-          var dy = touchStartY - e.changedTouches[0].screenY;
-          if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-            if (dx > 0) next(); else prev();
-          }
-        }, { passive: true });
-      }
-
-      document.addEventListener('keydown', onKeydown);
-
-      eventsBound = true;
-    }
-
-    /* ─── Arranque ─── */
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
-      init();
-    }
-
-  })();
-  </script>
-
   <script src="/app.js"></script>
 
-  <!-- Cleanup: if app.js SPA sets _galeriaEventsVinculados, reset it -->
-  <script>
-    window._galeriaEventsVinculados = true;
-  </script>
+  <!-- Marcar como inicializada para que app.js no intente su propia init -->
+  <script>window._galeriaEventsVinculados = true;</script>
 </body>
 </html>
