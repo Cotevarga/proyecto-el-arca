@@ -80,7 +80,34 @@
       </div>
     </header>
 
-    <section class="py-16 bg-noche" style="min-height:500px;">
+    <!-- ─── Categorías (card landing) ─── -->
+    <section id="categoria-cards" class="py-16" style="background-color:#111111">
+      <div class="max-w-5xl mx-auto px-4">
+        <div class="grid md:grid-cols-3 gap-8">
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" data-seccion="Relatos: El Jano">
+            <div class="text-6xl mb-4 opacity-70">👤</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">El Jano</h2>
+            <p class="text-white/50 text-sm leading-relaxed max-w-xs">Relatos, vivencias y memorias orales sobre el mentor, amigo y motor creativo de la organización popular.</p>
+          </button>
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" data-seccion="Relatos: El Arca">
+            <div class="text-6xl mb-4 opacity-70">🏛️</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">El Arca</h2>
+            <p class="text-white/50 text-sm leading-relaxed max-w-xs">Archivo vivo de la trinchera cultural de La Goya: talleres, Navidades Populares y la victoria comunitaria.</p>
+          </button>
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" data-seccion="Relatos: Otras organizaciones">
+            <div class="text-6xl mb-4 opacity-70">🤝</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">Otras Organizaciones Sociales</h2>
+            <p class="text-white/50 text-sm leading-relaxed max-w-xs">El tejido histórico de nuestro barrio: memorias de Antupeñi, grupos juveniles y las raíces del trabajo territorial.</p>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Relatos view (hidden until card click or URL param) ─── -->
+    <section id="relatos-section" class="py-16 bg-noche" style="min-height:500px;display:none;">
+      <div class="max-w-6xl mx-auto px-4 mb-4" style="text-align:left;">
+        <button id="btn-volver" class="text-mir hover:underline text-sm font-semibold" style="background:transparent;border:none;cursor:pointer;font-family:inherit;">← Volver a categorías</button>
+      </div>
       <div id="relatos-container" class="max-w-6xl mx-auto px-4">
         <div style="text-align:center;padding:80px 20px;color:#666;">
           <div class="loading-spinner" style="width:32px;height:32px;border-width:3px;margin:0 auto 16px;"></div>
@@ -219,15 +246,52 @@
       var SECCIONES_ORDEN = ['Relatos: El Jano', 'Relatos: El Arca', 'Relatos: Otras organizaciones'];
       var seccionLabels = { 'Relatos: El Jano': 'El Jano', 'Relatos: El Arca': 'El Arca', 'Relatos: Otras organizaciones': 'Otras Org.' };
       var activeSeccion = null;
+      var relatosCargados = false;
 
-      async function cargarRelatos() {
+      function mostrarRelatosView() {
+        var cards = document.getElementById('categoria-cards');
+        var section = document.getElementById('relatos-section');
+        if (cards) cards.style.display = 'none';
+        if (section) section.style.display = '';
+      }
+
+      function mostrarCardsView() {
+        var cards = document.getElementById('categoria-cards');
+        var section = document.getElementById('relatos-section');
+        if (cards) cards.style.display = '';
+        if (section) section.style.display = 'none';
+      }
+
+      // ─── Card click handlers ───
+      document.querySelectorAll('.cat-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var sec = this.getAttribute('data-seccion');
+          if (!sec) return;
+          mostrarRelatosView();
+          cargarRelatos(sec);
+        });
+      });
+
+      // ─── Back button ───
+      document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'btn-volver') {
+          mostrarCardsView();
+        }
+      });
+
+      async function cargarRelatos(seccionInicial) {
         var container = document.getElementById('relatos-container');
         if (!container) return;
 
-        // Read URL params
+        // Read URL params (only on first load)
         var urlParams = new URLSearchParams(window.location.search);
         var highlightId = urlParams.get('id') || null;
         var highlightSeccion = urlParams.get('seccion') || null;
+
+        // If called from card click, seccionInicial overrides URL param
+        if (seccionInicial) {
+          highlightSeccion = seccionInicial;
+        }
 
         container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#666;">Cargando relatos...</div>';
 
@@ -263,7 +327,7 @@
             if (secciones[r.seccion]) secciones[r.seccion].push(r);
           });
 
-          // Determine active seccion from URL or fallback to first non-empty
+          // Determine active seccion
           if (highlightSeccion && secciones[highlightSeccion] && secciones[highlightSeccion].length > 0) {
             activeSeccion = highlightSeccion;
           } else {
@@ -379,6 +443,7 @@
           html += '</div></div></div>'; // body, layout, container
 
           container.innerHTML = html;
+          relatosCargados = true;
 
           // ─── Update count ───
           updateRelatoCount();
@@ -414,7 +479,6 @@
 
           // ─── After render: scroll to highlight if present ───
           if (highlightId && targetRelato) {
-            // Use a short delay to let DOM paint
             setTimeout(function() {
               var activeBtn = container.querySelector('.relato-index-item.active');
               if (activeBtn) {
@@ -551,11 +615,21 @@
         return String(text).replace(/[&<>"']/g, function(c) { return map[c]; });
       }
 
-      // Load relatos when DOM is ready
+      // On load: if URL has id or seccion param, skip cards and go directly to relatos
+      function init() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var hasId = urlParams.has('id');
+        var hasSeccion = urlParams.has('seccion');
+        if (hasId || hasSeccion) {
+          mostrarRelatosView();
+          cargarRelatos();
+        }
+      }
+
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', cargarRelatos);
+        document.addEventListener('DOMContentLoaded', init);
       } else {
-        cargarRelatos();
+        init();
       }
 
     })();
