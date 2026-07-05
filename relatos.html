@@ -84,22 +84,22 @@
     <section id="navegacion-subsecciones" class="py-16" style="background-color:#111111">
       <div class="max-w-5xl mx-auto px-4">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="renderizarPorSeccion('Relatos: El Jano')">
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="navegarASubseccion('Relatos: El Jano')">
             <div class="text-6xl mb-4 opacity-70">👤</div>
             <h2 class="text-mir font-title text-2xl uppercase mb-3">El Jano</h2>
             <p class="text-white/50 text-sm leading-relaxed max-w-xs">Relatos, vivencias y memorias orales sobre el mentor, amigo y motor creativo de la organización popular.</p>
           </button>
-          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="renderizarPorSeccion('Relatos: El Arca')">
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="navegarASubseccion('Relatos: El Arca')">
             <div class="text-6xl mb-4 opacity-70">🏛️</div>
             <h2 class="text-mir font-title text-2xl uppercase mb-3">El Arca</h2>
             <p class="text-white/50 text-sm leading-relaxed max-w-xs">Archivo vivo de la trinchera cultural de La Goya: talleres, Navidades Populares y la victoria comunitaria.</p>
           </button>
-          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="renderizarPorSeccion('Relatos: Otras organizaciones')">
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="navegarASubseccion('Relatos: Otras organizaciones')">
             <div class="text-6xl mb-4 opacity-70">🤝</div>
             <h2 class="text-mir font-title text-2xl uppercase mb-3">Otras Organizaciones Sociales</h2>
             <p class="text-white/50 text-sm leading-relaxed max-w-xs">El tejido histórico de nuestro barrio: memorias de Antupeñi, grupos juveniles y las raíces del trabajo territorial.</p>
           </button>
-          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="renderizarPorSeccion('Relatos: Anecdotas')">
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="navegarASubseccion('Relatos: Anecdotas')">
             <div class="text-6xl mb-4 opacity-70">💬</div>
             <h2 class="text-mir font-title text-2xl uppercase mb-3">Anécdotas</h2>
             <p class="text-white/50 text-sm leading-relaxed max-w-xs">Momentos espontáneos, recuerdos breves y pequeñas historias que construyen la memoria colectiva del barrio.</p>
@@ -108,12 +108,22 @@
       </div>
     </section>
 
-    <!-- ─── Contenedor de índices (se llena vía JS) ─── -->
+    <!-- ─── Layout SPA: índice izquierdo + lector derecho ─── -->
     <section id="contenedor-indices-section" class="py-16 bg-noche" style="min-height:500px;display:none;">
-      <div class="max-w-5xl mx-auto px-4 mb-4" style="text-align:left;">
+      <div class="max-w-6xl mx-auto px-4 mb-4" style="text-align:left;">
         <button id="btn-volver" class="text-mir hover:underline text-sm font-semibold" style="background:transparent;border:none;cursor:pointer;font-family:inherit;" onclick="volverCategorias()">← Volver a categorías</button>
       </div>
-      <div id="contenedor-indices" class="max-w-5xl mx-auto px-4"></div>
+      <div class="layout-relatos max-w-6xl mx-auto px-4">
+        <aside id="indice-izquierdo" class="sidebar">
+          <h3 class="sidebar-titulo">Índice</h3>
+          <ul id="lista-titulos"></ul>
+        </aside>
+        <main id="relato-completo" class="lector">
+          <div id="contenido-dinamico">
+            <h2>Selecciona un relato</h2>
+          </div>
+        </main>
+      </div>
     </section>
 
     <section class="py-16 bg-black border-t border-mir/20 text-center">
@@ -172,6 +182,25 @@
     .relato-individual { max-width: 60rem; margin: 0 auto; }
     .btn-volver-indice { background: transparent; border: 1px solid rgba(229,9,20,0.4); color: var(--color-mir); font-family: Arial, Helvetica, sans-serif; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.55rem 1.25rem; cursor: pointer; transition: all 0.3s; margin-bottom: 1.5rem; }
     .btn-volver-indice:hover { background: var(--color-mir); color: white; }
+
+    /* ─── Layout SPA: sidebar + lector ─── */
+    .layout-relatos { display: flex; gap: 40px; padding: 20px 0; }
+    .sidebar { width: 300px; min-width: 260px; border-right: 1px solid rgba(229,9,20,0.25); padding-right: 20px; }
+    .sidebar .sidebar-titulo { font-family: Arial, Helvetica, sans-serif; color: var(--color-mir); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem; margin: 0 0 1rem 0; text-align: left !important; }
+    .sidebar ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar li { cursor: pointer; color: #ff0000; margin-bottom: 12px; padding: 8px 12px; font-size: 14px; border-left: 2px solid transparent; transition: all 0.3s; text-align: left; }
+    .sidebar li:hover { color: #fff; border-left-color: var(--color-mir); background: rgba(229,9,20,0.05); }
+    .sidebar li.active { color: #fff; border-left-color: var(--color-mir); background: rgba(229,9,20,0.08); }
+    .lector { flex: 1; padding: 0 20px 20px 20px; min-width: 0; }
+    .img-relato { max-width: 100%; height: auto; margin-bottom: 20px; border: 1px solid rgba(229,9,20,0.2); }
+
+    @media (max-width: 768px) {
+      .layout-relatos { flex-direction: column; gap: 20px; }
+      .sidebar { width: 100%; min-width: 0; border-right: none; border-bottom: 1px solid rgba(229,9,20,0.25); padding-right: 0; padding-bottom: 16px; }
+      .sidebar ul { display: flex; flex-wrap: wrap; gap: 6px; }
+      .sidebar li { margin-bottom: 0; padding: 6px 12px; border-left: none; border-bottom: 2px solid transparent; font-size: 13px; }
+      .sidebar li:hover { border-left-color: transparent; border-bottom-color: var(--color-mir); }
+    }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
@@ -224,130 +253,102 @@
       modo: 'index'  // 'index' | 'individual'
     };
 
-    /* ─── Funciones globales SPA ─── */
-    /* ─── Cargar sección (índice o plana según configuración) ─── */
-    function renderizarPorSeccion(nombreSeccion) {
+    /* ─── Navegar a una subsección: carga sidebar + primer relato ─── */
+    async function navegarASubseccion(nombreSeccion) {
       var nav = document.getElementById('navegacion-subsecciones');
       var section = document.getElementById('contenedor-indices-section');
-      var contenedor = document.getElementById('contenedor-indices');
-      if (!contenedor) return;
+      var lista = document.getElementById('lista-titulos');
+      var dinamico = document.getElementById('contenido-dinamico');
+      if (!lista || !dinamico) return;
       if (nav) nav.style.display = 'none';
       if (section) section.style.display = '';
-      contenedor.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#666;">Cargando relatos...</div>';
+      lista.innerHTML = '<li style="color:#666;cursor:default;">Cargando...</li>';
+      dinamico.innerHTML = '<h2>Cargando relato...</h2>';
 
       var cfg = SECCIONES_RELATOS[nombreSeccion];
-      if (!cfg) { contenedor.innerHTML = '<p style="color:var(--color-mir);text-align:center;">Sección no encontrada.</p>'; return; }
+      if (!cfg) { dinamico.innerHTML = '<p style="color:var(--color-mir);">Sección no encontrada.</p>'; return; }
 
-      // Recolectar hardcodeados
+      // 1. Recolectar hardcodeados
       var items = [];
       var hard = RELATOS_HARDCODEADOS[nombreSeccion] || [];
       hard.forEach(function(a) {
         items.push({ id: a.id, titulo: a.titulo, subtitulo: a.subtitulo, html: a.html, fuente: 'hardcodeado' });
       });
 
-      // Fetch de Supabase
+      // 2. Fetch de Supabase
       var supabaseClient = window.miSupabase;
-      if (!supabaseClient) {
-        if (items.length === 0) { contenedor.innerHTML = '<p style="color:var(--color-mir);text-align:center;">Error de conexión.</p>'; return; }
-        estadoRelatos.seccion = nombreSeccion;
-        estadoRelatos.items = items;
-        if (cfg.tipo === 'indice') { mostrarIndice(); procesarDeepLink(); }
-        else { mostrarPlana(); procesarDeepLink(); }
-        return;
-      }
-
-      supabaseClient
-        .from('recuerdos')
-        .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, nombre_serie')
-        .eq('seccion', nombreSeccion)
-        .eq('aprobado', true)
-        .not('titulo_relato', 'is', null)
-        .neq('titulo_relato', '')
-        .order('created_at', { ascending: false })
-        .then(function(resp) {
+      if (supabaseClient) {
+        try {
+          var resp = await supabaseClient
+            .from('recuerdos')
+            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, nombre_serie')
+            .eq('seccion', nombreSeccion)
+            .eq('aprobado', true)
+            .not('titulo_relato', 'is', null)
+            .neq('titulo_relato', '')
+            .order('created_at', { ascending: false });
           if (!resp.error) {
             (resp.data || []).forEach(function(r) {
-              var cuerpo = sanitizarHTML(r.mensaje_largo || r.mensaje || '');
-              var serie = r.nombre_serie || '';
               items.push({
-                id: 'db-' + r.id,
+                id: r.id,
                 titulo: r.titulo_relato || 'Sin título',
-                subtitulo: (r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) : '') + (serie ? ' · Serie: ' + serie : '') + ' · por ' + (r.nombre || 'Anónimo'),
-                html: '<div class="relato-detalle" id="relato-' + r.id + '"><h2>' + escaparHTML(r.titulo_relato || 'Sin título') + '</h2><div class="meta">' + (r.created_at ? '<span>' + new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) + '</span>' : '') + '<span>por ' + escaparHTML(r.nombre || 'Anónimo') + '</span>' + (serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escaparHTML(serie) + '</span>' : '') + '</div><div class="contenido">' + cuerpo + '</div></div>',
+                subtitulo: (r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) : '') + (r.nombre_serie ? ' · Serie: ' + r.nombre_serie : '') + ' · por ' + (r.nombre || 'Anónimo'),
+                html: '<div class="relato-detalle"><h2>' + escaparHTML(r.titulo_relato || 'Sin título') + '</h2><div class="meta">' + (r.created_at ? '<span>' + new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) + '</span>' : '') + '<span>por ' + escaparHTML(r.nombre || 'Anónimo') + '</span>' + (r.nombre_serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escaparHTML(r.nombre_serie) + '</span>' : '') + '</div><div class="contenido">' + sanitizarHTML(r.mensaje_largo || r.mensaje || '') + '</div></div>',
                 fuente: 'supabase'
               });
             });
           }
-          estadoRelatos.seccion = nombreSeccion;
-          estadoRelatos.items = items;
-          if (items.length === 0) {
-            contenedor.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="font-size:48px;opacity:0.3;margin-bottom:12px;">📖</div><p style="color:#666;">No hay relatos en esta sección aún.</p></div>';
-            return;
-          }
-          if (cfg.tipo === 'indice') { mostrarIndice(); procesarDeepLink(); }
-          else { mostrarPlana(); procesarDeepLink(); }
-        })
-        .catch(function(err) {
-          console.error('[Relatos] Error:', err);
-          if (items.length > 0) {
-            estadoRelatos.seccion = nombreSeccion;
-            estadoRelatos.items = items;
-            if (cfg.tipo === 'indice') mostrarIndice();
-            else mostrarPlana();
-          } else {
-            contenedor.innerHTML = '<p style="color:var(--color-mir);text-align:center;">Error al cargar relatos.</p>';
-          }
-        });
-    }
+        } catch (err) {
+          console.error('[Relatos] Error Supabase:', err);
+        }
+      }
 
-    /* ─── Mostrar índice (lista de títulos) ─── */
-    function mostrarIndice() {
-      var contenedor = document.getElementById('contenedor-indices');
-      if (!contenedor) return;
+      estadoRelatos.seccion = nombreSeccion;
+      estadoRelatos.items = items;
       estadoRelatos.modo = 'index';
-      var html = '<div class="indice-relatos"><h3 class="heading-mir text-2xl md:text-3xl mb-6" style="text-align:center;">Índice de relatos</h3>';
-      estadoRelatos.items.forEach(function(item, i) {
-        html += '<div class="indice-item" onclick="mostrarRelatoIndividual(' + i + ')"><h3>' + escaparHTML(item.titulo) + '</h3><p>' + escaparHTML(item.subtitulo) + '</p></div>';
-      });
-      html += '</div>';
-      contenedor.innerHTML = html;
-    }
 
-    /* ─── Mostrar un relato individual ─── */
-    function mostrarRelatoIndividual(indice) {
-      var contenedor = document.getElementById('contenedor-indices');
-      if (!contenedor) return;
-      var item = estadoRelatos.items[indice];
-      if (!item) return;
-      estadoRelatos.modo = 'individual';
-      var html = '<div class="relato-individual"><button class="btn-volver-indice" onclick="mostrarIndice()">← Volver al índice</button>' + item.html + '</div>';
-      contenedor.innerHTML = html;
-      // Re-init tabs if this is Otras organizaciones
-      if (estadoRelatos.seccion === 'Relatos: Otras organizaciones') {
-        var btns = document.querySelectorAll('#contenedor-indices .tab-btn');
-        btns.forEach(function(btn) {
-          btn.addEventListener('click', function() {
-            btns.forEach(function(b) { b.classList.remove('active'); });
-            this.classList.add('active');
-            var contents = document.querySelectorAll('#contenedor-indices .tab-content');
-            contents.forEach(function(c) { c.classList.remove('active'); });
-            var target = document.getElementById('tab-' + this.dataset.tab);
-            if (target) target.classList.add('active');
-          });
-        });
+      if (items.length === 0) {
+        lista.innerHTML = '<li style="color:#666;cursor:default;">Sin relatos aún</li>';
+        dinamico.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="font-size:48px;opacity:0.3;margin-bottom:12px;">📖</div><p style="color:#666;">No hay relatos en esta sección aún.</p></div>';
+        return;
+      }
+
+      // 3. Renderizar índice en la sidebar
+      lista.innerHTML = items.map(function(r) {
+        return '<li onclick="mostrarRelato(\'' + r.id + '\')" class="' + (r.id === items[0].id ? 'active' : '') + '">' + escaparHTML(r.titulo) + '</li>';
+      }).join('');
+
+      // 4. Mostrar el primer relato o saltar si hay deep-link
+      procesarDeepLink();
+      if (estadoRelatos.modo === 'index') {
+        mostrarRelato(items[0].id);
       }
     }
 
-    /* ─── Mostrar sección plana (todo apilado, sin índice) ─── */
-    function mostrarPlana() {
-      var contenedor = document.getElementById('contenedor-indices');
-      if (!contenedor) return;
-      estadoRelatos.modo = 'plana';
-      var html = '';
-      estadoRelatos.items.forEach(function(item) {
-        html += item.html;
+    /* ─── Mostrar un relato específico en el panel derecho ─── */
+    function mostrarRelato(id) {
+      var dinamico = document.getElementById('contenido-dinamico');
+      if (!dinamico) return;
+
+      var item = null;
+      for (var i = 0; i < estadoRelatos.items.length; i++) {
+        if (estadoRelatos.items[i].id === id) { item = estadoRelatos.items[i]; break; }
+      }
+      if (!item) return;
+
+      estadoRelatos.modo = 'individual';
+
+      // Marcar activo en sidebar
+      var itemsSidebar = document.querySelectorAll('#lista-titulos li');
+      itemsSidebar.forEach(function(li) { li.classList.remove('active'); });
+      // Buscar el li que contiene este id en su onclick
+      itemsSidebar.forEach(function(li) {
+        if (li.getAttribute('onclick') && li.getAttribute('onclick').indexOf(id) !== -1) {
+          li.classList.add('active');
+        }
       });
-      contenedor.innerHTML = html;
+
+      dinamico.innerHTML = item.html;
     }
 
     /* ─── Deep-link: auto-abrir relato destacado desde vitrina ─── */
@@ -355,23 +356,17 @@
       var urlParams = new URLSearchParams(window.location.search);
       var highlightId = urlParams.get('id');
       if (!highlightId) return;
-      var idx = -1;
-      estadoRelatos.items.forEach(function(item, i) {
-        if (item.id === 'db-' + highlightId || item.id === highlightId) idx = i;
+      var match = null;
+      estadoRelatos.items.forEach(function(item) {
+        if (item.id === highlightId || item.id === 'db-' + highlightId) match = item;
       });
-      if (idx === -1) return;
-      if (estadoRelatos.modo === 'index') {
-        mostrarRelatoIndividual(idx);
-        setTimeout(function() {
-          var el = document.querySelector('#contenedor-indices .relato-individual');
-          if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
-        }, 300);
-      } else if (estadoRelatos.modo === 'plana') {
-        setTimeout(function() {
-          var el = document.getElementById('relato-' + highlightId);
-          if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
-        }, 300);
-      }
+      if (!match) return;
+      estadoRelatos.modo = 'index'; // señal para que no muestre el primero
+      mostrarRelato(match.id);
+      setTimeout(function() {
+        var el = document.getElementById('relato-completo');
+        if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }, 300);
     }
 
     function volverCategorias() {
@@ -421,7 +416,7 @@
       var seccionRelato = urlParams.get('seccion');
       if (idRelato || seccionRelato) {
         var sec = seccionRelato || 'Relatos: El Arca';
-        renderizarPorSeccion(sec);
+        navegarASubseccion(sec);
       }
     })();
   </script>
