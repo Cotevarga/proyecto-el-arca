@@ -80,21 +80,21 @@
       </div>
     </header>
 
-    <!-- ─── Categorías (card landing) ─── -->
-    <section id="categoria-cards" class="py-16" style="background-color:#111111">
+    <!-- ─── Sub-secciones (card landing) ─── -->
+    <section id="navegacion-subsecciones" class="py-16" style="background-color:#111111">
       <div class="max-w-5xl mx-auto px-4">
         <div class="grid md:grid-cols-3 gap-8">
-          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" data-seccion="Relatos: El Jano">
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="renderizarPorSeccion('Relatos: El Jano')">
             <div class="text-6xl mb-4 opacity-70">👤</div>
             <h2 class="text-mir font-title text-2xl uppercase mb-3">El Jano</h2>
             <p class="text-white/50 text-sm leading-relaxed max-w-xs">Relatos, vivencias y memorias orales sobre el mentor, amigo y motor creativo de la organización popular.</p>
           </button>
-          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" data-seccion="Relatos: El Arca">
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="renderizarPorSeccion('Relatos: El Arca')">
             <div class="text-6xl mb-4 opacity-70">🏛️</div>
             <h2 class="text-mir font-title text-2xl uppercase mb-3">El Arca</h2>
             <p class="text-white/50 text-sm leading-relaxed max-w-xs">Archivo vivo de la trinchera cultural de La Goya: talleres, Navidades Populares y la victoria comunitaria.</p>
           </button>
-          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" data-seccion="Relatos: Otras organizaciones">
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="renderizarPorSeccion('Relatos: Otras organizaciones')">
             <div class="text-6xl mb-4 opacity-70">🤝</div>
             <h2 class="text-mir font-title text-2xl uppercase mb-3">Otras Organizaciones Sociales</h2>
             <p class="text-white/50 text-sm leading-relaxed max-w-xs">El tejido histórico de nuestro barrio: memorias de Antupeñi, grupos juveniles y las raíces del trabajo territorial.</p>
@@ -103,17 +103,12 @@
       </div>
     </section>
 
-    <!-- ─── Relatos view (hidden until card click or URL param) ─── -->
-    <section id="relatos-section" class="py-16 bg-noche" style="min-height:500px;display:none;">
-      <div class="max-w-6xl mx-auto px-4 mb-4" style="text-align:left;">
-        <button id="btn-volver" class="text-mir hover:underline text-sm font-semibold" style="background:transparent;border:none;cursor:pointer;font-family:inherit;">← Volver a categorías</button>
+    <!-- ─── Contenedor de índices (se llena vía JS) ─── -->
+    <section id="contenedor-indices-section" class="py-16 bg-noche" style="min-height:500px;display:none;">
+      <div class="max-w-5xl mx-auto px-4 mb-4" style="text-align:left;">
+        <button id="btn-volver" class="text-mir hover:underline text-sm font-semibold" style="background:transparent;border:none;cursor:pointer;font-family:inherit;" onclick="volverCategorias()">← Volver a categorías</button>
       </div>
-      <div id="relatos-container" class="max-w-6xl mx-auto px-4">
-        <div style="text-align:center;padding:80px 20px;color:#666;">
-          <div class="loading-spinner" style="width:32px;height:32px;border-width:3px;margin:0 auto 16px;"></div>
-          Cargando relatos...
-        </div>
-      </div>
+      <div id="contenedor-indices" class="max-w-5xl mx-auto px-4"></div>
     </section>
 
     <section class="py-16 bg-black border-t border-mir/20 text-center">
@@ -143,78 +138,23 @@
     .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
     .hover\:bg-resistencia-700:hover { background-color: #b91c1c !important; }
 
-    /* ─── Índice / Navegación de relatos ─── */
-    .relato-index-item {
-      display: block;
-      width: 100%;
-      text-align: left;
-      padding: 14px 20px;
-      background: transparent;
-      border: none;
-      border-left: 3px solid transparent;
-      color: #ccc;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: inherit;
-      line-height: 1.4;
-    }
-    .relato-index-item:hover {
-      background: rgba(229,9,20,0.06);
-      color: white;
-      border-left-color: var(--color-mir);
-    }
-    .relato-index-item.active {
-      color: var(--color-mir);
-      border-left-color: var(--color-mir);
-      background: rgba(229,9,20,0.08);
-    }
-    .relato-body h2 {
-      font-family: Arial, Helvetica, sans-serif !important;
-      color: var(--color-mir) !important;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      text-align: left !important;
-    }
-    .relato-body p {
-      text-align: justify !important;
-      line-height: 1.8;
-      color: #ddd;
-    }
-    .relato-body b, .relato-body strong { color: white; }
-    .relato-body i, .relato-body em { color: #ddd; }
-    .relato-body u { text-decoration: underline; }
-    .seccion-tab {
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid transparent;
-      color: #888;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 12px 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: inherit;
-      letter-spacing: 0.03em;
-    }
-    .seccion-tab:hover:not(:disabled) { color: #fff; background: rgba(229,9,20,0.04); }
-    .seccion-tab.active {
-      color: var(--color-mir);
-      border-bottom-color: var(--color-mir);
-    }
-      @media (max-width: 768px) {
-        .relato-layout {
-          flex-direction: column !important;
-        }
-      .relato-index {
-        width: 100% !important;
-        border-right: none !important;
-        border-bottom: 1px solid rgba(229,9,20,0.15);
-        max-height: 200px !important;
-        overflow-y: auto !important;
-      }
-    }
+    /* ─── Relato detalle (SPA) ─── */
+    .relato-detalle { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.2) !important; padding: 2rem; margin-bottom: 2rem; border-radius: 0; }
+    .relato-detalle h2 { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; text-align: left !important; margin: 0 0 0.75rem 0; }
+    .relato-detalle .meta { display: flex; gap: 12px; font-size: 12px; color: #666; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(229,9,20,0.1); flex-wrap: wrap; text-align: left; }
+    .relato-detalle .contenido { font-size: 15px; line-height: 1.8; color: #ddd; text-align: justify; white-space: pre-wrap; }
+    .relato-detalle .contenido b, .relato-detalle .contenido strong { color: white; }
+    .relato-detalle .contenido i, .relato-detalle .contenido em { color: #ddd; }
+    .relato-detalle .contenido u { text-decoration: underline; }
+
+    /* ─── Hardcodeado (textos recuperados de git) ─── */
+    .relato { margin-bottom: 4rem; }
+    .tab-btn { font-family: Arial, Helvetica, sans-serif; font-size: 0.8rem; font-weight: bold; padding: 0.65rem 1.25rem; border: 1px solid rgba(229,9,20,0.3); background: transparent; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+    .tab-btn:hover { border-color: var(--color-mir); color: white; }
+    .tab-btn.active { background: var(--color-mir); color: white; border-color: var(--color-mir); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeInUp 0.5s ease-out forwards; }
+    #contenedor-indices .card-mir { margin-bottom: 1rem; }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
@@ -226,9 +166,327 @@
   </script>
 
   <script>
-    (function() {
-      'use strict';
+    /* ─── Contenido hardcodeado recuperado de relatos/jano.html, arca.html, organizaciones.html ─── */
+    var CONTENIDO_HARDCODEADO = {
+      'Relatos: El Jano': `
+<section class="py-16 bg-noche">
+  <div class="max-w-4xl mx-auto px-4">
+    <article class="relato">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-mir font-title text-4xl">01</span>
+        <div>
+          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">El Sueño del Jano</h2>
+          <p class="text-white/40 text-sm">Los inicios en La Goya — Mediados de los 90</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="space-y-4 text-white/70 leading-relaxed">
+          <p>Pedro Alejandro González Reyes llegó a la Población Francisco de Goya con una convicción: la cultura popular era la herramienta más poderosa para transformar la realidad. En un territorio golpeado por la exclusión, el narcotráfico y el abandono estatal, el Jano no vino a prometer: vino a hacer.</p>
+          <p>"Me acuerdo cuando llegó con un parlante viejo y un micrófono —recuerda Sonia, vecina del pasaje —. Dijo que iba a montar un centro cultural y todos pensamos que estaba loco. Pero a la semana siguiente ya había doce niños sentados en el suelo de la sede, aprendiendo a tocar la batería con tarros vacíos."</p>
+          <p>Así nació El Arca: sin plata, sin auspicios, sin permiso de nadie. Solo con la fuerza de la comunidad organizada y la convicción de un hombre que se negaba a aceptar que el destino de los niños pobres estuviera escrito.</p>
+          <p>Pedagogía popular, amor por la comunidad y una convicción inquebrantable: <strong class="text-white">solo el pueblo salva al pueblo</strong>. El Jano no daba discursos desde un escritorio; estaba en la cancha, en la sede, en la marcha, en las radios, hombro con hombro con su gente.</p>
+        </div>
+        <div class="space-y-4">
+          <div class="card-mir"><img src="images/jano_inicio.jpg" alt="El Cabezón Jano" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">"El Jano nos enseñó que la cultura no era un lujo, era una trinchera."</p></div>
+          <div class="card-mir"><img src="images/FB_IMG_1782701775498.jpg" alt="Jano pintando la sede" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">Jano pintando la sede de El Arca con sus propias manos.</p></div>
+        </div>
+      </div>
+    </article>
+    <article class="relato">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-mir font-title text-4xl">02</span>
+        <div>
+          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La TV del Pueblo</h2>
+          <p class="text-white/40 text-sm">El sueño de comunicación popular del Jano</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="card-mir md:order-2"><img src="images/FB_IMG_1782701826979.jpg" alt="Jano planificando TV Comunitaria" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">Planificando la comunicación popular, cámara en mano.</p></div>
+        <div class="space-y-4 text-white/70 leading-relaxed md:order-1">
+          <p>"El Jano tenía una obsesión: que la población se viera a sí misma en pantalla. Decía que mientras la tele mostrara solo realidades ajenas, el pueblo nunca iba a creerse capaz de contar su propia historia."</p>
+          <p>Con una cámara prestada y cables que conseguía de aquí y allá, el Jano comenzó a grabar: las ollas comunes, los talleres, las marchas, los carnavales. Cada grabación era un acto de soberanía. No importaba la calidad técnica: importaba el contenido, la verdad, la mirada del pueblo.</p>
+          <p>Ese sueño de comunicación popular —la televisión comunitaria— fue el germen de la Radio Libre 90.1 / 100.5 FM. Donde no llegó la pantalla, llegó la frecuencia. El micrófono siempre fue del pueblo.</p>
+        </div>
+      </div>
+    </article>
+    <article class="relato">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-mir font-title text-4xl">03</span>
+        <div>
+          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Tragedia y la Memoria</h2>
+          <p class="text-white/40 text-sm">Cuesta El Melón — 24 de Mayo de 2006.</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="space-y-4 text-white/70 leading-relaxed">
+          <p>El 24 de Mayo del 2006, el destino golpeó con la crueldad que solo el azar sabe tener. En la Cuesta El Melón, un accidente de tránsito arrebató físicamente al Jano, al Nino y al Carlos. La comunidad quedó en shock. El Arca perdió a tres de sus hijos más queridos.</p>
+          <p>"Cuando supimos, nadie podía creerlo —recuerda Patricia, vecina del sector—. El Jano era tan inmenso que parecía indestructible. Pero esa noche entendimos que los gigantes también caen. Lo que no sabíamos es que sus sueños eran más grandes que su partida."</p>
+          <p>El dolor paralizó a La Goya. Pero la comunidad se organizó para mantener vivo el legado. Porque el Jano no había construido una obra personal: había sembrado conciencia colectiva. Y la conciencia colectiva no muere con un accidente de tránsito.</p>
+        </div>
+        <div class="card-mir"><img src="images/companeros_melon.jpg" alt="Compañeros de El Arca" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">"No están muertos quienes viven en el corazón del pueblo."</p></div>
+      </div>
+    </article>
+  </div>
+</section>`,
 
+      'Relatos: El Arca': `
+<section class="py-16 bg-noche">
+  <div class="max-w-4xl mx-auto px-4">
+    <article class="relato">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-mir font-title text-4xl">01</span>
+        <div>
+          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Mística del Trabajo Territorial</h2>
+          <p class="text-white/40 text-sm">Infancias, Navidad Popular y resistencia</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="card-mir md:order-2"><img src="images/FB_IMG_1782701859802.jpg" alt="Navidad Popular" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La Navidad Popular: ningún niño sin celebrar en La Goya.</p></div>
+        <div class="space-y-4 text-white/70 leading-relaxed md:order-1">
+          <p>El Arca no fue solo un centro cultural. Fue la demostración palpable de que el trabajo de masas con las niñeces es la tarea más revolucionaria que puede emprender un pueblo. En cada taller, en cada navidad popular, en cada programa de radio, el Jano y su comunidad tejieron una red de contención, dignidad y conciencia que arrancó a cientos de niños y niñas de las garras de la delincuencia, del consumismo y del sometimiento del sistema.</p>
+          <p>"El Jano decía que la delincuencia no se combatía con más carabineros, sino con oportunidades —cuenta Carlos, ex monitor de El Arca—. Por eso los talleres no eran un pasatiempo: eran una alternativa real al destino que el sistema tenía preparado para nuestros niños."</p>
+          <p>La música, el arte, la comunicación: cada actividad era una semilla plantada en tierra fértil. De aquellos niños, algunos hoy son dirigentes sociales, comunicadores, educadores populares. La siembra dio frutos. Porque la transformación real no se juega en las urnas ni en los titulares: se juega en la cancha, en la sede vecinal, en la mirada de un niño que descubre que puede ser alguien. Esa es la apuesta de El Arca, y sigue siendo la apuesta de los pueblos que se niegan a doblegarse.</p>
+          <p><strong class="text-white">MEDIOS DE EMANCIPACIÓN, INFANCIAS DE LIBERACIÓN:</strong> Disputar las infancias al capitalismo no es una tarea local, es el deber histórico de los pueblos del mundo. Que la memoria viva sea el puente para recuperar el territorio a través del arte, la cultura y la organización comunitaria.</p>
+          <p class="text-mir font-bold mt-6 text-center text-xl">¡A sembrar el mañana, porque el futuro le pertenece a los pueblos libres! 🌍✊</p>
+        </div>
+      </div>
+    </article>
+    <article class="relato">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-mir font-title text-4xl">02</span>
+        <div>
+          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Goya en las Calles</h2>
+          <p class="text-white/40 text-sm">Organización, marchas y lucha popular</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="space-y-4 text-white/70 leading-relaxed">
+          <p>El Arca no era solo un espacio físico: era un movimiento. Cuando la comunidad necesitaba organizarse, la sede se convertía en asamblea. Cuando había que salir a la calle, el Jano estaba al frente, con su cámara al hombro y su megáfono en la mano.</p>
+          <p>"La marcha comunitaria no se improvisaba: se construía en las reuniones, en los talleres, en la radio —dice Marta, dirigenta vecinal—. El Jano nos enseñó que la queja sin organización es ruido, pero la organización sin calle es letra muerta."</p>
+          <p>La lucha por Av. Violeta Parra, el Carnaval del 30, las tomas culturales: cada acción era una lección de pedagogía popular. Herencia del Jano. El pueblo aprendía haciendo, organizándose, enfrentándose al sistema con la frente en alto.</p>
+        </div>
+        <div class="card-mir"><img src="images/FB_IMG_1782701766075.jpg" alt="Marcha comunitaria en La Goya" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La comunidad organizada en las calles de La Pintana.</p></div>
+      </div>
+    </article>
+    <article class="relato">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-mir font-title text-4xl">03</span>
+        <div>
+          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">El Legado que Camina</h2>
+          <p class="text-white/40 text-sm">Radio, Preuniversitario, Carnaval y lucha vigente</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="card-mir md:order-2"><img src="images/radio_libre.jpg" alt="Radio Libre" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La Radio Libre 90.1 / 100.5 FM: el sueño hecho frecuencia.</p></div>
+        <div class="space-y-4 text-white/70 leading-relaxed md:order-1">
+          <p>El Arca no se cerró. El Arca se multiplicó. La Radio Libre 90.1 / 100.5 FM salió al aire, con programas como "El Sartén por el Mango", "La Gozadera" y espacios informativos que mantenían viva la comunicación popular.</p>
+          <p>El Preuniversitario Popular "Pedro Alejandro González" abrió las puertas de la educación superior a los jóvenes de La Pintana. La nivelación de estudios recuperó a quienes el sistema expulsó. El Carnaval del 30 llenó de colores y comparsas el Paradero 30 de Santa Rosa.</p>
+          <p>"El Jano nos enseñó que la lucha no termina con la muerte de un compañero —dice un monitor de El Arca—. La lucha termina cuando el pueblo deja de soñar. Y nosotros seguimos soñando."</p>
+          <p class="text-mir font-bold mt-4">El legado vive. La memoria resiste. El Arca es el pueblo.</p>
+        </div>
+      </div>
+    </article>
+    <article class="relato">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-mir font-title text-4xl">04</span>
+        <div>
+          <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">Medios de Emancipación</h2>
+          <p class="text-white/40 text-sm">Radio, comunicación popular y la voz del territorio</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="space-y-4 text-white/70 leading-relaxed">
+          <p>La Radio Libre 90.1 / 100.5 FM no fue solo un proyecto de comunicación: fue un <strong class="text-white">acto de soberanía popular</strong>. En un territorio donde las grandes cadenas dictan lo que se debe pensar, El Arca tomó la palabra y le dio micrófono a la comunidad. Programas como "El Sartén por el Mango" y "La Gozadera" no entretenían: concientizaban.</p>
+          <p>La comunicación popular era, para el Jano y los compañeros, una <strong class="text-white">herramienta de emancipación</strong> tan poderosa como los talleres o las navidades. Porque quien controla el relato, controla la realidad. Y la comunidad de La Goya se negó a que otros contaran su historia por ellos.</p>
+          <p>Hoy, este archivo digital es la continuación de esa lucha: <strong class="text-white">la memoria como medio de emancipación</strong>. Cada fotografía, cada relato, cada programa de radio rescatado es un fusil cargado de pasado y futuro. Porque mientras el pueblo recuerde, el poder no podrá reescribir la historia.</p>
+        </div>
+        <div class="card-mir"><img src="images/antupeni.jpg" alt="Antupení" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La comunicación popular construye identidad y libera conciencias.</p></div>
+      </div>
+    </article>
+  </div>
+</section>`,
+
+      'Relatos: Otras organizaciones': `
+<section class="py-16 bg-noche">
+  <div class="max-w-5xl mx-auto px-4">
+    <div class="flex flex-wrap gap-2 mb-10 border-b border-mir/20 pb-4 overflow-x-auto" id="tab-menu">
+      <button class="tab-btn active" data-tab="caleta">La Caleta y Antupeñi (1998-2003)</button>
+    </div>
+    <div id="tab-caleta" class="tab-content active">
+      <div class="max-w-4xl mx-auto">
+        <article>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="text-mir font-title text-4xl">01</span>
+            <div>
+              <h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Caleta y Antupeñi</h2>
+              <p class="text-white/40 text-sm">1998 — 2003 · Organización territorial en La Pintana</p>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-6 items-start">
+            <div class="space-y-4 text-white/70 leading-relaxed">
+              <p class="font-bold text-white uppercase text-sm tracking-wider">Los primeros pasos y la llegada a La Caleta (1998)</p>
+              <p>El compromiso social de Carlos comenzó formalmente a finales de la década de los noventa, cuando apenas tenía 19 años. "Comencé el 98 en La Caleta y supe de la ONG por la Universidad donde estudiaba", recuerda. Su inserción territorial se dio de manera natural gracias a su ubicación, en el sector de Antumapu (paradero 32 de Santa Rosa): "como vivía cerca, me acerqué porque consideré interesante el proyecto".</p>
+              <p>La Corporación La Caleta poseía ya una trayectoria histórica. Según explica, "era una ONG chilena fundada el 85 y en sus orígenes estuvo ligado a educadores y agentes pastorales que trabajaban con niños en extrema vulneralidad durante la dictadura".</p>
+              <p class="font-bold text-white uppercase text-sm tracking-wider">Filosofía de trabajo y el verdadero objetivo preventivo</p>
+              <p>El enfoque institucional era moderno e integral. "La filosofía de La Caleta se basaba en la educación popular, trabajo comunitario y enfoque en los derechos de la niñez", detalla. La metodología priorizaba el trabajo territorial, "fortaleciendo las organizaciones comunitarias en lugar de intervenir solo de forma asistencial", viendo a los menores como "sujetos de derechos" y buscando incidir en las políticas públicas mediante el fomento del "'Buen Vivir', la diversidad cultural y el empoderamiento de los sectores populares".</p>
+              <p>Sin embargo, detrás del trabajo infantil existía una profunda y estratégica misión enfocada en la juventud. "Muchos piensan que nuestro trabajo iba enfocado a los niños, porque recibíamos niños desde 3 años, pero nuestro objetivo base era atacar la entrada de drogas en los jóvenes desde los 13 hasta los 18 y más", revela Carlos.</p>
+              <p>El método de prevención consistía en dotar de sentido y deber a los adolescentes locales, "Dándoles responsabilidades visibles dentro de la comunidad a hacerse cargo de niños que veían a diario, evitando así que ellos tuvieran acceso enlace misma población o sector a las drogas duras". Sumar a los jóvenes se lograba del "boca a boca", ya que "es una edad donde están dispuestos a conocer a otros y buscar una identidad en común".</p>
+              <p class="font-bold text-white uppercase text-sm tracking-wider">El territorio, los espacios y la labor comunitaria</p>
+              <p>El despliegue en la zona sur de Santiago era extenso. "La Caleta actuaba en 5 puntos de la comuna. El Bosque, Santo Tomás, El Castillo, Villa Colombia y (no recuerdo el nombre de la 5ta que estaba ahi mismo donde esta la Muni...)". Para asegurar un point de reunión fijo en su sector, Carlos relata que "El grupo se juntaba en una de las salas de la iglesia que estaba en la Villa El Bosque y se consiguió hablando con el cura". Este acuerdo fue un beneficio mutuo que "Justo coincidió con un Encuentro Latinoamericano de Jovenes y la iglesia requería de nuevos jóvenes en ella".</p>
+              <p>La capacitación de la ONG permitió entregar herramientas culturales y de liderazgo. "La Caleta nos aportó talleres de recreación para niños, batucadas (en esos años era la moda), zancos, pinta caras, circo teatro, talleres de monitores infantiles, pintura de murales", enumera. Estos aprendizajes se llevaban a la práctica mediante el modelo de prevención: "Y nosotros hacíamos talleres y aplicabamos lo aprendido con los niños desde 3 a 12 años con tíos desde los 13 a los 18 o más".</p>
+              <p>La dedicación era constante, abarcando "todos los fines de semana y durante el verano se hacían las colonias de verano donde comentábamos con un cupo de 150 niños y terminábamos con cerca de 300", apoyados por una sólida base humana donde "Los tios o monitores eran cerca de 30 jóvenes del sector".</p>
+              <p class="font-bold text-white uppercase text-sm tracking-wider">El fin del financiamiento y el nacimiento de "Antupeñi" (2000 - 2003)</p>
+              <p>El apoyo institucional no fue permanente. "Esta ONG nos apoyó por cerca de 2 años y luego se retiró por falta de recursos", narra Carlos. Frente a la ausencia de la Corporación original (alrededor del año 2000), los dirigentes barriales tomaron una decisión fundamental basada en el vínculo creado: "El tema es que no podíamos darle la espalda a los jóvenes y niños que habíamos acogido".</p>
+              <p>Fue la propia juventud empoderada la que salvó la iniciativa. "El mismo grupo de tíos a los que iba dirigido el proyecto se hizo cargo de la continuidad del mismo", señala con orgullo, marcando el origen de una nueva etapa puramente autogestionada: "Así nació el grupo Antupeñi 'Niños de la tierra' hasta por el 2003".</p>
+              <p class="font-bold text-white uppercase text-sm tracking-wider">Reflexiones y el impacto en una generación</p>
+              <p>Al mirar hacia atrás y evaluar aquellos años de labor territorial ininterrumpida, Carlos aterriza las expectativas frente a un contexto adverso. "No se pretendia una efectividad total, pero sí hacer una mudanza en el pensamiento social de cada uno de ellos respecto a su entorno".</p>
+              <p>Reconoce abiertamente que "Muchos chicos se perdieron en la droga", pero rescata el legado invaluable y principal logro de la organización: "una gran mayoría consiguieron crear pensamiento crítico y razonamiento social".</p>
+            </div>
+            <div class="card-mir"><img src="images/antupeni.jpg" alt="Antupeñi" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">"La semilla de la organización territorial germina en la memoria del pueblo."</p></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>`
+    };
+
+    /* ─── Funciones globales SPA ─── */
+    function renderizarPorSeccion(nombreSeccion) {
+      var nav = document.getElementById('navegacion-subsecciones');
+      var section = document.getElementById('contenedor-indices-section');
+      var contenedor = document.getElementById('contenedor-indices');
+      if (!contenedor) return;
+      if (nav) nav.style.display = 'none';
+      if (section) section.style.display = '';
+      contenedor.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#666;">Cargando relatos...</div>';
+
+      // Render hardcoded content if available
+      var html = '';
+      var hard = CONTENIDO_HARDCODEADO[nombreSeccion];
+      if (hard) {
+        html += '<div class="hardcodeado-wrapper">' + hard + '</div>';
+      } else {
+        html = '';
+      }
+
+      // Also fetch from Supabase (user-submitted relatos)
+      var supabaseClient = window.miSupabase;
+      if (!supabaseClient) {
+        if (!hard) { contenedor.innerHTML = '<p style="color:var(--color-mir);text-align:center;">Error de conexión.</p>'; }
+        return;
+      }
+
+      supabaseClient
+        .from('recuerdos')
+        .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, nombre_serie')
+        .eq('seccion', nombreSeccion)
+        .eq('aprobado', true)
+        .not('titulo_relato', 'is', null)
+        .neq('titulo_relato', '')
+        .order('created_at', { ascending: false })
+        .then(function(resp) {
+          if (resp.error) {
+            if (!hard) { contenedor.innerHTML = '<p style="color:var(--color-mir);text-align:center;">Error al cargar relatos.</p>'; }
+            return;
+          }
+          var data = resp.data || [];
+          if (hard && data.length === 0) {
+            // Only hardcoded content, no DB relatos
+            contenedor.innerHTML = html;
+            finalizarRender(nombreSeccion);
+            return;
+          }
+          if (!hard && data.length === 0) {
+            contenedor.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="font-size:48px;opacity:0.3;margin-bottom:12px;">📖</div><p style="color:#666;">No hay relatos en esta sección aún.</p></div>';
+            return;
+          }
+          if (data.length > 0) {
+            html += '<div style="margin-top:2rem;"><h3 class="text-mir font-title text-xl uppercase mb-4" style="text-align:center;">Relatos de la comunidad</h3>';
+            data.forEach(function(r) {
+              var titulo = r.titulo_relato || 'Sin título';
+              var cuerpo = sanitizarHTML(r.mensaje_largo || r.mensaje || '');
+              var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) : '';
+              var serie = r.nombre_serie || '';
+              html +=
+                '<div class="relato-detalle" id="relato-' + r.id + '">' +
+                  '<h2>' + escaparHTML(titulo) + '</h2>' +
+                  '<div class="meta">' +
+                    (fecha ? '<span>' + fecha + '</span>' : '') +
+                    '<span>por ' + escaparHTML(r.nombre || 'Anónimo') + '</span>' +
+                    (serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escaparHTML(serie) + '</span>' : '') +
+                  '</div>' +
+                  '<div class="contenido">' + cuerpo + '</div>' +
+                '</div>';
+            });
+            html += '</div>';
+          }
+          contenedor.innerHTML = html;
+          finalizarRender(nombreSeccion);
+        })
+        .catch(function(err) {
+          console.error('[Relatos] Error:', err);
+          if (!hard) { contenedor.innerHTML = '<p style="color:var(--color-mir);text-align:center;">Error al cargar relatos.</p>'; }
+        });
+    }
+
+    function finalizarRender(nombreSeccion) {
+      // Re-init tabs for "Otras organizaciones"
+      if (nombreSeccion === 'Relatos: Otras organizaciones') {
+        var btns = document.querySelectorAll('#contenedor-indices .tab-btn');
+        btns.forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            btns.forEach(function(b) { b.classList.remove('active'); });
+            this.classList.add('active');
+            var contents = document.querySelectorAll('#contenedor-indices .tab-content');
+            contents.forEach(function(c) { c.classList.remove('active'); });
+            var target = document.getElementById('tab-' + this.dataset.tab);
+            if (target) target.classList.add('active');
+          });
+        });
+      }
+      // Scroll al relato destacado si viene de la vitrina
+      var urlParams = new URLSearchParams(window.location.search);
+      var highlightId = urlParams.get('id');
+      if (highlightId) {
+        setTimeout(function() {
+          var el = document.getElementById('relato-' + highlightId);
+          if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        }, 300);
+      }
+    }
+
+    function volverCategorias() {
+      var nav = document.getElementById('navegacion-subsecciones');
+      var section = document.getElementById('contenedor-indices-section');
+      if (nav) nav.style.display = '';
+      if (section) section.style.display = 'none';
+    }
+
+    function sanitizarHTML(html) {
+      if (!html) return '';
+      return html
+        .replace(/<script[^>]*>.*?<\/script>/gi, '')
+        .replace(/on\w+=["'][^"']*["']/gi, '')
+        .replace(/<[^>]*>/g, function(m) {
+          var permitidas = ['<b>','</b>','<i>','</i>','<u>','</u>','<br>','<br/>','<br />','<p>','</p>','<div>','</div>','<span>','</span>','<strong>','</strong>','<em>','</em>'];
+          if (permitidas.indexOf(m.toLowerCase()) !== -1) return m;
+          if (/^<br\s*\/?>$/i.test(m)) return '<br>';
+          if (/^<\/?(p|div|span)>$/i.test(m)) return m.toLowerCase();
+          if (/^<(p|div|span)\s+[^>]*>$/i.test(m)) return m.replace(/on\w+=["'][^"']*["']/gi, '');
+          return '';
+        });
+    }
+
+    function escaparHTML(text) {
+      if (!text) return '';
+      return String(text).replace(/[&<>"']/g, function(c) {
+        return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[c];
+      });
+    }
+
+    /* ─── Inicialización ─── */
+    (function() {
       var menuToggle = document.getElementById('menu-toggle');
       if (menuToggle) {
         menuToggle.addEventListener('click', function() {
@@ -239,399 +497,14 @@
         l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
       });
 
-      var supabase = window.miSupabase;
-
-      // ─── Flat list of all relatos for lookup ───
-      var allRelatos = [];
-      var SECCIONES_ORDEN = ['Relatos: El Jano', 'Relatos: El Arca', 'Relatos: Otras organizaciones'];
-      var seccionLabels = { 'Relatos: El Jano': 'El Jano', 'Relatos: El Arca': 'El Arca', 'Relatos: Otras organizaciones': 'Otras Org.' };
-      var activeSeccion = null;
-      var relatosCargados = false;
-
-      function mostrarRelatosView() {
-        var cards = document.getElementById('categoria-cards');
-        var section = document.getElementById('relatos-section');
-        if (cards) cards.style.display = 'none';
-        if (section) section.style.display = '';
+      // Deep linking desde vitrina (?id=...&seccion=...)
+      var urlParams = new URLSearchParams(window.location.search);
+      var idRelato = urlParams.get('id');
+      var seccionRelato = urlParams.get('seccion');
+      if (idRelato || seccionRelato) {
+        var sec = seccionRelato || 'Relatos: El Arca';
+        renderizarPorSeccion(sec);
       }
-
-      function mostrarCardsView() {
-        var cards = document.getElementById('categoria-cards');
-        var section = document.getElementById('relatos-section');
-        if (cards) cards.style.display = '';
-        if (section) section.style.display = 'none';
-      }
-
-      // ─── Card click handlers ───
-      document.querySelectorAll('.cat-card').forEach(function(card) {
-        card.addEventListener('click', function() {
-          var sec = this.getAttribute('data-seccion');
-          if (!sec) return;
-          mostrarRelatosView();
-          cargarRelatos(sec);
-        });
-      });
-
-      // ─── Back button ───
-      document.addEventListener('click', function(e) {
-        if (e.target && e.target.id === 'btn-volver') {
-          mostrarCardsView();
-        }
-      });
-
-      async function cargarRelatos(seccionInicial) {
-        var container = document.getElementById('relatos-container');
-        if (!container) return;
-
-        // Read URL params (only on first load)
-        var urlParams = new URLSearchParams(window.location.search);
-        var highlightId = urlParams.get('id') || null;
-        var highlightSeccion = urlParams.get('seccion') || null;
-
-        // If called from card click, seccionInicial overrides URL param
-        if (seccionInicial) {
-          highlightSeccion = seccionInicial;
-        }
-
-        container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#666;">Cargando relatos...</div>';
-
-        try {
-          var { data, error } = await supabase
-            .from('recuerdos')
-            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, seccion, nombre_serie')
-            .eq('aprobado', true)
-            .in('seccion', ['Relatos: El Jano', 'Relatos: El Arca', 'Relatos: Otras organizaciones'])
-            .not('titulo_relato', 'is', null)
-            .neq('titulo_relato', '')
-            .order('nombre_serie', { ascending: true, nullsFirst: false })
-            .order('created_at', { ascending: false });
-
-          if (error) throw error;
-
-          var relatos = data || [];
-          allRelatos = relatos;
-
-          if (relatos.length === 0) {
-            container.innerHTML =
-              '<div style="text-align:center;padding:60px 20px;">' +
-                '<div style="font-size:48px;opacity:0.3;margin-bottom:12px;">📖</div>' +
-                '<p style="color:#666;">No hay relatos publicados aún. Vuelve pronto.</p>' +
-              '</div>';
-            return;
-          }
-
-          // ─── Group relatos by seccion ───
-          var secciones = {};
-          SECCIONES_ORDEN.forEach(function(sec) { secciones[sec] = []; });
-          relatos.forEach(function(r) {
-            if (secciones[r.seccion]) secciones[r.seccion].push(r);
-          });
-
-          // Determine active seccion
-          if (highlightSeccion && secciones[highlightSeccion] && secciones[highlightSeccion].length > 0) {
-            activeSeccion = highlightSeccion;
-          } else {
-            for (var i = 0; i < SECCIONES_ORDEN.length; i++) {
-              if (secciones[SECCIONES_ORDEN[i]].length > 0) {
-                activeSeccion = SECCIONES_ORDEN[i];
-                break;
-              }
-            }
-          }
-
-          // ─── Build Tabs ───
-          var html =
-            '<div style="max-width:1200px;margin:0 auto;">' +
-              '<div style="display:flex;gap:4px;border-bottom:1px solid rgba(229,9,20,0.15);padding:0 4px;margin-bottom:0;">';
-
-          SECCIONES_ORDEN.forEach(function(sec) {
-            var count = secciones[sec].length;
-            var label = seccionLabels[sec] || sec;
-            var isActive = sec === activeSeccion;
-            html +=
-              '<button class="seccion-tab' + (isActive ? ' active' : '') + '" data-seccion="' + sec + '"' +
-                (count === 0 ? ' style="opacity:0.35;cursor:default;" disabled' : '') + '>' +
-                label + ' <span style="font-weight:400;opacity:0.7;">(' + count + ')</span>' +
-              '</button>';
-          });
-
-          html += '</div>';
-
-          // ─── Layout container (sidebar + content) ───
-          html += '<div class="relato-layout" style="display:flex;gap:0;max-width:1200px;margin:0 auto;">';
-
-          // ─── Sidebar ───
-          html +=
-            '<div class="relato-index" id="relato-index" style="width:300px;flex-shrink:0;border-right:1px solid rgba(229,9,20,0.15);max-height:600px;overflow-y:auto;">' +
-              '<div style="padding:16px 20px;border-bottom:1px solid rgba(229,9,20,0.1);">' +
-                '<h3 style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin:0;font-weight:700;font-family:Arial,Helvetica,sans-serif;">Índice de relatos</h3>' +
-                '<span id="relato-count" style="font-size:10px;color:#555;"></span>' +
-              '</div>';
-
-          // Build sidebar items for each seccion (only active is visible via JS)
-          SECCIONES_ORDEN.forEach(function(sec) {
-            var relatosDeSeccion = secciones[sec] || [];
-
-            // Group by nombre_serie within this seccion
-            var groups = [];
-            var groupMap = {};
-            relatosDeSeccion.forEach(function(r) {
-              var serie = r.nombre_serie ? r.nombre_serie.trim() : '';
-              if (!serie) serie = '—';
-              if (!groupMap[serie]) {
-                groupMap[serie] = { nombre: serie, relatos: [] };
-                groups.push(groupMap[serie]);
-              }
-              groupMap[serie].relatos.push(r);
-            });
-            groups.sort(function(a, b) {
-              if (a.nombre === '—' && b.nombre !== '—') return 1;
-              if (b.nombre === '—' && a.nombre !== '—') return -1;
-              return a.nombre.localeCompare(b.nombre, 'es');
-            });
-
-            var panelId = 'idx-' + sec.replace(/[^a-zA-Z0-9]/g, '');
-            var isVisible = sec === activeSeccion;
-            html += '<div class="idx-panel" id="' + panelId + '"' + (isVisible ? '' : ' style="display:none;"') + '>';
-
-            groups.forEach(function(group) {
-              var isUnnamed = (group.nombre === '—');
-              html +=
-                '<div role="heading" aria-level="3" style="padding:10px 16px 2px 16px;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#555;font-weight:700;font-family:Arial,Helvetica,sans-serif;border-top:1px solid rgba(229,9,20,0.08);">' +
-                  (isUnnamed ? 'Sin serie' : escapeHtml(group.nombre)) +
-                  ' <span style="color:#444;font-weight:400;">(' + group.relatos.length + ')</span>' +
-                '</div>';
-
-              group.relatos.forEach(function(r) {
-                var titulo = r.titulo_relato || 'Sin título';
-                var isHighlight = String(r.id) === String(highlightId);
-                html +=
-                  '<button class="relato-index-item' + (isHighlight ? ' active' : '') + '" data-id="' + r.id + '" data-seccion="' + sec + '">' +
-                    '<span style="font-weight:600;font-size:13px;">' + escapeHtml(titulo) + '</span>' +
-                    '<div style="font-size:11px;color:#666;margin-top:2px;">por ' + escapeHtml(r.nombre || 'Anónimo') + '</div>' +
-                  '</button>';
-              });
-            });
-
-            html += '</div>'; // idx-panel
-          });
-
-          html += '</div>'; // relato-index (sidebar)
-
-          // ─── Main content area ───
-          html += '<div class="relato-body" id="relato-body" style="flex:1;padding:32px 40px;min-height:500px;overflow-y:auto;">';
-
-          // Find the first relato to show
-          var targetRelato = null;
-
-          // Try highlightId first
-          if (highlightId) {
-            targetRelato = relatos.filter(function(r) { return String(r.id) === String(highlightId); })[0];
-          }
-
-          // Fallback to first relato in active seccion
-          if (!targetRelato && activeSeccion) {
-            var activeRelatos = secciones[activeSeccion] || [];
-            targetRelato = activeRelatos[0] || null;
-          }
-
-          // Absolute fallback
-          if (!targetRelato) targetRelato = relatos[0] || null;
-
-          if (targetRelato) html += renderRelatoBody(targetRelato);
-
-          html += '</div></div></div>'; // body, layout, container
-
-          container.innerHTML = html;
-          relatosCargados = true;
-
-          // ─── Update count ───
-          updateRelatoCount();
-
-          // ─── Tab click handlers ───
-          container.querySelectorAll('.seccion-tab').forEach(function(tab) {
-            tab.addEventListener('click', function() {
-              if (this.disabled) return;
-              var sec = this.getAttribute('data-seccion');
-              if (sec === activeSeccion) return;
-              switchTab(sec);
-            });
-          });
-
-          // ─── Index click handlers ───
-          container.querySelectorAll('.relato-index-item').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-              var id = this.getAttribute('data-id');
-              var sec = this.getAttribute('data-seccion');
-              var relato = allRelatos.filter(function(r) { return String(r.id) === String(id); })[0];
-              if (!relato) return;
-
-              // If relato belongs to a different seccion, switch tab first
-              if (sec && sec !== activeSeccion) {
-                switchTab(sec, function() {
-                  selectRelato(id);
-                });
-              } else {
-                selectRelato(id);
-              }
-            });
-          });
-
-          // ─── After render: scroll to highlight if present ───
-          if (highlightId && targetRelato) {
-            setTimeout(function() {
-              var activeBtn = container.querySelector('.relato-index-item.active');
-              if (activeBtn) {
-                activeBtn.scrollIntoView({ block: 'center', behavior: 'smooth' });
-              }
-            }, 200);
-          }
-
-        } catch (err) {
-          console.error('[Relatos] Error:', err);
-          container.innerHTML =
-            '<div style="text-align:center;padding:60px 20px;">' +
-              '<p style="color:var(--color-mir);">Error al cargar los relatos. Intenta de nuevo más tarde.</p>' +
-            '</div>';
-        }
-      }
-
-      function switchTab(sec, callback) {
-        var container = document.getElementById('relatos-container');
-        if (!container || sec === activeSeccion) { if (callback) callback(); return; }
-
-        activeSeccion = sec;
-
-        // Update tab active states
-        container.querySelectorAll('.seccion-tab').forEach(function(t) {
-          t.classList.toggle('active', t.getAttribute('data-seccion') === sec);
-        });
-
-        // Show/hide index panels
-        container.querySelectorAll('.idx-panel').forEach(function(panel) {
-          var panelSeccion = null;
-          // Derive seccion from id attribute (reverse of what we built)
-          SECCIONES_ORDEN.forEach(function(s) {
-            if (panel.id === 'idx-' + s.replace(/[^a-zA-Z0-9]/g, '')) panelSeccion = s;
-          });
-          panel.style.display = (panelSeccion === sec) ? '' : 'none';
-        });
-
-        // Find first relato in this seccion and show it
-        var firstInTab = allRelatos.filter(function(r) { return r.seccion === sec; })[0];
-        var bodyEl = document.getElementById('relato-body');
-        if (firstInTab && bodyEl) {
-          bodyEl.innerHTML = renderRelatoBody(firstInTab);
-          bodyEl.scrollTop = 0;
-        }
-
-        // Update active state in index
-        container.querySelectorAll('.relato-index-item').forEach(function(b) {
-          b.classList.toggle('active', b.getAttribute('data-seccion') === sec && String(b.getAttribute('data-id')) === String(firstInTab ? firstInTab.id : null));
-        });
-
-        updateRelatoCount();
-
-        if (callback) callback();
-      }
-
-      function selectRelato(id) {
-        var container = document.getElementById('relatos-container');
-        if (!container) return;
-
-        var relato = allRelatos.filter(function(r) { return String(r.id) === String(id); })[0];
-        if (!relato) return;
-
-        // If seccion changed, switchTab was already called before this
-        // Update active state in index
-        container.querySelectorAll('.relato-index-item').forEach(function(b) {
-          b.classList.toggle('active', String(b.getAttribute('data-id')) === String(id));
-        });
-
-        // Update body
-        var bodyEl = document.getElementById('relato-body');
-        if (bodyEl) {
-          bodyEl.innerHTML = renderRelatoBody(relato);
-          bodyEl.scrollTop = 0;
-        }
-      }
-
-      function updateRelatoCount() {
-        var container = document.getElementById('relatos-container');
-        if (!container) return;
-        var countEl = document.getElementById('relato-count');
-        if (!countEl) return;
-        var activeCount = allRelatos.filter(function(r) { return r.seccion === activeSeccion; }).length;
-        countEl.textContent = activeCount + ' relatos';
-      }
-
-      function renderRelatoBody(r) {
-        var titulo = r.titulo_relato || 'Sin título';
-        var cuerpoHTML = r.mensaje_largo || r.mensaje || '';
-        var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
-        var serie = r.nombre_serie || '';
-
-        // Sanitize: remove potentially dangerous HTML but keep <b>, <i>, <u>
-        cuerpoHTML = sanitizeRelatoHTML(cuerpoHTML);
-
-        return '' +
-          '<h2 style="font-family:Arial,Helvetica,sans-serif;color:var(--color-mir);text-transform:uppercase;letter-spacing:0.05em;font-size:28px;margin:0 0 8px 0;text-align:left !important;">' + escapeHtml(titulo) + '</h2>' +
-          '<div style="display:flex;gap:12px;font-size:12px;color:#666;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(229,9,20,0.1);flex-wrap:wrap;">' +
-            (fecha ? '<span>' + fecha + '</span>' : '') +
-            '<span>por ' + escapeHtml(r.nombre || 'Anónimo') + '</span>' +
-            (serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escapeHtml(serie) + '</span>' : '') +
-            '<span style="text-transform:uppercase;letter-spacing:0.05em;color:#888;">Relato</span>' +
-          '</div>' +
-          '<div style="font-size:15px;line-height:1.8;color:#ddd;">' +
-            (cuerpoHTML || '<em style="color:#666;">Sin contenido</em>') +
-          '</div>';
-      }
-
-      function sanitizeRelatoHTML(html) {
-        if (!html) return '';
-        // Only allow <b>, <i>, <u>, <br>, <p>, <div>, <span> tags
-        return html
-          .replace(/<script[^>]*>.*?<\/script>/gi, '')
-          .replace(/on\w+=["'][^"']*["']/gi, '')
-          .replace(/<[^>]*>/g, function(match) {
-            var allowed = ['<b>', '</b>', '<i>', '</i>', '<u>', '</u>', '<br>', '<br/>', '<br />', '<p>', '</p>', '<div>', '</div>', '<span>', '</span>', '<strong>', '</strong>', '<em>', '</em>'];
-            if (allowed.indexOf(match.toLowerCase()) !== -1) return match;
-            // Allow self-closing br variations
-            if (/^<br\s*\/?>$/i.test(match)) return '<br>';
-            // Allow <p>, </p>, <div>, </div>, <span>, </span>
-            if (/^<\/?(p|div|span)>$/i.test(match)) return match.toLowerCase();
-            // Allow attributes on p, div, span only if they don't contain event handlers
-            if (/^<(p|div|span)\s+[^>]*>$/i.test(match)) {
-              var safe = match.replace(/on\w+=["'][^"']*["']/gi, '');
-              return safe;
-            }
-            return '';
-          });
-      }
-
-      function escapeHtml(text) {
-        if (!text) return '';
-        var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return String(text).replace(/[&<>"']/g, function(c) { return map[c]; });
-      }
-
-      // On load: if URL has id or seccion param, skip cards and go directly to relatos
-      function init() {
-        var urlParams = new URLSearchParams(window.location.search);
-        var hasId = urlParams.has('id');
-        var hasSeccion = urlParams.has('seccion');
-        if (hasId || hasSeccion) {
-          mostrarRelatosView();
-          cargarRelatos();
-        }
-      }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-      } else {
-        init();
-      }
-
     })();
   </script>
   <script src="/app.js"></script>
