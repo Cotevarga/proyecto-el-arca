@@ -124,27 +124,15 @@
               <input type="text" id="tags" name="tags" placeholder="Ej: marcha, pobladores, años 90" style="width:100%;padding:8px 12px;background:black;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:white;font-size:12px;outline:none;">
             </div>
           </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;background:rgba(229,9,20,0.04);border:1px solid rgba(229,9,20,0.15);border-radius:8px;">
+            <input type="checkbox" id="autorizacion" name="autorizacion" required style="margin-top:3px;accent-color:var(--color-mir);width:18px;height:18px;flex-shrink:0;">
+            <label for="autorizacion" style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5;cursor:pointer;">
+              Autorizo a 'El Arca' a resguardar, digitalizar y publicar mi aporte con fines de memoria colectiva y archivo comunitario, aceptando los <a href="/terminos.html" target="_blank" style="color:var(--color-mir);text-decoration:underline;">Términos y Condiciones</a>.
+            </label>
+          </div>
           <button type="submit" id="btn-enviar" class="btn-mir w-full" aria-label="Enviar recuerdo al Archivo Comunitario">Subir y compartir recuerdo</button>
           <div id="form-messages" class="text-center text-sm font-medium hidden"></div>
-        </form>
-      </div>
-    </section>
-  </main>
-
-<footer class="bg-black text-white/50 py-12 border-t border-mir/20">
-    <div class="max-w-5xl mx-auto px-4 text-center">
-      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
-      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
-      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
-        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
-        <span>|</span>
-        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
-      </nav>
-      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
-    </div>
-</footer>
-
-  <script>
+          <script>
     (function () {
       'use strict';
       var supabaseClient = window.miSupabase;
@@ -226,6 +214,7 @@
             tamanio_bytes: file.size,
             mensaje_largo: metadata.relato || null,
             aprobado: false,
+            consentimiento: true,
             geolocalizacion: meta.geolocalizacion || null,
             tags: meta.tags || null,
             fecha_creacion_archivo: meta.fecha_creacion_archivo || null
@@ -252,6 +241,14 @@
             return;
           }
 
+          var autorizacion = document.getElementById('autorizacion');
+          if (!autorizacion || !autorizacion.checked) {
+            messages.textContent = 'Debes autorizar el resguardo y publicaci\u00f3n de tu aporte.';
+            messages.className = 'text-center text-sm font-medium text-mir';
+            messages.classList.remove('hidden');
+            return;
+          }
+
           btn.textContent = 'Enviando\u2026';
           btn.disabled = true;
 
@@ -267,6 +264,7 @@
                   anio: anio || null,
                   mensaje_largo: relato || null,
                   aprobado: false,
+                  consentimiento: true,
                   geolocalizacion: meta.geolocalizacion || null,
                   tags: meta.tags || null,
                   fecha_creacion_archivo: meta.fecha_creacion_archivo || null
@@ -292,6 +290,24 @@
       }
     })();
   </script>
+        </form>
+      </div>
+    </section>
+  </main>
+
+<footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
+        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
+        <span>|</span>
+        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
+      </nav>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+</footer>
+
   <script src="/app.js"></script>
 </body>
 </html>
