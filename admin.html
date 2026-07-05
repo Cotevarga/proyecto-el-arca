@@ -588,6 +588,7 @@
         <a href="#" data-section="dashboard" class="active"><span class="icon">📊</span> Dashboard</a>
         <a href="#" data-section="pending"><span class="icon">⏳</span> Pendientes</a>
         <a href="#" data-section="approved"><span class="icon">✅</span> Aprobados</a>
+        <a href="#" data-section="history"><span class="icon">📋</span> Historial</a>
         <a href="#" data-section="music"><span class="icon">🎵</span> Música</a>
         <a href="#" data-section="upload"><span class="icon">📤</span> Subida Manual</a>
       </div>
@@ -691,6 +692,39 @@
               <div class="empty-state">
                 <div class="icon">📸</div>
                 <div class="text">No hay recuerdos aprobados</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORIAL -->
+        <div class="content-section" id="section-history">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Historial completo de subidas</h3>
+              <span style="font-size:11px;color:#555;">Total: <span id="history-count">0</span> registros</span>
+            </div>
+            <div id="history-toolbar" style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;">
+              <input type="text" id="history-search" placeholder="Buscar por nombre, título, relato..." style="flex:1;min-width:180px;padding:8px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+              <select id="history-filter-section" style="padding:8px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+                <option value="">Todas las secciones</option>
+                <option value="Galeria">Galería</option>
+                <option value="Videos y Audios">Videos y Audios</option>
+                <option value="Relatos: El Jano">Relatos: El Jano</option>
+                <option value="Relatos: El Arca">Relatos: El Arca</option>
+                <option value="Relatos: Otras organizaciones">Relatos: Otras organizaciones</option>
+                <option value="Relatos: Anecdotas">Relatos: Anecdotas</option>
+              </select>
+              <select id="history-filter-status" style="padding:8px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+                <option value="">Todos los estados</option>
+                <option value="aprobado">Publicado</option>
+                <option value="pendiente">Pendiente</option>
+              </select>
+            </div>
+            <div id="history-list" style="overflow-x:auto;">
+              <div class="empty-state">
+                <div class="icon">📋</div>
+                <div class="text">No hay registros</div>
               </div>
             </div>
           </div>
@@ -888,6 +922,55 @@
     </div>
   </div>
 
+  <!-- ─── Edit Modal ─── -->
+  <div id="edit-modal" style="display:none;position:fixed;z-index:99996;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
+    <div style="background:#121212;border:1px solid rgba(229,9,20,0.2);border-radius:16px;padding:32px;max-width:560px;width:90%;max-height:90vh;overflow-y:auto;">
+      <h3 style="font-size:18px;font-weight:700;color:white;margin:0 0 4px 0;">Editar recuerdo</h3>
+      <p style="font-size:12px;color:#888;margin:0 0 20px 0;">Corrige el texto, cambia la sección o actualiza los metadatos.</p>
+      <div class="form-group">
+        <label>Sección</label>
+        <select id="edit-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+          <option value="Galeria">Galería</option>
+          <option value="Videos y Audios">Videos y Audios</option>
+          <option value="Relatos: El Jano">Relatos: El Jano</option>
+          <option value="Relatos: El Arca">Relatos: El Arca</option>
+          <option value="Relatos: Otras organizaciones">Relatos: Otras organizaciones</option>
+          <option value="Relatos: Anecdotas">Relatos: Anecdotas</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Pseudónimo / Nombre</label>
+        <input type="text" id="edit-nombre" placeholder="Nombre del colaborador" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+      </div>
+      <div class="form-group">
+        <label>Título del relato</label>
+        <input type="text" id="edit-titulo" placeholder="Título" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+      </div>
+      <div class="form-group">
+        <label>Serie / Colección</label>
+        <input type="text" id="edit-serie" placeholder="Ej: Memorias de La Pintana" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+      </div>
+      <div class="form-group">
+        <label>Texto del relato / descripción</label>
+        <textarea id="edit-texto" rows="8" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Relato o descripción..."></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Ubicación</label>
+          <input type="text" id="edit-geo" placeholder="Ej: La Pintana, Santiago" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Tags (separados por coma)</label>
+          <input type="text" id="edit-tags" placeholder="marcha, pobladores, años 90" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
+        <button class="btn-secondary" id="btn-edit-cancel" aria-label="Cancelar edición">Cancelar</button>
+        <button class="btn-primary" id="btn-edit-save" aria-label="Guardar cambios">✓ GUARDAR</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
@@ -929,10 +1012,11 @@
         document.querySelectorAll('.content-section').forEach(function(s) { s.classList.remove('active'); });
         var target = document.getElementById('section-' + section);
         if (target) target.classList.add('active');
-        var titles = { dashboard: 'Dashboard', pending: 'Pendientes', approved: 'Aprobados', music: 'Gestión de Música', upload: 'Subida Manual' };
+        var titles = { dashboard: 'Dashboard', pending: 'Pendientes', approved: 'Aprobados', history: 'Historial', music: 'Gestión de Música', upload: 'Subida Manual' };
         sectionTitle.textContent = titles[section] || 'Dashboard';
         if (section === 'pending') loadPending();
         if (section === 'approved') loadApproved();
+        if (section === 'history') loadHistory();
         if (section === 'music') { actualizarListadoMusica(); iniciarRealtimeMusica(); }
         if (section === 'dashboard') loadDashboard();
       });
@@ -1311,13 +1395,15 @@
 
           var estadoBadge = '';
           var acciones = '';
+          var editAccion = '<button class="btn-sm btn-sm-edit" onclick="window.editRecuerdo(\'' + r.id + '\')" aria-label="Editar recuerdo de ' + escapeHtml(nombre) + '" style="margin-right:4px;">✎ Editar</button>';
           if (r.aprobado) {
             estadoBadge = '<span class="badge badge-approved">Publicado</span>';
-            acciones = '<button class="btn-sm btn-sm-danger" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo de ' + escapeHtml(nombre) + '">✕ Eliminar</button>';
+            acciones = editAccion + '<button class="btn-sm btn-sm-danger" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo de ' + escapeHtml(nombre) + '">✕ Eliminar</button>';
           } else {
             estadoBadge = '<span class="badge badge-pending">Pendiente</span>';
             acciones =
               '<button class="btn-sm btn-sm-approve" onclick="window.approveRecuerdo(\'' + r.id + '\')" style="margin-right:4px;" aria-label="Abrir modal de aprobación para recuerdo de ' + escapeHtml(nombre) + '">✓ Aprobar</button>' +
+              editAccion +
               '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo pendiente de ' + escapeHtml(nombre) + '">✕ Eliminar</button>';
           }
 
@@ -1459,6 +1545,7 @@
             '<td style="vertical-align:middle;">' + relatoHtml + '</td>' +
             '<td style="vertical-align:middle;white-space:nowrap;">' +
               '<button class="btn-sm btn-sm-approve" onclick="window.approveRecuerdo(\'' + r.id + '\')" aria-label="Abrir modal de aprobación">✓ APROBAR</button> ' +
+              '<button class="btn-sm btn-sm-edit" onclick="window.editRecuerdo(\'' + r.id + '\')" aria-label="Editar recuerdo">✎ Editar</button> ' +
               '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo permanentemente">✕ ELIMINAR</button>' +
             '</td></tr>';
         });
@@ -1538,7 +1625,9 @@
             '<td class="truncate">' + escapeHtml(r.nombre) + '</td>' +
             '<td class="hide-mobile"><span class="badge badge-approved">' + (r.tipo_archivo && r.tipo_archivo.indexOf('audio') !== -1 ? 'Audio' : 'Imagen') + '</span></td>' +
             '<td class="hide-mobile">' + fecha + '</td>' +
-            '<td><button class="btn-sm btn-sm-danger" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo aprobado de ' + escapeHtml(r.nombre) + '">✕ Eliminar</button></td></tr>';
+            '<td style="white-space:nowrap;">' +
+              '<button class="btn-sm btn-sm-edit" onclick="window.editRecuerdo(\'' + r.id + '\')" aria-label="Editar recuerdo de ' + escapeHtml(r.nombre) + '" style="margin-right:4px;">✎ Editar</button>' +
+              '<button class="btn-sm btn-sm-danger" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo aprobado de ' + escapeHtml(r.nombre) + '">✕ Eliminar</button></td></tr>';
         });
         html += '</tbody></table>';
         list.innerHTML = html;
@@ -1546,6 +1635,198 @@
         if (err.message !== 'Sesión expirada') showToast('Error al cargar aprobados', 'error');
       }
     }
+
+    // ─── Edit Modal ───
+    var _editTargetId = null;
+    var editModal = document.getElementById('edit-modal');
+    var editSeccion = document.getElementById('edit-seccion');
+    var editNombre = document.getElementById('edit-nombre');
+    var editTitulo = document.getElementById('edit-titulo');
+    var editSerie = document.getElementById('edit-serie');
+    var editTexto = document.getElementById('edit-texto');
+    var editGeo = document.getElementById('edit-geo');
+    var editTags = document.getElementById('edit-tags');
+    var btnEditCancel = document.getElementById('btn-edit-cancel');
+    var btnEditSave = document.getElementById('btn-edit-save');
+
+    window.editRecuerdo = async function(id) {
+      _editTargetId = id;
+      try {
+        var s = getSupabaseClient();
+        if (!s) { showToast('Cliente Supabase no disponible', 'error'); return; }
+        var { data: r, error } = await s.from('recuerdos').select('*').eq('id', id).single();
+        if (error) { showToast('Error al cargar datos', 'error'); return; }
+        if (editSeccion) editSeccion.value = r.seccion || 'Galeria';
+        if (editNombre) editNombre.value = r.nombre || '';
+        if (editTitulo) editTitulo.value = r.titulo_relato || '';
+        if (editSerie) editSerie.value = r.nombre_serie || '';
+        if (editTexto) editTexto.value = r.mensaje_largo || r.mensaje || '';
+        if (editGeo) editGeo.value = r.geolocalizacion || '';
+        if (editTags) editTags.value = (r.tags && Array.isArray(r.tags)) ? r.tags.join(', ') : (r.tags || '');
+        if (editModal) editModal.style.display = 'flex';
+      } catch (err) {
+        showToast('Error al cargar datos', 'error');
+      }
+    };
+
+    function closeEditModal() {
+      _editTargetId = null;
+      if (editModal) editModal.style.display = 'none';
+    }
+
+    if (btnEditCancel) btnEditCancel.addEventListener('click', closeEditModal);
+    if (editModal) {
+      editModal.addEventListener('click', function (e) {
+        if (e.target === editModal) closeEditModal();
+      });
+    }
+
+    if (btnEditSave) {
+      btnEditSave.addEventListener('click', async function () {
+        var id = _editTargetId;
+        if (!id) { closeEditModal(); return; }
+
+        var seccion = editSeccion ? editSeccion.value : 'Galeria';
+        var nombre = editNombre ? editNombre.value.trim() : '';
+        var titulo = editTitulo ? editTitulo.value.trim() : '';
+        var serie = editSerie ? editSerie.value.trim() : '';
+        var texto = editTexto ? editTexto.value.trim() : '';
+        var geo = editGeo ? editGeo.value.trim() : '';
+        var tagsRaw = editTags ? editTags.value.trim() : '';
+        var tags = tagsRaw ? tagsRaw.split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t.length > 0; }) : null;
+
+        btnEditSave.textContent = 'Guardando...';
+        btnEditSave.disabled = true;
+
+        try {
+          var s = getSupabaseClient();
+          if (!s) throw new Error('Cliente Supabase no disponible');
+
+          var updateData = {
+            seccion: seccion,
+            nombre: nombre || null,
+            titulo_relato: titulo || null,
+            nombre_serie: serie || null,
+            mensaje_largo: texto || null,
+            geolocalizacion: geo || null,
+            tags: tags
+          };
+
+          var { error: updateError } = await s
+            .from('recuerdos')
+            .update(updateData)
+            .eq('id', id);
+
+          if (updateError) throw updateError;
+
+          showToast('Recuerdo actualizado', 'success');
+          closeEditModal();
+          loadPending();
+          loadApproved();
+          loadHistory();
+          loadDashboard();
+        } catch (err) {
+          console.error('[Editar] Error:', err);
+          showToast('Error al guardar: ' + (err.message || 'desconocido'), 'error');
+        } finally {
+          btnEditSave.textContent = '✓ GUARDAR';
+          btnEditSave.disabled = false;
+        }
+      });
+    }
+
+    // ─── Historial ───
+    var _historyData = [];
+
+    async function loadHistory() {
+      try {
+        var s = getSupabaseClient();
+        if (!s) return;
+        var { data, error } = await s.from('recuerdos').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        _historyData = data || [];
+        document.getElementById('history-count').textContent = _historyData.length;
+        renderHistoryTable(_historyData);
+      } catch (err) {
+        if (err.message !== 'Sesión expirada') showToast('Error al cargar historial', 'error');
+      }
+    }
+
+    function renderHistoryTable(records) {
+      var list = document.getElementById('history-list');
+      if (!list) return;
+
+      if (records.length === 0) {
+        list.innerHTML = '<div class="empty-state"><div class="icon">📋</div><div class="text">No hay registros</div></div>';
+        return;
+      }
+
+      var html = '<table><thead><tr><th>Fecha</th><th>Pseudónimo</th><th>Título</th><th>Sección</th><th>Estado</th><th>Acción</th></tr></thead><tbody>';
+      records.forEach(function(r) {
+        var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL') : '—';
+        var nombre = escapeHtml(r.nombre || 'Anónimo');
+        var titulo = escapeHtml(r.titulo_relato || r.nombre || '—');
+        var seccionLabel = nombreSeccion(r.seccion);
+        var estadoBadge = r.aprobado
+          ? '<span class="badge badge-approved">Publicado</span>'
+          : '<span class="badge badge-pending">Pendiente</span>';
+
+        var editBtn = '<button class="btn-sm btn-sm-edit" onclick="window.editRecuerdo(\'' + r.id + '\')" aria-label="Editar recuerdo de ' + nombre + '">✎ Editar</button>';
+        var deleteBtn = '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo de ' + nombre + '" style="margin-left:4px;">✕ Eliminar</button>';
+
+        html += '<tr>' +
+          '<td style="white-space:nowrap;">' + fecha + '</td>' +
+          '<td class="truncate">' + nombre + '</td>' +
+          '<td class="truncate">' + titulo + '</td>' +
+          '<td>' + seccionLabel + '</td>' +
+          '<td>' + estadoBadge + '</td>' +
+          '<td style="white-space:nowrap;">' + editBtn + deleteBtn + '</td></tr>';
+      });
+      html += '</tbody></table>';
+      list.innerHTML = html;
+    }
+
+    // ─── History search / filter ───
+    function applyHistoryFilters() {
+      var search = document.getElementById('history-search');
+      var filterSection = document.getElementById('history-filter-section');
+      var filterStatus = document.getElementById('history-filter-status');
+      if (!search || !filterSection || !filterStatus) return;
+
+      var query = (search.value || '').toLowerCase().trim();
+      var sectionVal = filterSection.value;
+      var statusVal = filterStatus.value;
+
+      var filtered = _historyData.filter(function(r) {
+        if (sectionVal && r.seccion !== sectionVal) return false;
+        if (statusVal === 'aprobado' && !r.aprobado) return false;
+        if (statusVal === 'pendiente' && r.aprobado) return false;
+        if (query) {
+          var haystack = ((r.nombre || '') + ' ' + (r.titulo_relato || '') + ' ' + (r.mensaje_largo || r.mensaje || '') + ' ' + (r.seccion || '')).toLowerCase();
+          if (haystack.indexOf(query) === -1) return false;
+        }
+        return true;
+      });
+
+      renderHistoryTable(filtered);
+    }
+
+    // Debounced search
+    var _searchTimer = null;
+    function setupHistoryFilters() {
+      var search = document.getElementById('history-search');
+      var filterSection = document.getElementById('history-filter-section');
+      var filterStatus = document.getElementById('history-filter-status');
+      if (search) {
+        search.addEventListener('input', function() {
+          clearTimeout(_searchTimer);
+          _searchTimer = setTimeout(applyHistoryFilters, 250);
+        });
+      }
+      if (filterSection) filterSection.addEventListener('change', applyHistoryFilters);
+      if (filterStatus) filterStatus.addEventListener('change', applyHistoryFilters);
+    }
+    setTimeout(setupHistoryFilters, 200);
 
     // ─── Modal de aprobación ───
     var _approvalTargetId = null;
