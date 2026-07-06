@@ -7,9 +7,25 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 
 const ENV = process.env.VERCEL_ENV || process.env.NODE_ENV || 'development';
-const SUPABASE_URL = process.env.SUPABASE_URL || '';
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
-const SUPABASE_PROJECT_ID = process.env.SUPABASE_PROJECT_ID || 'ukpoprkdgezgxlkjjuve';
+
+// Leer variables desde config.js como fallback
+let cfgSupabaseUrl = 'https://ukpoprkdgezgxlkjjuve.supabase.co';
+let cfgAnonKey = '';
+let cfgProjectId = 'ukpoprkdgezgxlkjjuve';
+try {
+  const cfgPath = join(ROOT, 'config.js');
+  const cfgContent = readFileSync(cfgPath, 'utf-8');
+  const urlMatch = cfgContent.match(/SUPABASE_URL\s*=\s*'([^']+)'/);
+  const keyMatch = cfgContent.match(/SUPABASE_ANON_KEY\s*=\s*'([^']+)'/);
+  const projMatch = cfgContent.match(/SUPABASE_PROJECT_ID\s*=\s*'([^']+)'/);
+  if (urlMatch) cfgSupabaseUrl = urlMatch[1];
+  if (keyMatch) cfgAnonKey = keyMatch[1];
+  if (projMatch) cfgProjectId = projMatch[1];
+} catch {}
+
+const SUPABASE_URL = process.env.SUPABASE_URL || cfgSupabaseUrl;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || cfgAnonKey;
+const SUPABASE_PROJECT_ID = process.env.SUPABASE_PROJECT_ID || cfgProjectId;
 const EDGE_FUNCTIONS_URL = process.env.EDGE_FUNCTIONS_URL || `https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1`;
 
 function injectEnv(filePath, content) {
