@@ -11,38 +11,34 @@ Deno.serve(async (req: Request) => {
   const clientIp = getClientIp(req);
 
   try {
-    // ─── Rate limiting ───
-    const rl = await checkRateLimit(clientIp, "search");
-    if (!rl.allowed) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Demasiadas solicitudes. Intenta en 1 minuto." }),
-        { status: 429, headers: { ...ch, "Content-Type": "application/json", ...rateLimitHeaders(rl.remaining, 30, rl.retryAfter) } },
-      );
+    if (req.method === "GET") {
+      const rl = await checkRateLimit(clientIp, "search");
+      if (!rl.allowed) {
+        return new Response(
+          JSON.stringify({ success: false, error: "Demasiadas solicitudes." }),
+          { status: 429, headers: { ...ch, "Content-Type": "application/json", ...rateLimitHeaders(rl.remaining, 30, rl.retryAfter) } },
+        );
+      }
+      await recordRateLimit(clientIp, "search");
     }
 
     const url = new URL(req.url);
-    const q = url.searchParams.get("q")?.trim();
+    const q = (url.searchParams.get("q") || "").trim();
 
     if (!q || q.length < 2) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Mínimo 2 caracteres" }),
-        { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ success: false, error: "Mínimo 2 caracteres" }), { status: 400, headers: { ...ch, "Content-Type": "application/json" } });
     }
 
     const sanitized = q.replace(/[^\w\sáéíóúñüäëïö]/gi, "").trim();
     if (!sanitized) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Consulta inválida" }),
-        { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ success: false, error: "Consulta inválida" }), { status: 400, headers: { ...ch, "Content-Type": "application/json" } });
     }
 
     const query = sanitized.split(/\s+/).map(w => w + ":*").join(" & ");
 
     const { data, error } = await supabase
       .from("recuerdos")
-      .select("id, nombre, mensaje_largo, tipo_archivo, url_archivo, pais, region, created_at, aprobado")
+      .select("id, nombre, mensaje_largo, tipo_archivo, url_archivo, created_at")
       .eq("aprobado", true)
       .textSearch("buscador", query, { config: "spanish" })
       .order("created_at", { ascending: false })
@@ -50,13 +46,9 @@ Deno.serve(async (req: Request) => {
 
     if (error) throw error;
 
-    // ─── Register rate limit ───
-    await recordRateLimit(clientIp, "search");
-
-    return new Response(
-      JSON.stringify({ success: true, data: data ?? [], total: data?.length ?? 0 }),
-      { status: 200, headers: { ...ch, "Content-Type": "application/json", ...rateLimitHeaders(rl.remaining, 30) } },
-    );
+    return new Response(JSON.stringify({ success: true, data: data ?? [], total: data?.length ?? 0 }), {
+      status: 200, headers: { ...ch, "Content-Type": "application/json" },
+    });
   } catch (err) {
     return new Response(
       JSON.stringify({ success: false, error: "Error interno del servidor" }),

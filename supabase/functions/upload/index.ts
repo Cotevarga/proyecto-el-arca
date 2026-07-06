@@ -8,6 +8,34 @@ const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") ?? "mariajosevarga@gmail.com";
 const MAX_STRING_LENGTH = 5000;
 const MAX_NOMBRE_LENGTH = 200;
 
+// ─── Magic byte signatures for allowed file types ───
+const MAGIC_BYTES: Record<string, Uint8Array[]> = {
+  "image/jpeg": [new Uint8Array([0xFF, 0xD8, 0xFF])],
+  "image/png": [new Uint8Array([0x89, 0x50, 0x4E, 0x47])],
+  "image/webp": [new Uint8Array([0x52, 0x49, 0x46, 0x46])], // RIFF....WEBP
+  "audio/mpeg": [
+    new Uint8Array([0x49, 0x44, 0x33]), // ID3 tag
+    new Uint8Array([0xFF, 0xFB]),        // MPEG-1 Layer 3
+    new Uint8Array([0xFF, 0xF3]),
+    new Uint8Array([0xFF, 0xF2]),
+  ],
+  "audio/wav": [new Uint8Array([0x52, 0x49, 0x46, 0x46])], // RIFF....WAVE
+  "video/mp4": [new Uint8Array([0x00, 0x00, 0x00])], // ....ftyp
+  "application/pdf": [new Uint8Array([0x25, 0x50, 0x44, 0x46])],
+};
+
+function matchesMagicByte(fileBytes: Uint8Array, mimeType: string): boolean {
+  const signatures = MAGIC_BYTES[mimeType];
+  if (!signatures) return true; // unknown type, skip check
+  return signatures.some(sig => {
+    if (fileBytes.length < sig.length) return false;
+    for (let i = 0; i < sig.length; i++) {
+      if (fileBytes[i] !== sig[i]) return false;
+    }
+    return true;
+  });
+}
+
 function escapeHtml(text: string): string {
   const map: Record<string, string> = {
     "&": "&amp;", "<": "&lt;", ">": "&gt;",
@@ -81,6 +109,30 @@ Deno.serve(async (req: Request) => {
       if (file.size > 50 * 1024 * 1024) {
         return new Response(
           JSON.stringify({ success: false, error: "El archivo supera los 50 MB." }),
+          { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
+        );
+      }
+
+      // ─── Magic byte validation (server-side) ───
+      const headerBytes = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+      if (!matchesMagicByte(headerBytes, file.type)) {
+        console.warn(`[Upload] Magic byte mismatch: declared=${file.type}, firstBytes=${Array.from(headerBytes.slice(0, 4)).map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
+        // Log security event
+        try {
+          await supabase.from("audit_log").insert({
+            accion: "security_file_rejected",
+            entidad: "upload",
+            metadata: {
+              reason: "magic_byte_mismatch",
+              declared_type: file.type,
+              first_bytes: Array.from(headerBytes.slice(0, 16)).map(b => b.toString(16).padStart(2, '0')).join(' '),
+              filename: file.name,
+              size: file.size,
+            },
+          });
+        } catch (_) { /* audit best-effort */ }
+        return new Response(
+          JSON.stringify({ success: false, error: "El archivo no coincide con el tipo declarado." }),
           { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
         );
       }

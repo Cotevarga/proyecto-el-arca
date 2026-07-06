@@ -13,6 +13,7 @@ const DEFAULTS: Record<string, RateLimitConfig> = {
   galeria: { windowMs: 60 * 1000, maxRequests: 30, action: "galeria" },
   musica: { windowMs: 60 * 1000, maxRequests: 30, action: "musica" },
   recuerdos: { windowMs: 60 * 1000, maxRequests: 30, action: "recuerdos" },
+  export: { windowMs: 60 * 1000, maxRequests: 30, action: "export" },
 };
 
 export async function checkRateLimit(
