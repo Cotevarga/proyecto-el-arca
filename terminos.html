@@ -10,10 +10,21 @@
   <meta property="og:url" content="https://elarca.cl/terminos.html">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_CL">
-  <meta name="description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <meta name="description" content="Términos de acceso, licencia CC BY-NC-SA 4.0 y política de privacidad del Archivo Comunitario El Arca, La Pintana.">
   <link rel="canonical" href="https://elarca.cl/terminos.html">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📜</text></svg>">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Términos y Condiciones — El Arca",
+    "description": "Términos de acceso, licencia CC BY-NC-SA 4.0 y política de privacidad",
+    "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "inLanguage": "es-CL",
+    "isAccessibleForFree": true
+  }
+  </script>
   <style>
     :root { --color-mir: #E50914; --color-noche: #111111; }
     body { font-family: 'Inter', system-ui, sans-serif; background-color: #000 !important; color: #fff !important; }
@@ -23,8 +34,6 @@
     .border-mir { border-color: var(--color-mir) !important; }
     .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
     .divider-mir { width:4rem;height:0.25rem;background-color:var(--color-mir);margin:1.5rem auto; }
-    .btn-mir { background-color: var(--color-mir) !important; color: white !important; font-weight: bold; padding: 0.75rem 2rem; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem; border: 2px solid var(--color-mir); }
-    .btn-mir:hover { background-color: #000 !important; color: var(--color-mir) !important; }
     .hover\:text-mir:hover { color: var(--color-mir) !important; }
     .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
     .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
@@ -38,7 +47,6 @@
   </style>
 </head>
 <body class="bg-black text-white antialiased">
-
   <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
@@ -60,13 +68,13 @@
         <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Escudo Legal</span>
         <h1 class="heading-mir text-4xl md:text-5xl mt-4 mb-2">Términos de Acceso Abierto</h1>
         <div class="divider-mir"></div>
-        <p class="text-white/50 text-sm mb-10">Creative Commons Reconocimiento-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)</p>
+        <p class="text-white/50 text-sm mb-2">Creative Commons Reconocimiento-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)</p>
+        <p class="text-white/40 text-xs mb-10">Actualizado: Julio 2026 · Versión 2.0 — Alineado con GDPR y Ley 19.628 (Chile)</p>
       </div>
 
       <div class="card-mir" style="text-align:left;">
-
         <div class="clausula">
-          <h3>Licencia CC BY-NC-SA 4.0</h3>
+          <h3>1. Licencia CC BY-NC-SA 4.0</h3>
           <p>El material contenido en El Arca se publica bajo una licencia <strong>Creative Commons CC BY-NC-SA 4.0</strong>.</p>
           <ul>
             <li><strong>Atribución:</strong> Debes reconocer la autoría de la comunidad.</li>
@@ -76,6 +84,98 @@
           <p>Al subir tu material, autorizas a El Arca a resguardar, digitalizar y utilizar dicho contenido con fines exclusivamente educativos, pedagógicos y de memoria colectiva.</p>
         </div>
 
+        <div class="clausula">
+          <h3>2. Política de Privacidad</h3>
+          <p>En El Arca nos tomamos tu privacidad en serio. Esta política describe cómo recopilamos, usamos y protegemos tus datos personales, en cumplimiento con la <strong>Ley 19.628 sobre Protección de la Vida Privada (Chile)</strong> y el <strong>Reglamento General de Protección de Datos (GDPR) de la Unión Europea</strong>.</p>
+
+          <p style="margin-top:12px;font-weight:600;color:#fff;">2.1. Datos que recopilamos</p>
+          <ul>
+            <li><strong>Nombre:</strong> El que proporciones voluntariamente al subir un recuerdo. Puede ser un seudónimo.</li>
+            <li><strong>Correo electrónico:</strong> Solo si eres administrador (almacenado de forma segura en Supabase Auth).</li>
+            <li><strong>Dirección IP:</strong> Almacenada temporalmente para rate limiting y seguridad. No asociada a tu identidad.</li>
+            <li><strong>Cookies técnicas:</strong> Solo las necesarias para el funcionamiento del sitio (no hay cookies de rastreo).</li>
+            <li><strong>Google Analytics:</strong> Datos anónimos de navegación (páginas visitadas, duración, país aproximado). Puedes optar por no participar mediante el complemento de inhabilitación de Google Analytics.</li>
+          </ul>
+
+          <p style="margin-top:12px;font-weight:600;color:#fff;">2.2. Cómo usamos tus datos</p>
+          <ul>
+            <li>Preservar y exhibir tu contribución en el archivo comunitario.</li>
+            <li>Mejorar la plataforma con base en patrones de uso anónimos.</li>
+            <li>Proteger el sistema contra abusos (rate limiting, detección de spam).</li>
+            <li>Comunicarnos contigo solo si nos has contactado directamente.</li>
+          </ul>
+
+          <p style="margin-top:12px;font-weight:600;color:#fff;">2.3. Base legal (GDPR)</p>
+          <p>El tratamiento de tus datos se basa en:</p>
+          <ul>
+            <li><strong>Consentimiento explícito:</strong> Al marcar el checkbox en el formulario de subida.</li>
+            <li><strong>Interés público:</strong> La preservación del patrimonio cultural inmaterial es un interés público reconocido por la UNESCO.</li>
+            <li><strong>Interés legítimo:</strong> La seguridad del sistema y la mejora continua de la plataforma.</li>
+          </ul>
+
+          <p style="margin-top:12px;font-weight:600;color:#fff;">2.4. Tus derechos</p>
+          <p>Tienes derecho a:</p>
+          <ul>
+            <li><strong>Acceder</strong> a tus datos personales almacenados.</li>
+            <li><strong>Rectificar</strong> datos incorrectos.</li>
+            <li><strong>Suprimir</strong> tu contribución y datos asociados (derecho al olvido).</li>
+            <li><strong>Oponerte</strong> al tratamiento de tus datos.</li>
+            <li><strong>Portabilidad</strong> de tus datos a otro sistema.</li>
+          </ul>
+          <p>Para ejercer estos derechos, escribe a <a href="mailto:privacidad@elarca.cl" style="color:var(--color-mir);">privacidad@elarca.cl</a>. Responderemos en un máximo de 30 días hábiles.</p>
+
+          <p style="margin-top:12px;font-weight:600;color:#fff;">2.5. Transferencia internacional de datos</p>
+          <p>El Arca está alojado en servidores de Supabase (Google Cloud Platform, us-central1) y Vercel (AWS/GCP). Al usar el servicio, consientes la transferencia de tus datos a estos proveedores, que cumplen con el Escudo de Privacidad UE-EE.UU. y las garantías adecuadas del GDPR.</p>
+        </div>
+
+        <div class="clausula">
+          <h3>3. Responsabilidad del Contribuyente</h3>
+          <p>Al subir contenido declaras que:</p>
+          <ul>
+            <li>Tienes los derechos necesarios sobre el material (fotos, audios, textos) o cuentas con la autorización de sus titulares.</li>
+            <li>El contenido no infringe derechos de autor, marcas registradas, privacidad u otros derechos de terceros.</li>
+            <li>El contenido no contiene discursos de odio, violencia explícita, material ilegal o que vulnere los derechos de niños, niñas y adolescentes.</li>
+          </ul>
+          <p>El Arca se reserva el derecho de rechazar o retirar cualquier contenido que infrinja estas condiciones, sin perjuicio de las acciones legales que correspondan.</p>
+        </div>
+
+        <div class="clausula">
+          <h3>4. Limitación de Responsabilidad</h3>
+          <p>El Arca no se hace responsable por:</p>
+          <ul>
+            <li>El uso que terceros hagan del contenido publicado bajo licencia CC BY-NC-SA 4.0.</li>
+            <li>Daños o pérdidas derivadas del uso de la plataforma, dentro del máximo permitido por la ley aplicable.</li>
+            <li>La veracidad absoluta de los relatos y memorias compartidas por los contribuyentes (el archivo opera bajo el principio de buena fe).</li>
+          </ul>
+        </div>
+
+        <div class="clausula">
+          <h3>5. Retención y Eliminación de Datos</h3>
+          <p>Conservamos tus datos mientras el archivo esté operativo y tu contribución permanezca publicada. Si solicitas la eliminación de tu contribución:</p>
+          <ul>
+            <li>El contenido público será retirado en un plazo máximo de 15 días hábiles.</li>
+            <li>Los registros internos (auditoría, metadatos) podrían conservarse con fines de integridad del archivo, anonimizados.</li>
+            <li>Los backups pueden contener copias residuales hasta su renovación (máximo 30 días).</li>
+          </ul>
+        </div>
+
+        <div class="clausula">
+          <h3>6. Seguridad</h3>
+          <p>Implementamos medidas técnicas y organizativas para proteger tus datos:</p>
+          <ul>
+            <li>Cifrado en tránsito (TLS 1.3) para todas las conexiones.</li>
+            <li>Row Level Security (RLS) en base de datos: cada usuario solo accede a lo que debe.</li>
+            <li>Rate limiting para prevenir abusos y ataques de fuerza bruta.</li>
+            <li>Validación de archivos (MIME type + magic bytes) para prevenir subida de malware.</li>
+            <li>Monitoreo continuo de seguridad y registro de intentos de acceso.</li>
+          </ul>
+        </div>
+
+        <div class="clausula">
+          <h3>7. Cambios en estos Términos</h3>
+          <p>Podemos actualizar estos términos periódicamente. Los cambios significativos serán notificados a través del sitio web con al menos 15 días de antelación. El uso continuado del archivo después de los cambios constituye la aceptación de los nuevos términos.</p>
+          <p style="margin-top:8px;color:#888;font-size:12px;">Versión 2.0 — Julio 2026. Para consultas: <a href="mailto:legal@elarca.cl" style="color:var(--color-mir);">legal@elarca.cl</a></p>
+        </div>
       </div>
     </div>
   </main>
@@ -88,11 +188,14 @@
         <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
         <span>|</span>
         <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
+        <span>|</span>
+        <a href="/impacto.html" class="hover:text-mir transition">Impacto</a>
+        <span>|</span>
+        <a href="/status.html" class="hover:text-mir transition">Estado del Sistema</a>
       </nav>
       <div style="margin-top:8px;"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:rgba(255,255,255,0.4);font-size:11px;text-decoration:none;">CC BY-NC-SA 4.0 — Contenido bajo licencia Creative Commons</a></div>
       <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
     </div>
   </footer>
-
 </body>
 </html>

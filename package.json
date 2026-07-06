@@ -1,0 +1,19 @@
+{
+  "name": "elarca",
+  "version": "3.0.0",
+  "private": true,
+  "description": "El Arca — Archivo Comunitario. Memorial de Pedro Cabezón Jano González",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "lint": "node scripts/lint.mjs",
+    "test": "deno test --allow-net --allow-env --allow-read supabase/functions/",
+    "test:frontend": "node scripts/test-frontend.mjs",
+    "format": "deno fmt supabase/functions/",
+    "backup": "bash scripts/backup.sh",
+    "deploy:functions": "supabase functions deploy --project-ref ukpoprkdgezgxlkjjuve",
+    "deploy:frontend": "vercel --prod"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}
