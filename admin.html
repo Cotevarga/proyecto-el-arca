@@ -1538,12 +1538,25 @@
 
       // ─── 1. Insertar registro primero para obtener ID ───
       var now = new Date().toISOString();
+      var linkUrl = extraData.url_externo || null;
+      var tipoArchivo = null;
+      if (linkUrl) {
+        var l = linkUrl.toLowerCase();
+        if (l.indexOf('youtube.com') !== -1 || l.indexOf('youtu.be') !== -1) tipoArchivo = 'video/youtube';
+        else if (l.indexOf('facebook.com') !== -1) tipoArchivo = 'video/facebook';
+        else if (l.match(/\.(mp3|wav|ogg|aac|m4a|flac)(\?|$)/)) tipoArchivo = 'audio/external';
+        else if (l.match(/\.(mp4|webm|ogg|mov|avi)(\?|$)/)) tipoArchivo = 'video/external';
+        else tipoArchivo = 'link';
+      }
+
       var insertData = {
         nombre: extraData.nombre || 'Admin',
         mensaje: extraData.descripcion || null,
         mensaje_largo: extraData.texto_largo || null,
         titulo_relato: extraData.titulo_relato || null,
         nombre_serie: extraData.nombre_serie || null,
+        url_archivo: linkUrl || null,
+        tipo_archivo: tipoArchivo,
         seccion: seccion,
         aprobado: true,
         destacado: extraData.destacado === true,
@@ -1951,6 +1964,10 @@
         container.innerHTML = html;
       } catch (err) {
         console.error('[StatsPais] Error:', err);
+        var container = document.getElementById('country-stats-container');
+        if (container && err.code === '42703') {
+          container.innerHTML = '<div class="empty-state" style="padding:20px 0;"><div class="icon">🗄️</div><div class="text" style="font-size:12px;color:#999;">La columna <code style="background:rgba(255,255,255,0.06);padding:1px 6px;border-radius:3px;">pais</code> no existe en la base de datos. Ejecuta:<br><code style="background:rgba(255,255,255,0.06);padding:4px 10px;border-radius:4px;display:inline-block;margin-top:8px;font-size:11px;">ALTER TABLE public.recuerdos ADD COLUMN IF NOT EXISTS pais VARCHAR(100);<br>NOTIFY pgrst, \'reload schema\';</code></div></div>';
+        }
       }
     }
 
@@ -2951,6 +2968,7 @@
 
       html += '<div class="form-group">' +
         '<label>Archivo' + (fileRequired ? ' <span style="color:var(--color-mir);">*</span>' : ' (opcional)') + '</label>' +
+        '<div style="font-size:11px;color:#666;margin-bottom:6px;">Sube un archivo <strong>o</strong> ingresa un link externo (YouTube, Facebook, audio directo).</div>' +
         '<div class="upload-area" id="admin-upload-area">' +
           '<div class="icon">📁</div>' +
           '<div class="text" id="admin-upload-text">Haz clic para seleccionar archivo</div>' +
@@ -2958,6 +2976,11 @@
           '<input type="file" id="admin-upload-file" accept="' + acceptAttr + '" style="display:none">' +
         '</div>' +
         '<div class="file-info" id="admin-upload-file-info"></div>' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label>Link externo (opcional)</label>' +
+        '<input type="url" id="admin-upload-link" placeholder="https://www.youtube.com/watch?v=... o https://facebook.com/... o https://ejemplo.com/audio.mp3" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">' +
+        '<div style="font-size:11px;color:#666;margin-top:4px;">Si no adjuntas archivo, este link se usará para mostrar el contenido embebido en la página.</div>' +
       '</div>';
 
       // ─── Texto largo (solo para relatos) ───
@@ -3070,6 +3093,8 @@
       var nombreSerie = isRelato ? (document.getElementById('admin-upload-serie') ? document.getElementById('admin-upload-serie').value.trim() : '') : '';
       var fileInput = document.getElementById('admin-upload-file');
       var file = fileInput && fileInput.files ? fileInput.files[0] : null;
+      var linkInput = document.getElementById('admin-upload-link');
+      var linkUrl = linkInput ? linkInput.value.trim() : '';
       var destacado = document.getElementById('admin-upload-destacado').checked;
 
       // ─── Sanitizar HTML (solo b, i, u) ───
@@ -3087,9 +3112,9 @@
 
       // ─── Validaciones ───
       if (!titulo) { showToast('El campo "Título" es obligatorio.', 'error'); return; }
-      if (cfg.requireFile && !file) { showToast('Debes seleccionar un archivo para esta sección.', 'error'); return; }
+      if (cfg.requireFile && !file && !linkUrl) { showToast('Debes seleccionar un archivo o ingresar un link para esta sección.', 'error'); return; }
       if (isRelato && !textoLargo) { showToast('El campo "Texto largo" es obligatorio para relatos.', 'error'); return; }
-      if (!file && !textoLargo && !descripcion) { showToast('Agrega al menos un archivo, texto o descripción.', 'error'); return; }
+      if (!file && !linkUrl && !textoLargo && !descripcion) { showToast('Agrega al menos un archivo, link, texto o descripción.', 'error'); return; }
 
       // ─── Metadatos ───
       var adminGeo = document.getElementById('admin-upload-geo');
@@ -3102,6 +3127,7 @@
         nombre_serie: nombreSerie || null,
         descripcion: descripcion || textoLargo ? (descripcion || textoLargo.substring(0, 200)) : null,
         texto_largo: textoLargo || null,
+        url_externo: linkUrl || null,
         destacado: destacado,
         es_efimero: destacado,
         geolocalizacion: adminGeo ? adminGeo.value.trim() || null : null,
@@ -3118,12 +3144,26 @@
           await subirArchivo(file, seccion, extraData);
         } else {
           var now = new Date().toISOString();
+
+          // Detect type from link URL
+          var tipoDetectado = null;
+          if (linkUrl) {
+            var l = linkUrl.toLowerCase();
+            if (l.indexOf('youtube.com') !== -1 || l.indexOf('youtu.be') !== -1) tipoDetectado = 'video/youtube';
+            else if (l.indexOf('facebook.com') !== -1) tipoDetectado = 'video/facebook';
+            else if (l.match(/\.(mp3|wav|ogg|aac|m4a|flac)(\?|$)/)) tipoDetectado = 'audio/external';
+            else if (l.match(/\.(mp4|webm|ogg|mov|avi)(\?|$)/)) tipoDetectado = 'video/external';
+            else tipoDetectado = 'link';
+          }
+
           var insertData = {
             nombre: 'Admin',
             titulo_relato: titulo || null,
             nombre_serie: nombreSerie || null,
             mensaje: extraData.descripcion || null,
             mensaje_largo: textoLargo || null,
+            url_archivo: linkUrl || null,
+            tipo_archivo: tipoDetectado,
             seccion: seccion,
             aprobado: true,
             destacado: destacado,

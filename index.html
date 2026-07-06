@@ -289,7 +289,7 @@
 
         try {
           var cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-          var { data, error } = await supabaseClient
+          var { data, error, status } = await supabaseClient
             .from('recuerdos')
             .select('id, titulo_relato, mensaje, mensaje_largo, url_archivo, tipo_archivo, seccion, created_at, es_efimero, fecha_subida')
             .eq('aprobado', true)
@@ -298,7 +298,20 @@
             .order('fecha_subida', { ascending: false })
             .limit(6);
 
-          if (error) throw error;
+          // Fallback if columns es_efimero/fecha_subida don't exist (migrations blocked)
+          if (error && (error.code === '42703' || status === 400)) {
+            var { data: data2, error: error2 } = await supabaseClient
+              .from('recuerdos')
+              .select('id, titulo_relato, mensaje, mensaje_largo, url_archivo, tipo_archivo, seccion, created_at')
+              .eq('aprobado', true)
+              .eq('destacado', true)
+              .order('created_at', { ascending: false })
+              .limit(6);
+            if (error2) throw error2;
+            data = data2;
+          } else if (error) {
+            throw error;
+          }
 
           var items = data || [];
           if (items.length === 0) return;

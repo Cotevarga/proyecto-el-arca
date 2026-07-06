@@ -84,10 +84,11 @@ Deno.serve(async (req: Request) => {
     const pais = (formData.get("pais") as string)?.slice(0, 100) ?? null;
     const region = (formData.get("region") as string)?.slice(0, 100) ?? null;
     const transcripcion = (formData.get("transcripcion") as string)?.slice(0, 50000) ?? null;
+    const linkExterno = (formData.get("link_externo") as string)?.trim() ?? null;
 
-    if ((!file || file.size === 0) && !mensaje_largo && !texto) {
+    if ((!file || file.size === 0) && !linkExterno && !mensaje_largo && !texto) {
       return new Response(
-        JSON.stringify({ success: false, error: "Archivo o texto requerido" }),
+        JSON.stringify({ success: false, error: "Archivo, link o texto requerido" }),
         { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
       );
     }
@@ -166,6 +167,9 @@ Deno.serve(async (req: Request) => {
         .getPublicUrl(storagePath);
 
       urlArchivo = publicUrl;
+    } else if (linkExterno) {
+      urlArchivo = linkExterno;
+      tipoArchivo = "link";
     }
 
     // ─── Insert into recuerdos ───

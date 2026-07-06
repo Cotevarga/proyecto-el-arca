@@ -109,6 +109,11 @@
             <div id="file-error" class="text-mir text-sm mt-1 hidden"></div>
             <div id="file-info" class="text-white/50 text-sm mt-1 hidden"></div>
             <p class="text-white/40 text-xs mt-2">Formatos: JPG, PNG, MP3, WAV, MP4 &middot; Máx 50 MB &middot; Opcional si solo es texto.</p>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);">
+              <label for="link-externo" class="block text-sm font-bold text-white/80 mb-1 uppercase">O pega un link externo</label>
+              <input type="url" id="link-externo" name="link_externo" placeholder="https://www.youtube.com/watch?v=... o https://facebook.com/... o https://ejemplo.com/audio.mp3" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
+              <p class="text-white/40 text-xs mt-1">Si no puedes subir el archivo, pega un enlace a YouTube, Facebook o un audio/video público.</p>
+            </div>
           </div>
           <div>
             <label for="relato" class="block text-sm font-bold text-white/80 mb-1 uppercase">Relato</label>
@@ -228,9 +233,10 @@
           var anio = document.getElementById('anio').value.trim();
           var relato = document.getElementById('relato').value.trim();
           var file = fileInput && fileInput.files ? fileInput.files[0] : null;
+          var linkUrl = document.getElementById('link-externo') ? document.getElementById('link-externo').value.trim() : '';
 
-          if (!file && !relato) {
-            messages.textContent = 'Agrega un archivo o escribe un relato.';
+          if (!file && !linkUrl && !relato) {
+            messages.textContent = 'Agrega un archivo, un link o escribe un relato.';
             messages.className = 'text-center text-sm font-medium text-mir';
             messages.classList.remove('hidden');
             return;
@@ -254,6 +260,7 @@
             if (anio) formData.append('anio', anio);
             if (relato) formData.append('mensaje_largo', relato);
             formData.append('seccion', 'general');
+            if (linkUrl) formData.append('link_externo', linkUrl);
             var geo = document.getElementById('geolocalizacion');
             if (geo && geo.value.trim()) formData.append('geolocalizacion', geo.value.trim());
             var fechaArch = document.getElementById('fecha-creacion-archivo');
@@ -266,7 +273,10 @@
             if (regionEl && regionEl.value.trim()) formData.append('region', regionEl.value.trim());
             var transcEl = document.getElementById('transcripcion');
             if (transcEl && transcEl.value.trim()) formData.append('transcripcion', transcEl.value.trim());
-            formData.append('categoria', file ? (file.type.startsWith('audio') ? 'audio' : file.type.startsWith('video') ? 'video' : 'foto') : 'texto');
+            var categoria = 'texto';
+            if (file) categoria = file.type.startsWith('audio') ? 'audio' : file.type.startsWith('video') ? 'video' : 'foto';
+            else if (linkUrl) { var l = linkUrl.toLowerCase(); if (l.indexOf('youtube') !== -1 || l.indexOf('youtu.be') !== -1) categoria = 'video'; else if (l.indexOf('facebook') !== -1) categoria = 'video'; else if (l.match(/\.(mp3|wav|ogg)(\?|$)/)) categoria = 'audio'; else if (l.match(/\.(mp4|webm|mov)(\?|$)/)) categoria = 'video'; else categoria = 'link'; }
+            formData.append('categoria', categoria);
             formData.append('texto', relato || '');
 
             var resp = await fetch(UPLOAD_URL, { method: 'POST', body: formData });

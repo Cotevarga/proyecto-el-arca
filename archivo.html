@@ -99,22 +99,6 @@
     </section>
     <section class="py-16" style="background-color:#111111">
       <div class="max-w-5xl mx-auto px-4">
-        <div class="mb-10 text-center">
-          <p class="text-white/40 text-sm mb-4">¿Investigador? Descarga el archivo completo en formatos académicos.</p>
-          <div id="export-links" class="flex justify-center gap-3 flex-wrap">
-            <a class="btn-outline-mir" style="font-size:12px;padding:8px 16px;text-decoration:none;display:inline-block;" href="#" onclick="return exportar('json')">JSON</a>
-            <a class="btn-outline-mir" style="font-size:12px;padding:8px 16px;text-decoration:none;display:inline-block;" href="#" onclick="return exportar('csv')">CSV</a>
-            <a class="btn-outline-mir" style="font-size:12px;padding:8px 16px;text-decoration:none;display:inline-block;" href="#" onclick="return exportar('csl')">CSL (Zotero)</a>
-          </div>
-          <script>
-            function exportar(fmt) {
-              var fnUrl = window.EDGE_FUNCTIONS_URL;
-              if (!fnUrl) { alert('Error de configuración'); return false; }
-              window.open(fnUrl + '/export?format=' + fmt, '_blank');
-              return false;
-            }
-          </script>
-        </div>
         <div class="grid md:grid-cols-2 gap-8">
           <a href="/galeria.html" class="card-mir flex flex-col items-center text-center min-h-[250px] justify-center hover:border-mir transition-all">
             <div class="text-6xl mb-4 opacity-70">📷</div>
@@ -136,6 +120,29 @@
             <h2 class="text-mir font-title text-2xl uppercase mb-3">Manifiesto</h2>
             <p class="text-white/50 text-sm leading-relaxed">"Programo por amor y memoria" — El manifiesto de una informática popular.</p>
           </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-16" style="background-color:#111111;border-top:1px solid rgba(229,9,20,0.1);">
+      <div class="max-w-5xl mx-auto px-4">
+        <div class="mb-10 text-center">
+          <h2 class="text-mir font-title text-2xl uppercase mb-2">Para investigadores</h2>
+          <p class="text-white/40 text-sm mb-6">Descarga el archivo completo en formatos académicos compatibles con herramientas de citación.</p>
+          <div id="export-links" class="flex justify-center gap-3 flex-wrap">
+            <a class="btn-outline-mir" style="font-size:12px;padding:8px 16px;text-decoration:none;display:inline-block;" href="#" onclick="return exportar('json')">📋 JSON</a>
+            <a class="btn-outline-mir" style="font-size:12px;padding:8px 16px;text-decoration:none;display:inline-block;" href="#" onclick="return exportar('csv')">📊 CSV</a>
+            <a class="btn-outline-mir" style="font-size:12px;padding:8px 16px;text-decoration:none;display:inline-block;" href="#" onclick="return exportar('csl')">📖 CSL (Zotero)</a>
+          </div>
+          <p style="font-size:11px;color:#555;margin-top:16px;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.5;">Los archivos se generan dinámicamente con todos los registros aprobados del archivo comunitario. Para usar en Zotero, importa el archivo CSL desde "Archivo → Importar".</p>
+          <script>
+            function exportar(fmt) {
+              var fnUrl = window.EDGE_FUNCTIONS_URL;
+              if (!fnUrl) { alert('Error de configuración'); return false; }
+              window.open(fnUrl + '/export?format=' + fmt, '_blank');
+              return false;
+            }
+          </script>
         </div>
       </div>
     </section>
