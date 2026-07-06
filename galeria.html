@@ -490,9 +490,9 @@
               rData.data.forEach(function (d) { all.push({ url: d.url_archivo, titulo: d.nombre || '' }); });
             }
 
-            if (all.length > 0) {
-              images = all;
-            } else { usarFallback(); }
+            FALLBACK.forEach(function (f) { all.push({ url: f.url, titulo: '' }); });
+
+            images = all.length > 0 ? all : FALLBACK.slice();
             render();
           })
           .catch(function () { usarFallback(); render(); });
