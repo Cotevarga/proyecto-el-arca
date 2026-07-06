@@ -104,29 +104,35 @@
   <script>
   (function () {
     'use strict';
+
     var mapEl = document.getElementById('map');
     if (!mapEl) return;
 
-    var client = window.miSupabase;
-    if (!client) { mapEl.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">Error de conexión</p>'; return; }
+    var mapLoaded = false;
 
-    var map = L.map('map', {
-      center: [-33.5, -70.6],
-      zoom: 5,
-      zoomControl: true,
-      attributionControl: false
-    });
+    function cargarMapa() {
+      if (mapLoaded) return;
+      var client = window.miSupabase;
+      if (!client) { mapEl.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">Conectando...</p>'; return; }
+      mapLoaded = true;
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19
-    }).addTo(map);
+      var map = L.map('map', {
+        center: [-33.5, -70.6],
+        zoom: 5,
+        zoomControl: true,
+        attributionControl: false
+      });
 
-    client.from('recuerdos')
-      .select('nombre, geolocalizacion, pais, region, url_archivo, tipo_archivo, mensaje_largo')
-      .eq('aprobado', true)
-      .not('geolocalizacion', 'is', null)
-      .neq('geolocalizacion', '')
-      .order('created_at', { ascending: false })
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19
+      }).addTo(map);
+
+      client.from('recuerdos')
+        .select('nombre, geolocalizacion, pais, region, url_archivo, tipo_archivo, mensaje_largo')
+        .eq('aprobado', true)
+        .not('geolocalizacion', 'is', null)
+        .neq('geolocalizacion', '')
+        .order('created_at', { ascending: false })
       .then(function (r) {
         if (r.error || !r.data || r.data.length === 0) {
           document.getElementById('map-stats').textContent = 'Aún no hay contribuciones con ubicación.';
@@ -165,12 +171,20 @@
       .catch(function () {
         document.getElementById('map-stats').textContent = 'Error al cargar ubicaciones.';
       });
+    }
 
     var menuToggle = document.getElementById('menu-toggle');
     var mobileMenu = document.getElementById('mobile-menu');
     if (menuToggle && mobileMenu) {
       menuToggle.addEventListener('click', function () { mobileMenu.classList.toggle('hidden'); });
       mobileMenu.querySelectorAll('a').forEach(function (l) { l.addEventListener('click', function () { mobileMenu.classList.add('hidden'); }); });
+    }
+
+    if (window.miSupabase) { cargarMapa(); } else {
+      var checkReady = setInterval(function () {
+        if (window.miSupabase) { clearInterval(checkReady); cargarMapa(); }
+      }, 200);
+      setTimeout(function () { clearInterval(checkReady); }, 15000);
     }
   })();
   </script>
