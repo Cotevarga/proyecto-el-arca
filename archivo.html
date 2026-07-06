@@ -124,10 +124,10 @@
       </div>
     </section>
 
-    <section class="py-16" style="background-color:#111111;border-top:1px solid rgba(229,9,20,0.1);">
+    <section class="py-16" style="background-color:#111111;border-top:2px solid rgba(229,9,20,0.15);margin-top:2rem;">
       <div class="max-w-5xl mx-auto px-4">
         <div class="mb-10 text-center">
-          <h2 class="text-mir font-title text-2xl uppercase mb-2">Para investigadores</h2>
+          <h2 class="text-mir font-title text-2xl uppercase mb-2">📖 Para investigadores</h2>
           <p class="text-white/40 text-sm mb-6">Descarga el archivo completo en formatos académicos compatibles con herramientas de citación.</p>
           <div id="export-links" class="flex justify-center gap-3 flex-wrap">
             <a class="btn-outline-mir" style="font-size:12px;padding:8px 16px;text-decoration:none;display:inline-block;" href="#" onclick="return exportar('json')">📋 JSON</a>
@@ -175,6 +175,27 @@
     document.querySelectorAll('#mobile-menu a').forEach(function(l) {
       l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
     });
+
+    /* hash navigation */
+    var h = window.location.hash;
+    if (h && h.indexOf('rec-') === 1) {
+      var target = document.getElementById('buscador-input');
+      if (target) {
+        target.value = 'Cargando...';
+        setTimeout(function() {
+          target.value = 'Resultado en el archivo';
+          target.style.borderColor = '#E50914';
+          var msg = document.createElement('div');
+          msg.style.cssText = 'margin-top:8px;padding:12px 16px;background:rgba(229,9,20,0.08);border:1px solid rgba(229,9,20,0.2);border-radius:8px;font-size:13px;color:#ccc;';
+          msg.textContent = 'Elemento no encontrado en esta página. Prueba buscando en "Todo el sitio" desde cualquier página.';
+          var parent = target.parentElement;
+          if (parent && !document.getElementById('rec-notice')) {
+            msg.id = 'rec-notice';
+            parent.appendChild(msg);
+          }
+        }, 100);
+      }
+    }
   </script>
   <script src="/app.js"></script>
 </body>

@@ -236,7 +236,7 @@
             else tipoLabel = '<span style="font-size:18px;" title="Link">🔗</span>';
           }
 
-          html += '<div class="card-mir media-card" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">';
+          html += '<div class="card-mir media-card" data-rec-id="' + item.id + '" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">';
           html += '<div style="padding:16px 20px 12px;border-bottom:1px solid rgba(229,9,20,0.08);display:flex;align-items:center;gap:10px;">';
           html += tipoLabel;
           html += '<div style="flex:1;min-width:0;"><h3 style="font-family:Arial,Helvetica,sans-serif;color:white;text-transform:uppercase;letter-spacing:0.03em;font-size:14px;margin:0;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + titulo.replace(/</g, '&lt;') + '</h3></div>';
@@ -262,9 +262,24 @@
       }
     }
 
+    function navegarHash() {
+      var h = window.location.hash;
+      if (h && h.indexOf('rec-') === 1) {
+        var id = h.substring(5);
+        var card = document.querySelector('.media-card[data-rec-id="' + id + '"]');
+        if (card) {
+          setTimeout(function () {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            card.style.boxShadow = '0 0 0 3px var(--color-mir)';
+            setTimeout(function () { card.style.boxShadow = ''; }, 3000);
+          }, 500);
+        }
+      }
+    }
+
     // Init
     document.addEventListener('DOMContentLoaded', function() {
-      cargarVideos();
+      cargarVideos().then(function () { navegarHash(); });
     });
 
     // Mobile menu

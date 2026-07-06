@@ -512,7 +512,7 @@
           .order('orden', { ascending: true });
 
         var recuerdosPromise = client.from('recuerdos')
-          .select('url_archivo, nombre, mensaje_largo')
+          .select('id, url_archivo, nombre, mensaje_largo')
           .eq('aprobado', true)
           .in('tipo_archivo', ['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
           .order('created_at', { ascending: false });
@@ -529,7 +529,7 @@
 
             if (!rData.error && rData.data && rData.data.length > 0) {
               rData.data.forEach(function (d) {
-                all.push({ url: d.url_archivo, titulo: d.nombre || '', subtitulo: '' });
+                all.push({ id: d.id, url: d.url_archivo, titulo: d.nombre || '', subtitulo: '' });
               });
             }
 
@@ -602,6 +602,10 @@
           if (elLdr) elLdr.style.display = 'none';
           qsa('.gal-thumb').forEach(function (t, i) { t.classList.toggle('active', i === idx); });
           if (elCnt && images.length) elCnt.textContent = (idx + 1) + ' / ' + images.length;
+          var hid = images[n].id || 'idx-' + idx;
+          window.location.hash = 'rec-' + hid;
+          var act = qs('.gal-thumb.active');
+          if (act) act.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
       }
 
@@ -744,7 +748,20 @@
       /* ─────────────── arranque ─────────────── */
       function arrancar() {
         try {
-          cargar();
+          cargar().then(function () {
+            var h = window.location.hash;
+            if (h && h.indexOf('rec-') === 1) {
+              var target = h.substring(5);
+              for (var j = 0; j < images.length; j++) {
+                (function (idx) {
+                  var matchId = images[idx].id ? 'rec-' + images[idx].id : 'rec-idx-' + idx;
+                  if ('rec-' + target === matchId || 'rec-idx-' + target === matchId) {
+                    setTimeout(function () { mostrar(idx); }, 300);
+                  }
+                })(j);
+              }
+            }
+          });
           bind();
         } catch (e) {
           console.warn('[Galeria] Error:', e);
