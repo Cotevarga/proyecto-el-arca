@@ -11,7 +11,8 @@
   var timeout = null;
 
   function getTargetUrl(d) {
-    var id = d.id;
+    var id = d && d.id;
+    if (!id) return '#';
     return '/archivo.html?view=rec-' + id;
   }
 

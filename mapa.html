@@ -128,10 +128,9 @@
       }).addTo(map);
 
       client.from('recuerdos')
-        .select('nombre, geolocalizacion, pais, region, url_archivo, tipo_archivo, mensaje_largo')
+        .select('id, nombre, geolocalizacion, pais, region, url_archivo, tipo_archivo, mensaje_largo')
         .eq('aprobado', true)
         .not('geolocalizacion', 'is', null)
-        .neq('geolocalizacion', '')
         .order('created_at', { ascending: false })
       .then(function (r) {
         if (r.error || !r.data || r.data.length === 0) {
@@ -139,6 +138,7 @@
           return;
         }
         var count = 0;
+        r.data = r.data.filter(function (d) { return d.geolocalizacion && d.geolocalizacion.trim(); });
         r.data.forEach(function (d) {
           var geo = d.geolocalizacion || '';
           var parts = geo.split(',').map(function (s) { return parseFloat(s.trim()); }).filter(function (n) { return !isNaN(n); });
@@ -155,7 +155,8 @@
             var popup = '<div style="text-align:left;"><strong>' + (d.nombre || 'Anónimo') + '</strong>';
             if (d.pais) popup += '<br><span style="color:#888;font-size:11px;">' + d.pais + (d.region ? ', ' + d.region : '') + '</span>';
             if (d.mensaje_largo) popup += '<br><span style="color:#aaa;font-size:11px;">' + d.mensaje_largo.substring(0, 120) + (d.mensaje_largo.length > 120 ? '…' : '') + '</span>';
-            if (d.url_archivo) popup += '<br><a href="' + d.url_archivo + '" target="_blank" style="font-size:11px;">Ver archivo</a>';
+            if (d.id) popup += '<br><a href="/archivo.html?view=rec-' + d.id + '" style="font-size:11px;">Ver detalle</a>';
+            else if (d.url_archivo) popup += '<br><a href="' + d.url_archivo + '" target="_blank" style="font-size:11px;">Ver archivo</a>';
             popup += '</div>';
 
             L.marker([lat, lng], { icon: icon }).addTo(map).bindPopup(popup);
