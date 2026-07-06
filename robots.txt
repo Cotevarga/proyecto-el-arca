@@ -1,3 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /admin.html
+
 Sitemap: https://elarca.cl/sitemap.xml
+
+# El Arca — Archivo Comunitario
+# Memoria Viva de la Población Francisco de Goya, La Pintana

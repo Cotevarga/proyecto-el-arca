@@ -40,9 +40,7 @@ spring:
       max-request-size: 55MB
       location: ${java.io.tmpdir}
   flyway:
-    enabled: true
-    locations: classpath:db/migration
-    baseline-on-migrate: true
+    enabled: false  # Migraciones gestionadas desde Supabase (única fuente de verdad)
   web:
     resources:
       static-locations: classpath:/static/

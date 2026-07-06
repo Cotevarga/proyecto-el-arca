@@ -12,6 +12,32 @@
   <meta property="og:locale" content="es_CL">
   <meta name="description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
   <link rel="canonical" href="https://elarca.cl/">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ArchiveOrganization",
+    "@id": "https://elarca.cl",
+    "name": "El Arca — Archivo Comunitario",
+    "alternateName": "Memoria Viva de la Población Francisco de Goya",
+    "description": "Archivo comunitario de patrimonio inmaterial de la Población Francisco de Goya, La Pintana. Preservación digital de memoria territorial, relatos populares y trabajo con infancias.",
+    "url": "https://elarca.cl",
+    "foundingDate": "2025",
+    "location": {
+      "@type": "Place",
+      "name": "Población Francisco de Goya",
+      "address": { "@type": "PostalAddress", "addressLocality": "La Pintana", "addressRegion": "Región Metropolitana", "addressCountry": "CL" }
+    },
+    "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "inLanguage": "es-CL",
+    "isAccessibleForFree": true
+  }
+  </script>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#E50914">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="El Arca">
+  <link rel="apple-touch-icon" href="/images/icon-192.png">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script src="/config.js"></script>
   <script src="/supabase.js" defer></script>
@@ -657,42 +683,7 @@
 
   </main>
 
-  <!-- ===== ESTADÍSTICAS PÚBLICAS ===== -->
-  <section id="stats-arca" class="py-16 bg-black border-t border-t-[rgba(229,9,20,0.15)]">
-    <div class="max-w-5xl mx-auto px-4 text-center">
-      <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">El Archivo en Cifras</span>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8" id="stats-grid">
-        <div class="stat-card"><div class="stat-value" id="stat-contribuciones">—</div><div class="stat-label">Contribuciones</div></div>
-        <div class="stat-card"><div class="stat-value" id="stat-paises">—</div><div class="stat-label">Países</div></div>
-        <div class="stat-card"><div class="stat-value" id="stat-tamanio">—</div><div class="stat-label">GB Archivados</div></div>
-        <div class="stat-card"><div class="stat-value" id="stat-desglose">—</div><div class="stat-label">Fotos · Audios · Videos</div></div>
-      </div>
-    </div>
-  </section>
-  <style>
-    .stat-card { background:#0a0a0a; border:1px solid rgba(229,9,20,0.15); border-radius:12px; padding:24px 16px; transition:border-color 0.3s; }
-    .stat-card:hover { border-color:var(--color-mir); }
-    .stat-value { font-size:2rem; font-weight:800; color:var(--color-mir); line-height:1.2; }
-    .stat-label { font-size:0.75rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.05em; margin-top:4px; }
-  </style>
-  <script>
-  (function () {
-    var fnUrl = window.EDGE_FUNCTIONS_URL;
-    if (!fnUrl) return;
-    fetch(fnUrl + '/stats')
-      .then(function (r) { return r.json(); })
-      .then(function (res) {
-        if (!res.success || !res.data) return;
-        var d = res.data;
-        var el = function (id) { return document.getElementById(id); };
-        if (el('stat-contribuciones')) el('stat-contribuciones').textContent = d.total_contribuciones.toLocaleString('es-CL');
-        if (el('stat-paises')) el('stat-paises').textContent = d.total_paises;
-        if (el('stat-tamanio')) el('stat-tamanio').textContent = d.total_gigabytes + ' GB';
-        if (el('stat-desglose')) el('stat-desglose').textContent = (d.desglose.fotos || 0) + ' · ' + (d.desglose.audios || 0) + ' · ' + (d.desglose.videos || 0);
-      })
-      .catch(function () {});
-  })();
-  </script>
+  <!-- ===== ESTADÍSTICAS PÚBLICAS (eliminadas: se mantienen privadas en panel admin) ===== -->
 
   <!-- ===== FOOTER ===== -->
 <footer class="bg-black text-white/50 py-12 border-t border-t-[rgba(229,9,20,0.2)]">
@@ -728,5 +719,14 @@
   </script>
 
   <script src="/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then(function(reg) {
+        console.log('[PWA] Service Worker registrado:', reg.scope);
+      }).catch(function(err) {
+        console.warn('[PWA] Error al registrar SW:', err);
+      });
+    }
+  </script>
 </body>
 </html>

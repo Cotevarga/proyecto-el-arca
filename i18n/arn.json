@@ -1,0 +1,60 @@
+{
+  "site": {
+    "title": "El Arka — Komunitarya Aylin",
+    "description": "Francisco de Goya Población ñi Mongen Aylin, La Pintana.",
+    "tagline": "Pichikeche waria mew: kintun kimün ñi pengelkan"
+  },
+  "nav": {
+    "inicio": "Wüne",
+    "archivo": "Aylin",
+    "galeria": "Aylin pengelün",
+    "mapa": "Mapa",
+    "relatos": "Güxam",
+    "videos": "Video",
+    "subir": "Yekun tami relato",
+    "legado": "Elu",
+    "autora": "Tüfa ñi wirin",
+    "terminos": "Chumgechi",
+    "plan": "Günen"
+  },
+  "home": {
+    "hero_title": "Mongen Aylin",
+    "hero_subtitle": "Pichikeche waria mew: kintun kimün ñi pengelkan",
+    "seccion_mistica": "Mística",
+    "seccion_comunicacion": "Güxam",
+    "seccion_legado": "Elu"
+  },
+  "archivo": {
+    "title": "Aylin",
+    "filtros": "Kintun",
+    "buscar": "Kintun...",
+    "tipo": "Chumgechi",
+    "todos": "Itro kom",
+    "imagen": "Pengelün",
+    "audio": "Wirin",
+    "video": "Video",
+    "texto": "Wirintukun",
+    "anio": "Tripantu"
+  },
+  "subir": {
+    "title": "Yekun tami güxam",
+    "nombre": "Tami üy kam mapuche üy",
+    "archivo": "Pewen kiñe wirintukun",
+    "mensaje": "Wirintukun tami güxam",
+    "enviar": "Yekun",
+    "gracias": "Chaltu may tami güxam ñi yekun"
+  },
+  "mapa": {
+    "title": "Mapa de la Memoria",
+    "explorar": "Kintun aylin mapu mew"
+  },
+  "common": {
+    "cargando": "Küyen...",
+    "error": "Weda",
+    "cerrar": "Poyün",
+    "ver_mas": "Pengelün",
+    "compartir": "Güxamün",
+    "descargar": "Nüwün",
+    "licencia": "CC BY-NC-SA 4.0 — Wirintukun Creative Commons licencia mew"
+  }
+}

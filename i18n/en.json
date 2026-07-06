@@ -1,0 +1,60 @@
+{
+  "site": {
+    "title": "El Arca — Community Archive",
+    "description": "Living Memory of the Francisco de Goya Settlement, La Pintana.",
+    "tagline": "Mass work with children: an empirical and political demonstration"
+  },
+  "nav": {
+    "inicio": "Home",
+    "archivo": "Archive",
+    "galeria": "Gallery",
+    "mapa": "Map",
+    "relatos": "Stories",
+    "videos": "Videos",
+    "subir": "Submit memory",
+    "legado": "Legacy",
+    "autora": "About",
+    "terminos": "Terms",
+    "plan": "Management Plan"
+  },
+  "home": {
+    "hero_title": "Living Memory",
+    "hero_subtitle": "Mass work with children: an empirical and political demonstration",
+    "seccion_mistica": "Mystique",
+    "seccion_comunicacion": "Communication",
+    "seccion_legado": "Legacy"
+  },
+  "archivo": {
+    "title": "Archive",
+    "filtros": "Filters",
+    "buscar": "Search...",
+    "tipo": "Type",
+    "todos": "All",
+    "imagen": "Image",
+    "audio": "Audio",
+    "video": "Video",
+    "texto": "Text",
+    "anio": "Year"
+  },
+  "subir": {
+    "title": "Share your memory",
+    "nombre": "Your name or pseudonym",
+    "archivo": "Select a file",
+    "mensaje": "Tell us your story",
+    "enviar": "Submit memory",
+    "gracias": "Thank you for sharing your memory"
+  },
+  "mapa": {
+    "title": "Memory Map",
+    "explorar": "Explore memories in the territory"
+  },
+  "common": {
+    "cargando": "Loading...",
+    "error": "Error",
+    "cerrar": "Close",
+    "ver_mas": "See more",
+    "compartir": "Share",
+    "descargar": "Download",
+    "licencia": "CC BY-NC-SA 4.0 — Content under Creative Commons license"
+  }
+}

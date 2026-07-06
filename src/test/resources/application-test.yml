@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    enabled: false
+
+elarca:
+  jwt:
+    secret: test-secret-key-for-jwt-token-validation-in-tests
+    expiration-ms: 3600000
+  storage:
+    upload-dir: ${java.io.tmpdir}/elarca-test-uploads
+  cors:
+    allowed-origins: http://localhost:5173
+  rate-limiting:
+    enabled: false
+
+logging:
+  level:
+    com.elarca: DEBUG

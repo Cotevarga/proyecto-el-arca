@@ -1107,6 +1107,31 @@
       showToast('Sesión expirada. Ingresa nuevamente.', 'error');
     }
 
+    // ─── Auditoría: registrar acción admin en audit_log ───
+    async function registrarAuditoria(accion, entidad, entidadId, metadata) {
+      try {
+        var fnUrl = window.EDGE_FUNCTIONS_URL;
+        if (!fnUrl || !token) return;
+        await fetch(fnUrl + '/auditoria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            accion: accion,
+            entidad: entidad,
+            entidad_id: entidadId || null,
+            usuario_id: (userData && userData.id) || null,
+            usuario_email: (userData && userData.email) || null,
+            metadata: metadata || null
+          })
+        });
+      } catch (err) {
+        console.warn('[Auditoría] Error al registrar:', err.message);
+      }
+    }
+
     // ─── Cliente Supabase unificado ───
     function getSupabaseClient() {
       return window.miSupabase || window._supabase;
@@ -1238,6 +1263,15 @@
       inserted.tamanio_bytes = file.size;
 
       console.log('[subirArchivo] Archivo vinculado al recuerdo ID:', recordId);
+
+      // ─── Auditoría ───
+      registrarAuditoria('admin_upload', 'recuerdo', recordId, {
+        seccion: seccion,
+        nombre: extraData.nombre,
+        tipo_archivo: file.type,
+        tamanio_bytes: file.size
+      });
+
       return inserted;
     }
 
@@ -1724,6 +1758,7 @@
           if (updateError) throw updateError;
 
           showToast('Recuerdo actualizado', 'success');
+          registrarAuditoria('update', 'recuerdo', id, { seccion: seccion, campos: Object.keys(updateData) });
           closeEditModal();
           loadPending();
           loadApproved();
@@ -1947,6 +1982,7 @@
           }
 
           showToast('Recuerdo aprobado y publicado en ' + (NOMBRES_SECCION[seccion] || seccion), 'success');
+          registrarAuditoria('approve', 'recuerdo', id, { seccion: seccion, titulo: tituloRelato });
           closeApprovalModal();
           loadPending();
           loadDashboard();
@@ -2018,6 +2054,7 @@
           if (deleteError) throw deleteError;
 
           showToast('Recuerdo eliminado (motivo: ' + razon + ')', 'info');
+          registrarAuditoria('reject', 'recuerdo', id, { razon: razon, detalle: detalle });
           closeRejectionModal();
           loadPending();
           loadApproved();
@@ -2150,6 +2187,7 @@
 
         detenerPreview();
         showToast('Canción eliminada', 'info');
+        registrarAuditoria('delete', 'musica', id, { storage_path: cancion?.storage_path });
         actualizarListadoMusica();
         refrescarContadores();
         cargarAhoraSuena();
@@ -2225,6 +2263,8 @@
             orden: 0
           });
         if (insertError) throw insertError;
+
+        registrarAuditoria('admin_upload', 'musica', null, { titulo: titulo, artista: artista, archivo: fileName });
 
         document.getElementById('music-upload-form').reset();
         musicFileInfo.textContent = '';

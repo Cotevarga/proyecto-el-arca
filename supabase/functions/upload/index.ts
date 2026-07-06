@@ -1,11 +1,10 @@
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
 import { getSupabaseAdmin } from "../_shared/supabase.ts";
+import { checkRateLimit, recordRateLimit, getClientIp, rateLimitHeaders } from "../_shared/rateLimit.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
 const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") ?? "mariajosevarga@gmail.com";
 
-const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-const RATE_LIMIT_MAX = 5; // max submissions per window
 const MAX_STRING_LENGTH = 5000;
 const MAX_NOMBRE_LENGTH = 200;
 
@@ -23,22 +22,15 @@ Deno.serve(async (req: Request) => {
   const ch = corsHeaders(req);
 
   const supabase = getSupabaseAdmin();
-  const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-    || req.headers.get("cf-connecting-ip")
-    || "unknown";
+  const clientIp = getClientIp(req);
 
   try {
     // ─── Rate limiting ───
-    const { count, error: countError } = await supabase
-      .from("rate_limits")
-      .select("id", { count: "exact", head: true })
-      .eq("ip_address", clientIp)
-      .gte("created_at", new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString());
-
-    if (!countError && count !== null && count >= RATE_LIMIT_MAX) {
+    const rl = await checkRateLimit(clientIp, "upload");
+    if (!rl.allowed) {
       return new Response(
         JSON.stringify({ success: false, error: "Demasiadas solicitudes. Intenta en 15 minutos." }),
-        { status: 429, headers: { ...ch, "Content-Type": "application/json" } },
+        { status: 429, headers: { ...ch, "Content-Type": "application/json", ...rateLimitHeaders(rl.remaining, 5, rl.retryAfter) } },
       );
     }
 
@@ -151,10 +143,7 @@ Deno.serve(async (req: Request) => {
     if (insertError) throw insertError;
 
     // ─── Register rate limit ───
-    await supabase.from("rate_limits").insert({
-      ip_address: clientIp,
-      action: "upload_recuerdo",
-    }).catch(() => {});
+    await recordRateLimit(clientIp, "upload_recuerdo");
 
     // ─── Send email notification via Resend ───
     if (RESEND_API_KEY) {
@@ -191,7 +180,7 @@ Deno.serve(async (req: Request) => {
 
     return new Response(
       JSON.stringify({ success: true, data: inserted }),
-      { status: 201, headers: { ...ch, "Content-Type": "application/json" } },
+      { status: 201, headers: { ...ch, "Content-Type": "application/json", ...rateLimitHeaders(rl.remaining, 5) } },
     );
   } catch (err) {
     return new Response(

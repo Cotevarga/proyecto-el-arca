@@ -1,5 +1,6 @@
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
 import { getSupabaseAdmin } from "../_shared/supabase.ts";
+import { checkRateLimit, recordRateLimit, getClientIp, rateLimitHeaders } from "../_shared/rateLimit.ts";
 
 Deno.serve(async (req: Request) => {
   const cors = handleCors(req);
@@ -7,8 +8,18 @@ Deno.serve(async (req: Request) => {
   const ch = corsHeaders(req);
 
   const supabase = getSupabaseAdmin();
+  const clientIp = getClientIp(req);
 
   try {
+    // ─── Rate limiting ───
+    const rl = await checkRateLimit(clientIp, "search");
+    if (!rl.allowed) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Demasiadas solicitudes. Intenta en 1 minuto." }),
+        { status: 429, headers: { ...ch, "Content-Type": "application/json", ...rateLimitHeaders(rl.remaining, 30, rl.retryAfter) } },
+      );
+    }
+
     const url = new URL(req.url);
     const q = url.searchParams.get("q")?.trim();
 
@@ -39,9 +50,12 @@ Deno.serve(async (req: Request) => {
 
     if (error) throw error;
 
+    // ─── Register rate limit ───
+    await recordRateLimit(clientIp, "search");
+
     return new Response(
       JSON.stringify({ success: true, data: data ?? [], total: data?.length ?? 0 }),
-      { status: 200, headers: { ...ch, "Content-Type": "application/json" } },
+      { status: 200, headers: { ...ch, "Content-Type": "application/json", ...rateLimitHeaders(rl.remaining, 30) } },
     );
   } catch (err) {
     return new Response(

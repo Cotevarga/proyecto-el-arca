@@ -1,0 +1,60 @@
+{
+  "site": {
+    "title": "El Arca — Archivo Comunitario",
+    "description": "Memoria Viva de la Población Francisco de Goya, La Pintana.",
+    "tagline": "Trabajo de masas con las infancias: una demostración empírica y política"
+  },
+  "nav": {
+    "inicio": "Inicio",
+    "archivo": "Archivo",
+    "galeria": "Galería",
+    "mapa": "Mapa",
+    "relatos": "Relatos",
+    "videos": "Videos",
+    "subir": "Subir recuerdo",
+    "legado": "Legado",
+    "autora": "Autora",
+    "terminos": "Términos",
+    "plan": "Plan de Gestión"
+  },
+  "home": {
+    "hero_title": "Memoria Viva",
+    "hero_subtitle": "Trabajo de masas con las infancias: una demostración empírica y política",
+    "seccion_mistica": "Mística",
+    "seccion_comunicacion": "Comunicación",
+    "seccion_legado": "Legado"
+  },
+  "archivo": {
+    "title": "Archivo",
+    "filtros": "Filtros",
+    "buscar": "Buscar...",
+    "tipo": "Tipo",
+    "todos": "Todos",
+    "imagen": "Imagen",
+    "audio": "Audio",
+    "video": "Video",
+    "texto": "Texto",
+    "anio": "Año"
+  },
+  "subir": {
+    "title": "Comparte tu recuerdo",
+    "nombre": "Tu nombre o pseudónimo",
+    "archivo": "Selecciona un archivo",
+    "mensaje": "Cuéntanos tu historia",
+    "enviar": "Enviar recuerdo",
+    "gracias": "Gracias por compartir tu memoria"
+  },
+  "mapa": {
+    "title": "Mapa de la Memoria",
+    "explorar": "Explorar recuerdos en el territorio"
+  },
+  "common": {
+    "cargando": "Cargando...",
+    "error": "Error",
+    "cerrar": "Cerrar",
+    "ver_mas": "Ver más",
+    "compartir": "Compartir",
+    "descargar": "Descargar",
+    "licencia": "CC BY-NC-SA 4.0 — Contenido bajo licencia Creative Commons"
+  }
+}

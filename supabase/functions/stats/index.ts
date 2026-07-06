@@ -1,5 +1,6 @@
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
 import { getSupabaseAdmin } from "../_shared/supabase.ts";
+import { checkRateLimit, recordRateLimit, getClientIp, rateLimitHeaders } from "../_shared/rateLimit.ts";
 
 Deno.serve(async (req: Request) => {
   const cors = handleCors(req);
@@ -7,8 +8,17 @@ Deno.serve(async (req: Request) => {
   const ch = corsHeaders(req);
 
   const supabase = getSupabaseAdmin();
+  const clientIp = getClientIp(req);
 
   try {
+    // ─── Rate limiting ───
+    const rl = await checkRateLimit(clientIp, "stats");
+    if (!rl.allowed) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Demasiadas solicitudes. Intenta en 1 minuto." }),
+        { status: 429, headers: { ...ch, "Content-Type": "application/json", ...rateLimitHeaders(rl.remaining, 20, rl.retryAfter) } },
+      );
+    }
     const [totalRes, paisesRes, totalSizeRes] = await Promise.all([
       supabase.from("recuerdos").select("id", { count: "exact", head: true }).eq("aprobado", true),
       supabase.from("recuerdos").select("pais").eq("aprobado", true).not("pais", "is", null).neq("pais", ""),
@@ -43,6 +53,9 @@ Deno.serve(async (req: Request) => {
       !r.tipo_archivo || r.tipo_archivo === "texto" || r.tipo_archivo.startsWith("text")
     ).length;
 
+    // ─── Register rate limit ───
+    await recordRateLimit(clientIp, "stats");
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -54,7 +67,7 @@ Deno.serve(async (req: Request) => {
           desglose: { fotos, audios, videos, textos },
         },
       }),
-      { status: 200, headers: { ...ch, "Content-Type": "application/json" } },
+      { status: 200, headers: { ...ch, "Content-Type": "application/json", ...rateLimitHeaders(rl.remaining, 20) } },
     );
   } catch (err) {
     return new Response(
