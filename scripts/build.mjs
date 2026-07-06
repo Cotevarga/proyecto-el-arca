@@ -1,4 +1,3 @@
-import * as esbuild from 'esbuild';
 import { readFileSync, writeFileSync, readdirSync, statSync, mkdirSync, existsSync } from 'fs';
 import { join, dirname, relative, extname } from 'path';
 import { fileURLToPath } from 'url';

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Legado — Memoria de El Arca</title>
+  <meta property="og:title" content="EL ARCA — El Legado">
+  <meta property="og:description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <meta property="og:image" content="https://elarca.cl/images/og-image.jpg">
+  <meta property="og:url" content="https://elarca.cl/legado.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta name="description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <link rel="canonical" href="https://elarca.cl/legado.html">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+  <style>
+    :root { --color-mir: #E50914; --color-noche: #111111; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000000 !important; color: #ffffff !important; }
+    h1, h2, h3, h4, h5, h6, footer, p { text-align: center !important; }
+    .card-mir p, article p { text-align: justify !important; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+    .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
+    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; }
+    .text-mir { color: var(--color-mir) !important; }
+    .border-mir { border-color: var(--color-mir) !important; }
+    .bg-mir { background-color: var(--color-mir) !important; }
+    .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+    .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
+    .bg-noche { background-color: var(--color-noche) !important; }
+    .hover\:text-mir:hover { color: var(--color-mir) !important; }
+    .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
+    .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
+    .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
+    .border-mir\/40 { border-color: rgba(229,9,20,0.4) !important; }
+    .border-mir\/60 { border-color: rgba(229,9,20,0.6) !important; }
+    @keyframes tooltipPulse { 0%,100%{opacity:0.7;transform:translateX(0)} 50%{opacity:1;transform:translateX(4px)} }
+    .btn-mir { background-color: var(--color-mir) !important; color: white !important; font-weight: bold; padding: 0.75rem 2rem; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem; border: 2px solid var(--color-mir); }
+    .btn-mir:hover { background-color: black !important; color: var(--color-mir) !important; }
+  </style>
+  <script src="/audio-player.js" defer></script>
+    <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-0M3Q8DQ3QF');
+  </script>
+</head>
+<body class="bg-black text-white antialiased">
+
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div id="nav-player" class="flex items-center gap-1 md:gap-2 mx-1 md:mx-3"></div>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
+        <a href="/legado.html" class="text-mir border-b-2 border-mir pb-1">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+      </div>
+      <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-mir/30 px-4 py-4">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition">Relatos</a>
+        <a href="/legado.html" class="text-mir">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition">Archivo</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content">
+    <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
+      <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
+        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">La Mística de la Lucha</span>
+        <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">El Legado que Nos Mueve</h1>
+        <div class="divider-mir mx-auto"></div>
+        <p class="text-white/60 text-lg max-w-2xl mx-auto">Amor popular, trabajo de masas con las niñeces y la lucha que no se rinde.</p>
+      </div>
+    </header>
+
+    <section class="py-16 bg-noche">
+      <div class="max-w-4xl mx-auto px-4 space-y-10 text-white/80 text-lg leading-relaxed">
+
+        <div class="card-mir" style="text-align: justify !important;">
+          <p style="text-align: center !important; font-size: 1.5rem; font-weight: 700; color: var(--color-mir); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem;">El Legado: Sembrar el futuro en la arcilla de la infancia</p>
+          <p>Hablar del legado no es mirar las páginas de la historia como si fueran un museo de nostalgia. El legado es una antorcha encendida que se pasa de mano en mano, y su fuego solo sobrevive si somos capaces de traspasarlo a quienes vienen detrás. La historia de nuestra población, la obra de fundadores y militantes territoriales como el Jano, y la lucha de los grandes referentes de la izquierda social y política, convergen en una sola verdad histórica y empírica: el futuro de un pueblo se define en el territorio y en la mente de sus infancias.</p>
+          <p>Las infancias no son el mañana; son el presente que debemos cuidar y acompañar hoy, entregándoles las herramientas críticas necesarias en la edad donde más lo necesitan. El sistema lo sabe, y por eso intenta domesticarlos desde pequeños a través del individualismo y el consumo. Nuestra tarea, por tanto, es de trinchera: disputarle las infancias al sometimiento para formar los adultos conscientes del mañana.</p>
+          <p>Este es el hilo conductor que une a quienes nos enseñaron a caminar:</p>
+          <p><strong>1. El Che Guevara: El revolucionario se forja desde la niñez</strong><br>El pensamiento de Ernesto "Che" Guevara nos recuerda que la conciencia social no aparece de la noche a la mañana en la adultez; se cultiva desde los primeros años a través del ejemplo, el estudio y el lazo comunitario. El Che planteaba que la construcción de una sociedad nueva requiere transformar al ser humano desde su raíz más tierna, moldeando la arcilla en una dirección solidaria y no egoísta.</p>
+          <p style="text-align: center !important; font-style: italic; color: rgba(255,255,255,0.7); margin: 1rem 0;">"La arcilla fundamental de nuestra obra es la juventud, en ella depositamos nuestra esperanza y la preparamos para tomar de nuestras manos la bandera."<br><span style="color: var(--color-mir); font-size: 0.875rem;">— Ernesto "Che" Guevara</span></p>
+          <p><strong>2. Salvador Allende: Los niños como los únicos privilegiados</strong><br>El compañero presidente Salvador Allende comprendió como nadie que un proyecto socialista y humano debe tener como prioridad absoluta la protección material y mental de la niñez. Para Allende, la infancia no era una etapa de espera, sino el núcleo donde se fundaba la dignidad de la patria nueva. Si un niño crece con desnutrición, abandono o falta de educación crítica, el futuro de la revolución está hipotecado.</p>
+          <p style="text-align: center !important; font-style: italic; color: rgba(255,255,255,0.7); margin: 1rem 0;">"Para nosotros, el niño es la razón de ser de la vida, el niño es la semilla que hay que abonar... Queremos que el niño sea el centro de la preocupación del Estado, porque un pueblo que no cuida a sus niños no tiene derecho al futuro."<br><span style="color: var(--color-mir); font-size: 0.875rem;">— Salvador Allende</span></p>
+          <p><strong>3. Víctor Jara y Violeta Parra: El canto popular como escuela de conciencia</strong><br>La cultura popular y la militancia de Víctor Jara y Violeta Parra no se quedaron en los grandes escenarios; bajaron a la tierra, a las poblaciones y a las escuelas populares. Ellos entendieron que a las infancias se les entrega compañía y valores a través de la identidad, el juego y el arte. Un niño que canta la historia de su pueblo y comprende la realidad de su clase social crece con un escudo indestructible contra la alienación.</p>
+          <p style="text-align: center !important; font-style: italic; color: rgba(255,255,255,0.7); margin: 1rem 0;">"Nuestra canción no es una canción de protesta por la protesta misma, es una canción que quiere sembrar en los niños una semilla de amor y de dignidad, para que crezcan sabiendo quiénes son y de dónde vienen."<br><span style="color: var(--color-mir); font-size: 0.875rem;">— Víctor Jara</span></p>
+          <p><strong>4. Gladys Marín y la Comandante Tamara: El amor como motor de la militancia</strong><br>Tanto Gladys Marín como Cecilia Magni, la Comandante Tamara, demostraron con su consecuencia total que la vida del militante de izquierda está atravesada por un amor desbordante hacia los desposeídos y por la urgencia de proteger a los hijos del pueblo.<br>Gladys Marín dedicó gran parte de su labor política a denunciar cómo el sistema precarizaba la vida de los niños en las poblaciones y defendió siempre que la transformación social se hace con ternura, pero con firmeza combativa:</p>
+          <p style="text-align: center !important; font-style: italic; color: rgba(255,255,255,0.7); margin: 1rem 0;">"La vida es hermosa, pero vale la pena si se vive con dignidad, si se lucha por los demás, si se tiene la capacidad de indignarse ante la injusticia y de amar profundamente a los niños y al pueblo."<br><span style="color: var(--color-mir); font-size: 0.875rem;">— Gladys Marín</span></p>
+          <p>Por su parte, Cecilia Magni encarnó el dolor y la convicción de una madre revolucionaria que entendió que para asegurar un futuro libre para su propia hija y para todas las infancias del país, era necesario arriesgarlo todo en el presente. Su entrega total nació del amor más profundo por el destino de su clase.<br>El legado que ellas nos dejan es el de la urgencia de retomar los trabajos de masas en las poblaciones. Educar a los niños en colectividad, enseñarles a compartir, a ser solidarios con el vecino y a cuestionar la injusticia es el verdadero trabajo de base que el fascismo tanto teme.</p>
+          <p><strong>La evidencia viva de la semilla</strong><br>El sentido profundo de esta sección, y de todo este archivo vivo, es demostrar que esta teoría funciona. Cuando hombres como el Jano y las organizaciones sociales de la población dedicaron su vida, sus carreras, su tiempo y su inmenso amor a trabajar con los niños de la sede, a abrirles las puertas del ciber, a enseñarles arte, deporte y pensamiento crítico, no estaban perdiendo el tiempo: estaban sembrando.</p>
+          <p>Los adultos conscientes, los profesionales al servicio del pueblo, los vecinos organizados y los estudiantes críticos que hoy defienden la dignidad del territorio son el resultado empírico de esa semilla plantada hace décadas. El trabajo con las infancias da frutos de conciencia social.</p>
+          <p style="text-align: center !important; font-weight: 700; color: var(--color-mir); font-size: 1.25rem; margin-top: 1.5rem;">Retomar esa labor en los territorios no es una opción; es un deber histórico para que, más pronto que tarde, de nuevo se abran los caminos de la libertad.</p>
+        </div>
+
+        <div class="card-mir">
+          <div class="mb-6">
+            <img src="images/victor.jpeg" alt="Víctor Jara" class="w-full border border-[rgba(229,9,20,0.3)]" loading="lazy" decoding="async">
+          </div>
+          <p class="mb-4">
+            Es imposible hablar de amor popular sin recordar las manos curtidas y la voz inmortal de <strong class="text-white">Víctor Jara</strong>. Cuando cantaba <em>"El amor es algo grande que no se puede medir"</em>, no hablaba de un amor romántico y burgués: hablaba del amor que mueve a un poblador a compartir su última comida, del amor que lleva a un joven a tomar un micrófono para denunciar la injusticia, del amor que sostiene a una madre en la fila de la olla común.
+          </p>
+          <p class="mb-4">
+            Por eso sus canciones <strong class="text-white">"Te recuerdo Amanda"</strong> y <strong class="text-white">"Plegaria a un labrador"</strong> resuenan en cada rincón de La Goya, porque cantan al amor que lucha, al amor que no se rinde, al amor que construye territorio. Víctor lo dijo claro:
+          </p>
+          <blockquote class="border-l-4 border-mir pl-4 text-lg italic text-white/70 my-4">
+            "Cómo luchar por la vida, si no es por la vida misma.<br>
+            Cómo luchar por la paz, si no es en la tierra misma.<br>
+            Cómo luchar por el amor, si no es con amor."
+          </blockquote>
+          <p>
+            Ese es el mandato que nos dejaron: <strong class="text-white">continuar la lucha, resistir en el territorio, y retomar con urgencia el trabajo de masas con nuestras infancias</strong>, porque allí está la semilla de la dignidad. No hay camino más corto hacia la liberación que el que se construye hombro con hombro, codo con codo, amando al pueblo como se ama la vida misma.
+          </p>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
+        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
+        <span>|</span>
+        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
+      </nav>
+      <div style="margin-top:8px;"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:rgba(255,255,255,0.4);font-size:11px;text-decoration:none;">CC BY-NC-SA 4.0 — Contenido bajo licencia Creative Commons</a></div>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+  </footer>
+
+
+  <script>
+    var menuToggle = document.getElementById('menu-toggle');
+    if (menuToggle) {
+      menuToggle.addEventListener('click', function() {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+      });
+    } else {
+      console.warn('[Nav] menu-toggle no encontrado');
+    }
+    document.querySelectorAll('#mobile-menu a').forEach(function(l) {
+      l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
+    });
+  </script>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -13,7 +13,5 @@
     "deploy:functions": "supabase functions deploy --project-ref ukpoprkdgezgxlkjjuve",
     "deploy:frontend": "vercel --prod"
   },
-  "devDependencies": {
-    "esbuild": "^0.25.0"
-  }
+  "devDependencies": {}
 }

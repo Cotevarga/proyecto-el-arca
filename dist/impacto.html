@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impacto — El Arca</title>
+  <meta property="og:title" content="EL ARCA — Impacto del Archivo Comunitario">
+  <meta property="og:description" content="Métricas en tiempo real del archivo comunitario de la Población Francisco de Goya, La Pintana.">
+  <meta property="og:image" content="https://elarca.cl/images/og-image.jpg">
+  <meta property="og:url" content="https://elarca.cl/impacto.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta name="description" content="Dashboard público de impacto del Archivo Comunitario El Arca — KPIs en tiempo real, estadísticas de contribución, cobertura territorial.">
+  <link rel="canonical" href="https://elarca.cl/impacto.html">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  <script src="/config.js"></script>
+  <script src="/supabase.js" defer></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": "Archivo Comunitario El Arca — Dashboard de Impacto",
+    "description": "Métricas en tiempo real del archivo comunitario de la Población Francisco de Goya",
+    "creator": {
+      "@type": "Organization",
+      "name": "El Arca — Memoria Popular",
+      "url": "https://elarca.cl"
+    },
+    "temporalCoverage": "1980-01-01/2026-12-31",
+    "spatialCoverage": {
+      "@type": "Place",
+      "name": "Población Francisco de Goya, La Pintana, Santiago de Chile"
+    },
+    "measurementTechnique": "PostgreSQL queries + Supabase Realtime"
+  }
+  </script>
+  <style>
+    :root { --color-mir: #E50914; --color-noche: #0a0a0a; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #000; color: #e0e0e0; margin: 0; min-height: 100vh; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+    h1 { color: var(--color-mir); font-size: 28px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; text-align: center; }
+    h2 { font-size: 16px; color: #888; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: #0a0a0a; border: 1px solid rgba(229,9,20,0.15); border-radius: 12px; padding: 24px; text-align: center; transition: border-color 0.3s, transform 0.3s; }
+    .stat-card:hover { border-color: rgba(229,9,20,0.4); transform: translateY(-2px); }
+    .stat-number { font-size: 36px; font-weight: 800; color: #fff; line-height: 1.2; }
+    .stat-number.mir { color: var(--color-mir); }
+    .stat-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 8px; }
+    .bar-container { margin-bottom: 12px; }
+    .bar-label { display: flex; justify-content: space-between; font-size: 13px; color: #ccc; margin-bottom: 4px; }
+    .bar-track { height: 8px; background: #1a1a1a; border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; background: var(--color-mir); transition: width 1s ease; }
+    .section-title { text-align: center; color: var(--color-mir); font-size: 18px; font-weight: 700; margin: 40px 0 24px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .badge-blue { background: rgba(33,150,243,0.15); color: #2196f3; }
+    .badge-green { background: rgba(76,175,80,0.15); color: #4caf50; }
+    .badge-orange { background: rgba(255,152,0,0.15); color: #ff9800; }
+    .badge-purple { background: rgba(156,39,176,0.15); color: #9c27b0; }
+    .badge-mir { background: rgba(229,9,20,0.15); color: var(--color-mir); }
+    .footer { text-align: center; color: #555; font-size: 11px; margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .last-updated { text-align: center; color: #555; font-size: 11px; margin-bottom: 32px; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .animate-in { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
+    .skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; height: 80px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .map-placeholder { background: #0a0a0a; border: 1px solid rgba(229,9,20,0.15); border-radius: 12px; padding: 60px 24px; text-align: center; color: #555; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
+        <a href="/archivo.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+        <a href="/impacto.html" class="text-mir border-b-2 border-mir pb-1">Impacto</a>
+      </div>
+      <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-mir/30 px-4 py-4">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition">Relatos</a>
+        <a href="/archivo.html" class="hover:text-mir transition">Archivo</a>
+        <a href="/impacto.html" class="text-mir">Impacto</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="pt-32 pb-16">
+    <div class="container">
+      <div class="text-center animate-in">
+        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Transparencia y Métricas</span>
+        <h1>Impacto del Archivo</h1>
+        <div style="width:4rem;height:0.25rem;background-color:var(--color-mir);margin:1.5rem auto;"></div>
+        <p class="text-white/50 text-sm max-w-2xl mx-auto">Estadísticas en tiempo real del Archivo Comunitario El Arca. Todas las métricas se actualizan automáticamente desde la base de datos.</p>
+      </div>
+
+      <div class="last-updated">Última actualización: <span id="last-updated">—</span></div>
+
+      <!-- KPIs principales -->
+      <div class="grid-4" id="kpi-grid">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+      </div>
+
+      <!-- Desglose por tipo -->
+      <h2 class="section-title">📦 Composición del Archivo</h2>
+      <div class="grid-2" id="type-breakdown">
+        <div class="skeleton" style="height:200px;"></div>
+        <div class="skeleton" style="height:200px;"></div>
+      </div>
+
+      <!-- Cobertura geográfica -->
+      <h2 class="section-title">🌍 Cobertura Geográfica</h2>
+      <div id="geo-stats">
+        <div class="skeleton" style="height:200px;"></div>
+      </div>
+
+      <!-- Últimas contribuciones -->
+      <h2 class="section-title">📝 Últimas Contribuciones</h2>
+      <div id="recent-contributions">
+        <div class="skeleton" style="height:200px;"></div>
+      </div>
+
+      <!-- Metas ODS -->
+      <h2 class="section-title">🎯 Alineación con ODS</h2>
+      <div class="grid-4" id="ods-grid">
+        <div class="stat-card"><div class="stat-number mir" style="font-size:28px;">4.7</div><div class="stat-label">Educación de Calidad</div><div class="bar-track" style="margin-top:8px;height:4px;"><div class="bar-fill" style="width:100%;background:#4caf50;"></div></div></div>
+        <div class="stat-card"><div class="stat-number mir" style="font-size:28px;">11.4</div><div class="stat-label">Patrimonio Cultural</div><div class="bar-track" style="margin-top:8px;height:4px;"><div class="bar-fill" style="width:100%;background:#2196f3;"></div></div></div>
+        <div class="stat-card"><div class="stat-number mir" style="font-size:28px;">16.10</div><div class="stat-label">Acceso a la Información</div><div class="bar-track" style="margin-top:8px;height:4px;"><div class="bar-fill" style="width:100%;background:#ff9800;"></div></div></div>
+        <div class="stat-card"><div class="stat-number mir" style="font-size:28px;">17.17</div><div class="stat-label">Alianzas Comunitarias</div><div class="bar-track" style="margin-top:8px;height:4px;"><div class="bar-fill" style="width:100%;background:#9c27b0;"></div></div></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
+        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
+        <span>|</span>
+        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
+        <span>|</span>
+        <a href="/impacto.html" class="hover:text-mir transition">Impacto</a>
+        <span>|</span>
+        <a href="/status.html" class="hover:text-mir transition">Estado del Sistema</a>
+      </nav>
+      <div style="margin-top:8px;"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:rgba(255,255,255,0.4);font-size:11px;text-decoration:none;">CC BY-NC-SA 4.0 — Contenido bajo licencia Creative Commons</a></div>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+  </footer>
+
+  <script>
+    var menuToggle = document.getElementById('menu-toggle');
+    if (menuToggle) {
+      menuToggle.addEventListener('click', function() {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+      });
+      document.querySelectorAll('#mobile-menu a').forEach(function(l) {
+        l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
+      });
+    }
+
+    var fnUrl = window.EDGE_FUNCTIONS_URL;
+    var supabaseUrl = window.SUPABASE_URL;
+    var supabaseKey = window.SUPABASE_ANON_KEY;
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return String(text).replace(/[&<>"']/g, function(c) { return map[c]; });
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes || bytes === 0) return '0 B';
+      var units = ['B', 'KB', 'MB', 'GB', 'TB'];
+      var i = Math.floor(Math.log(bytes) / Math.log(1024));
+      return (bytes / Math.pow(1024, i)).toFixed(i > 1 ? 1 : 0) + ' ' + units[i];
+    }
+
+    function timeAgo(dateStr) {
+      var now = new Date();
+      var d = new Date(dateStr);
+      var diff = Math.floor((now - d) / 1000);
+      if (diff < 60) return 'hace ' + diff + 's';
+      if (diff < 3600) return 'hace ' + Math.floor(diff/60) + 'm';
+      if (diff < 86400) return 'hace ' + Math.floor(diff/3600) + 'h';
+      return 'hace ' + Math.floor(diff/86400) + 'd';
+    }
+
+    async function waitForSupabase(maxWaitMs) {
+      maxWaitMs = maxWaitMs || 10000;
+      var start = Date.now();
+      while ((!window.miSupabase && !window._supabase) && (Date.now() - start) < maxWaitMs) {
+        await new Promise(function(r) { setTimeout(r, 200); });
+      }
+      return window.miSupabase || window._supabase;
+    }
+
+    async function loadImpacto() {
+      document.getElementById('last-updated').textContent = new Date().toLocaleString('es-CL');
+
+      try {
+        // Load from stats edge function
+        var statsRes = await fetch(fnUrl + '/stats');
+        var statsData = await statsRes.json();
+        var stats = statsData.data || {};
+
+        // KPIs principales
+        var kpiGrid = document.getElementById('kpi-grid');
+        kpiGrid.innerHTML =
+          '<div class="stat-card animate-in"><div class="stat-number mir">' + (stats.total_contribuciones || 0) + '</div><div class="stat-label">Contribuciones Totales</div></div>' +
+          '<div class="stat-card animate-in"><div class="stat-number mir">' + (stats.total_paises || 0) + '</div><div class="stat-label">Países / Regiones</div></div>' +
+          '<div class="stat-card animate-in"><div class="stat-number mir">' + formatBytes((stats.total_gigabytes || 0) * 1024 * 1024 * 1024) + '</div><div class="stat-label">Archivo Preservado</div></div>' +
+          '<div class="stat-card animate-in"><div class="stat-number mir">' + ((stats.desglose && (stats.desglose.fotos + stats.desglose.audios + stats.desglose.videos + stats.desglose.textos)) || 0) + '</div><div class="stat-label">Elementos Archivados</div></div>';
+
+        // Desglose por tipo
+        var d = stats.desglose || { fotos: 0, audios: 0, videos: 0, textos: 0 };
+        var total = d.fotos + d.audios + d.videos + d.textos || 1;
+        var breakdownEl = document.getElementById('type-breakdown');
+        breakdownEl.innerHTML =
+          '<div class="stat-card animate-in"><h2 style="margin-bottom:16px;text-align:center;">📷 Fotos</h2><div class="stat-number">' + d.fotos + '</div><div class="bar-track" style="margin-top:12px;"><div class="bar-fill" style="width:' + (d.fotos/total*100) + '%;background:#4caf50;"></div></div><div class="stat-label">' + (d.fotos/total*100).toFixed(1) + '% del archivo</div></div>' +
+          '<div class="stat-card animate-in"><h2 style="margin-bottom:16px;text-align:center;">🎵 Audios</h2><div class="stat-number">' + d.audios + '</div><div class="bar-track" style="margin-top:12px;"><div class="bar-fill" style="width:' + (d.audios/total*100) + '%;background:#2196f3;"></div></div><div class="stat-label">' + (d.audios/total*100).toFixed(1) + '% del archivo</div></div>';
+
+        // Countries
+        var paises = stats.paises || [];
+        var geoEl = document.getElementById('geo-stats');
+        if (paises.length > 0) {
+          var geoHtml = '<div class="stat-card animate-in"><div class="stat-number" style="font-size:24px;">' + paises.length + ' países/regiones</div>';
+          paises.forEach(function(p) {
+            geoHtml += '<span class="badge badge-mir" style="margin:3px;">' + escapeHtml(p) + '</span> ';
+          });
+          geoHtml += '</div>';
+          geoEl.innerHTML = geoHtml;
+        } else {
+          geoEl.innerHTML = '<div class="stat-card animate-in"><div class="stat-number" style="font-size:18px;color:#888;">🌍</div><div class="stat-label">Datos geográficos próximamente</div></div>';
+        }
+
+        // Recent contributions from Supabase directly
+        try {
+          var s = await waitForSupabase();
+          if (s) {
+            var { data: recent, error: recentError } = await s
+              .from('recuerdos')
+              .select('nombre, created_at, tipo_archivo, seccion')
+              .eq('aprobado', true)
+              .order('created_at', { ascending: false })
+              .limit(10);
+
+            var recentEl = document.getElementById('recent-contributions');
+            if (recent && recent.length > 0) {
+              var html = '<div class="stat-card animate-in" style="text-align:left;padding:16px 20px;">';
+              recent.forEach(function(r) {
+                var icon = '📄';
+                if (r.tipo_archivo && r.tipo_archivo.startsWith('image')) icon = '📷';
+                else if (r.tipo_archivo && r.tipo_archivo.startsWith('audio')) icon = '🎵';
+                else if (r.tipo_archivo && r.tipo_archivo.startsWith('video')) icon = '🎬';
+                html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;">' +
+                  '<span>' + icon + ' ' + escapeHtml(r.nombre || 'Anónimo') + ' <span class="badge badge-blue">' + escapeHtml(r.seccion || 'general') + '</span></span>' +
+                  '<span style="color:#666;font-size:11px;">' + timeAgo(r.created_at) + '</span></div>';
+              });
+              html += '</div>';
+              recentEl.innerHTML = html;
+            } else {
+              recentEl.innerHTML = '<div class="stat-card animate-in"><div class="stat-label">Aún no hay contribuciones aprobadas</div></div>';
+            }
+          }
+        } catch (dbErr) {
+          console.warn('[Impacto] Error al cargar contribuciones recientes:', dbErr);
+        }
+
+      } catch (err) {
+        console.error('[Impacto] Error:', err);
+        document.getElementById('kpi-grid').innerHTML =
+          '<div class="stat-card" style="grid-column:1/-1;"><div class="stat-number" style="font-size:18px;color:#888;">⚠️</div><div class="stat-label">Error al cargar métricas. Verifica la conexión con Supabase.</div></div>';
+      }
+    }
+
+    loadImpacto();
+    setInterval(loadImpacto, 120000);
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0M3Q8DQ3QF');
+  </script>
+</body>
+</html>

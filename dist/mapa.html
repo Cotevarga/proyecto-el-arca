@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa — El Arca</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺️</text></svg>">
+  <meta property="og:title" content="EL ARCA — Mapa">
+  <meta property="og:description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <meta property="og:image" content="https://elarca.cl/images/og-image.jpg">
+  <meta property="og:url" content="https://elarca.cl/mapa.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta name="description" content="Mapa interactivo del Archivo Comunitario El Arca">
+  <link rel="canonical" href="https://elarca.cl/mapa.html">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root { --color-mir: #E50914; --color-noche: #111111; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000 !important; color: #fff !important; }
+    h1, h2, h3, h4, h5, h6, footer, p { text-align: center !important; }
+    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; }
+    .text-mir { color: var(--color-mir) !important; }
+    .border-mir { border-color: var(--color-mir) !important; }
+    .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
+    .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
+    .bg-mir { background-color: var(--color-mir) !important; }
+    .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
+    .hover\:text-mir:hover { color: var(--color-mir) !important; }
+    .btn-mir { background-color: var(--color-mir) !important; color: white !important; font-weight: bold; padding: 0.75rem 2rem; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem; border: 2px solid var(--color-mir); }
+    .btn-mir:hover { background-color: #000 !important; color: var(--color-mir) !important; }
+    #map { height: 60vh; width: 100%; border-radius: 12px; border: 1px solid rgba(229,9,20,0.3); z-index: 1; }
+    .leaflet-container { background: #1a1a1a !important; }
+    .leaflet-popup-content-wrapper { background: #111 !important; color: #fff !important; border: 1px solid rgba(229,9,20,0.3); border-radius: 8px !important; }
+    .leaflet-popup-tip { background: #111 !important; border: 1px solid rgba(229,9,20,0.3); }
+    .leaflet-popup-content { margin: 12px 16px; font-size: 13px; }
+    .leaflet-popup-content a { color: var(--color-mir); }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+  </style>
+  <script src="/config.js"></script>
+  <script src="/supabase.js" defer></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0M3Q8DQ3QF');</script>
+</head>
+<body class="bg-black text-white antialiased">
+
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+      </div>
+      <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-mir/30 px-4 py-4">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition">Archivo</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="pt-32 pb-16">
+    <div class="max-w-6xl mx-auto px-4 animate-fade-in-up">
+      <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Geografía de la Memoria</span>
+      <h1 class="heading-mir text-4xl md:text-5xl mt-4 mb-4">Mapa de Contribuciones</h1>
+      <div style="width:4rem;height:0.25rem;background-color:var(--color-mir);margin:1.5rem auto;"></div>
+      <p class="text-white/50 text-lg max-w-2xl mx-auto mb-8">Cada marcador representa un recuerdo archivado. Explora las contribuciones de cada territorio.</p>
+      <div id="map"></div>
+      <div id="map-stats" class="mt-6 text-center text-sm text-white/40"></div>
+    </div>
+  </main>
+
+  <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
+        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
+        <span>|</span>
+        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
+      </nav>
+      <div><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:rgba(255,255,255,0.4);font-size:11px;text-decoration:none;">CC BY-NC-SA 4.0 — Contenido bajo licencia Creative Commons</a></div>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+  </footer>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var mapEl = document.getElementById('map');
+    if (!mapEl) return;
+
+    var mapLoaded = false;
+
+    function cargarMapa() {
+      if (mapLoaded) return;
+      var client = window.miSupabase;
+      if (!client) { mapEl.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">Conectando...</p>'; return; }
+      mapLoaded = true;
+
+      var map = L.map('map', {
+        center: [-33.5, -70.6],
+        zoom: 5,
+        zoomControl: true,
+        attributionControl: false
+      });
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19
+      }).addTo(map);
+
+      client.from('recuerdos')
+        .select('id, nombre, geolocalizacion, pais, region, url_archivo, tipo_archivo, mensaje_largo')
+        .eq('aprobado', true)
+        .not('geolocalizacion', 'is', null)
+        .order('created_at', { ascending: false })
+      .then(function (r) {
+        if (r.error || !r.data || r.data.length === 0) {
+          document.getElementById('map-stats').textContent = 'Aún no hay contribuciones con ubicación.';
+          return;
+        }
+        var count = 0;
+        r.data = r.data.filter(function (d) { return d.geolocalizacion && d.geolocalizacion.trim(); });
+        r.data.forEach(function (d) {
+          var geo = d.geolocalizacion || '';
+          var parts = geo.split(',').map(function (s) { return parseFloat(s.trim()); }).filter(function (n) { return !isNaN(n); });
+          if (parts.length >= 2) {
+            var lat = parts[0], lng = parts[1];
+            if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
+            count++;
+            var icon = d.tipo_archivo && d.tipo_archivo.startsWith('audio')
+              ? L.divIcon({ className: '', html: '<div style="background:#E50914;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(229,9,20,0.6);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] })
+              : d.tipo_archivo && d.tipo_archivo.startsWith('video')
+              ? L.divIcon({ className: '', html: '<div style="background:#ff6b35;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(255,107,53,0.6);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] })
+              : L.divIcon({ className: '', html: '<div style="background:#fff;width:14px;height:14px;border-radius:50%;border:2px solid #E50914;box-shadow:0 0 8px rgba(229,9,20,0.4);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] });
+
+            var popup = '<div style="text-align:left;"><strong>' + (d.nombre || 'Anónimo') + '</strong>';
+            if (d.pais) popup += '<br><span style="color:#888;font-size:11px;">' + d.pais + (d.region ? ', ' + d.region : '') + '</span>';
+            if (d.mensaje_largo) popup += '<br><span style="color:#aaa;font-size:11px;">' + d.mensaje_largo.substring(0, 120) + (d.mensaje_largo.length > 120 ? '…' : '') + '</span>';
+            if (d.id) popup += '<br><a href="/archivo.html?view=rec-' + d.id + '" style="font-size:11px;">Ver detalle</a>';
+            else if (d.url_archivo) popup += '<br><a href="' + d.url_archivo + '" target="_blank" style="font-size:11px;">Ver archivo</a>';
+            popup += '</div>';
+
+            L.marker([lat, lng], { icon: icon }).addTo(map).bindPopup(popup);
+          }
+        });
+        document.getElementById('map-stats').textContent = count + ' contribuciones con ubicación geográfica.';
+        if (count > 0) {
+          var group = L.featureGroup();
+          map.eachLayer(function (l) { if (l instanceof L.Marker) group.addLayer(l); });
+          map.fitBounds(group.getBounds().pad(0.1));
+        }
+      })
+      .catch(function () {
+        document.getElementById('map-stats').textContent = 'Error al cargar ubicaciones.';
+      });
+    }
+
+    var menuToggle = document.getElementById('menu-toggle');
+    var mobileMenu = document.getElementById('mobile-menu');
+    if (menuToggle && mobileMenu) {
+      menuToggle.addEventListener('click', function () { mobileMenu.classList.toggle('hidden'); });
+      mobileMenu.querySelectorAll('a').forEach(function (l) { l.addEventListener('click', function () { mobileMenu.classList.add('hidden'); }); });
+    }
+
+    if (window.miSupabase) { cargarMapa(); } else {
+      var checkReady = setInterval(function () {
+        if (window.miSupabase) { clearInterval(checkReady); cargarMapa(); }
+      }, 200);
+      setTimeout(function () { clearInterval(checkReady); }, 15000);
+    }
+  })();
+  </script>
+</body>
+</html>

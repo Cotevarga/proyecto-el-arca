@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatos — Memoria de El Arca</title>
+  <meta property="og:title" content="EL ARCA — Relatos">
+  <meta property="og:description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <meta property="og:image" content="https://elarca.cl/images/og-image.jpg">
+  <meta property="og:url" content="https://elarca.cl/relatos.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta name="description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <link rel="canonical" href="https://elarca.cl/relatos.html">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+  <style>
+    :root { --color-mir: #E50914; --color-noche: #111111; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000000 !important; color: #ffffff !important; }
+    h1, h2, h3, h4, h5, h6, footer, p { text-align: center !important; }
+    .card-mir p, article p { text-align: justify !important; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+    .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
+    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: white !important; text-transform: uppercase; letter-spacing: 0.05em; }
+    .text-mir { color: var(--color-mir) !important; }
+    .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
+    .border-mir\/40 { border-color: rgba(229,9,20,0.4) !important; }
+    .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
+    .bg-mir { background-color: var(--color-mir) !important; }
+    .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
+    .bg-noche { background-color: var(--color-noche) !important; }
+    .hover\:text-mir:hover { color: var(--color-mir) !important; }
+    .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
+    @keyframes tooltipPulse { 0%,100%{opacity:0.7;transform:translateX(0)} 50%{opacity:1;transform:translateX(4px)} }
+    .cat-card { transition: all 0.4s ease; cursor: pointer; }
+    .cat-card:hover { transform: translateY(-8px); border-color: var(--color-mir) !important; box-shadow: 0 10px 40px rgba(229,9,20,0.2); }
+  </style>
+  <script src="/config.js"></script>
+  <script src="/supabase.js" defer></script>
+  <script src="/audio-player.js" defer></script>
+    <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-0M3Q8DQ3QF');
+  </script>
+</head>
+<body class="bg-black text-white antialiased">
+
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div id="nav-player" class="flex items-center gap-1 md:gap-2 mx-1 md:mx-3"></div>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="/relatos.html" class="text-mir border-b-2 border-mir pb-1">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+      </div>
+      <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-mir/30 px-4 py-4">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition">Videos</a>
+        <a href="/relatos.html" class="text-mir">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition">Archivo</a>
+      </div>
+    </div>
+  </nav>
+
+    <main id="main-content">
+    <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
+      <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
+        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Crónica Popular</span>
+        <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Relatos Populares</h1>
+        <div class="divider-mir mx-auto"></div>
+        <p class="text-white/60 text-lg max-w-2xl mx-auto">Crónicas, entrevistas y testimonios que reconstruyen la historia del centro cultural El Arca, su fundador y la memoria viva de La Goya.</p>
+      </div>
+    </header>
+
+    <!-- ─── Sub-secciones (card landing) ─── -->
+    <section id="navegacion-subsecciones" class="py-16" style="background-color:#111111">
+      <div class="max-w-3xl mx-auto px-4 mb-12">
+        <div style="position:relative;">
+          <input type="search" id="buscador-input" placeholder="Buscar en relatos y recuerdos…" style="width:100%;padding:14px 20px;background:#0a0a0a;border:1px solid rgba(229,9,20,0.25);border-radius:8px;color:white;font-size:15px;outline:none;transition:border-color 0.3s;" onfocus="this.style.borderColor='#E50914'" onblur="this.style.borderColor='rgba(229,9,20,0.25)'">
+          <button id="buscador-clear" class="hidden" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:#888;cursor:pointer;font-size:18px;" aria-label="Limpiar búsqueda">&times;</button>
+        </div>
+        <div id="buscador-results" class="mt-4" style="max-height:400px;overflow-y:auto;border:1px solid rgba(229,9,20,0.15);border-radius:8px;background:#0a0a0a;display:none;"></div>
+      </div>
+      <div class="max-w-5xl mx-auto px-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="navegarASubseccion('Relatos: El Jano')">
+            <div class="text-6xl mb-4 opacity-70">👤</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">El Jano</h2>
+            <p class="text-white/50 text-sm leading-relaxed max-w-xs">Relatos, vivencias y memorias orales sobre el mentor, amigo y motor creativo de la organización popular.</p>
+          </button>
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="navegarASubseccion('Relatos: El Arca')">
+            <div class="text-6xl mb-4 opacity-70">🏛️</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">El Arca</h2>
+            <p class="text-white/50 text-sm leading-relaxed max-w-xs">Archivo vivo de la trinchera cultural de La Goya: talleres, Navidades Populares y la victoria comunitaria.</p>
+          </button>
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="navegarASubseccion('Relatos: Otras organizaciones')">
+            <div class="text-6xl mb-4 opacity-70">🤝</div>
+            <h2 class="text-mir font-title text-xl uppercase mb-3">Otras Organizaciones Sociales</h2>
+            <p class="text-white/50 text-sm leading-relaxed max-w-xs">El tejido histórico de nuestro barrio: memorias de Antupeñi, grupos juveniles y las raíces del trabajo territorial.</p>
+          </button>
+          <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="navegarASubseccion('Relatos: Anecdotas')">
+            <div class="text-6xl mb-4 opacity-70">💬</div>
+            <h2 class="text-mir font-title text-2xl uppercase mb-3">Anécdotas</h2>
+            <p class="text-white/50 text-sm leading-relaxed max-w-xs">Momentos espontáneos, recuerdos breves y pequeñas historias que construyen la memoria colectiva del barrio.</p>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Layout SPA: índice izquierdo + lector derecho ─── -->
+    <section id="contenedor-indices-section" class="py-16 bg-noche" style="min-height:500px;display:none;">
+      <div class="max-w-6xl mx-auto px-4 mb-4" style="text-align:left;">
+        <button id="btn-volver" class="text-mir hover:underline text-sm font-semibold" style="background:transparent;border:none;cursor:pointer;font-family:inherit;" onclick="volverCategorias()">← Volver a categorías</button>
+      </div>
+      <div class="layout-relatos max-w-6xl mx-auto px-4">
+        <aside id="indice-izquierdo" class="sidebar">
+          <h3 class="sidebar-titulo">Índice</h3>
+          <ul id="lista-titulos"></ul>
+        </aside>
+        <main id="relato-completo" class="lector">
+          <div id="contenido-dinamico">
+            <h2>Selecciona un relato</h2>
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <section class="py-16 bg-black border-t border-mir/20 text-center">
+      <div class="max-w-3xl mx-auto px-4">
+        <h2 class="heading-mir text-4xl md:text-5xl mb-4">Tu relato también importa</h2>
+        <div class="divider-mir mx-auto"></div>
+        <p class="text-white/60 text-lg mb-8">Si fuiste parte de El Arca, si conociste al Jano, si creciste en La Goya: tu memoria es parte de esta historia.</p>
+        <a href="/subir.html" class="inline-block bg-mir hover:bg-resistencia-700 text-white font-bold py-3 px-10 transition-all duration-300 tracking-wider uppercase text-sm border-2 border-mir hover:bg-black hover:text-mir">Comparte tu recuerdo</a>
+      </div>
+    </section>
+
+  <script>
+    /* ─── Relatos hardcodeados (por artículo individual) ─── */
+    var RELATOS_HARDCODEADOS = {
+      'Relatos: El Jano': [
+        { id:'hc-jano-1', titulo:'¿Quién era el "Cabezón Jano"?', subtitulo:'El origen de un dirigente popular',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">¿Quién era el "Cabezón Jano"?</h2><p class="text-white/40 text-sm">El origen de un dirigente popular</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="space-y-4 text-white/70 leading-relaxed"><p>Pedro Alejandro González Reyes, más conocido como el Cabezón Jano o simplemente Jano, fue un dirigente social y gestor cultural incansable de la Población Francisco de Goya. Su figura se elevó como la de un referente imborrable para todo un territorio, encarnando la lucha de un hombre que, desde la marginalidad del bloque sur de La Pintana, se negó a aceptar el destino de pobreza que el sistema había diseñado para los suyos. Jano no era un político de escritorio ni un líder de cartón: era un hombre de territorio que entendió que la cultura popular era la herramienta más poderosa para transformar la realidad. Con un parlante viejo y un micrófono prestado, comenzó a tejer redes de solidaridad y organización que hasta el día de hoy sostienen a la comunidad.</p></div><div class="card-mir"><img src="images/jano_inicio.jpg" alt="El Cabezón Jano" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">"El Jano nos enseñó que la cultura no era un lujo, era una trinchera."</p></div></div></article>' },
+        { id:'hc-jano-2', titulo:'El Sueño del Jano: Los Inicios en el Territorio', subtitulo:'Los inicios en La Goya — Mediados de los 90',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">El Sueño del Jano: Los Inicios en el Territorio</h2><p class="text-white/40 text-sm">Los inicios en La Goya — Mediados de los 90</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="space-y-4 text-white/70 leading-relaxed"><p>La historia del Jano en La Goya comienza a mediados de los 90, cuando llegó con la convicción firme de que la cultura popular era el camino. En un territorio golpeado por la exclusión, el narcotráfico y el abandono estatal, montó un centro cultural que muchos creyeron una locura. Pero a las pocas semanas, ya había niños aprendiendo a tocar la batería con tarros vacíos en la sede vecinal. Así nació El Arca: sin plata, sin auspicios, sin permiso de nadie. Solo con la fuerza de la comunidad organizada y la convicción de un hombre que se negaba a aceptar que el destino de los niños pobres estuviera escrito. Pedagogía popular, amor por la comunidad y una convicción inquebrantable: solo el pueblo salva al pueblo.</p></div><div class="card-mir"><img src="images/FB_IMG_1782701775498.jpg" alt="Jano pintando la sede" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">Jano pintando la sede de El Arca.</p></div></div></article>' },
+        { id:'hc-jano-3', titulo:'La TV del Pueblo', subtitulo:'El sueño de comunicación popular del Jano',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La TV del Pueblo</h2><p class="text-white/40 text-sm">El sueño de comunicación popular del Jano</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="card-mir md:order-2"><img src="images/FB_IMG_1782701826979.jpg" alt="Jano planificando TV Comunitaria" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">Planificando la comunicación popular, cámara en mano.</p></div><div class="space-y-4 text-white/70 leading-relaxed md:order-1"><p>"El Jano tenía una obsesión: que la población se viera a sí misma en pantalla. Decía que mientras la tele mostrara solo realidades ajenas, el pueblo nunca iba a creerse capaz de contar su propia historia."</p><p>Con una cámara prestada y cables que conseguía de aquí y allá, el Jano comenzó a grabar: las ollas comunes, los talleres, las marchas, los carnavales. Cada grabación era un acto de soberanía. No importaba la calidad técnica: importaba el contenido, la verdad, la mirada del pueblo.</p><p>Ese sueño de comunicación popular —la televisión comunitaria— fue el germen de la Radio Libre 90.1 / 100.5 FM. Donde no llegó la pantalla, llegó la frecuencia. El micrófono siempre fue del pueblo.</p></div></div></article>' },
+        { id:'hc-jano-4', titulo:'La Tragedia y la Memoria', subtitulo:'Cuesta El Melón — 24 de Mayo de 2006.',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Tragedia y la Memoria</h2><p class="text-white/40 text-sm">Cuesta El Melón — 24 de Mayo de 2006.</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="space-y-4 text-white/70 leading-relaxed"><p>El 24 de Mayo del 2006, el destino golpeó con la crueldad que solo el azar sabe tener. En la Cuesta El Melón, un accidente de tránsito arrebató físicamente al Jano, al Nino y al Carlos. La comunidad quedó en shock. El Arca perdió a tres de sus hijos más queridos. El dolor paralizó a La Goya. Pero la comunidad se organizó para mantener vivo el legado. Porque el Jano no había construido una obra personal: había sembrado conciencia colectiva. Y la conciencia colectiva no muere con un accidente de tránsito.</p></div><div class="card-mir"><img src="images/companeros_melon.jpg" alt="Compañeros de El Arca" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">"No están muertos quienes viven en el corazón del pueblo."</p></div></div></article>' }
+      ],
+      'Relatos: El Arca': [
+        { id:'hc-arca-1', titulo:'La Mística del Trabajo Territorial', subtitulo:'Infancias, Talleres y Resistencia Colectiva',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Mística del Trabajo Territorial</h2><p class="text-white/40 text-sm">Infancias, Talleres y Resistencia Colectiva</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="card-mir md:order-2"><img src="images/FB_IMG_1782701859802.jpg" alt="Navidad Popular" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La Navidad Popular: ningún niño sin celebrar en La Goya.</p></div><div class="space-y-4 text-white/70 leading-relaxed md:order-1"><p>El Arca no fue solo un espacio físico; fue la demostración empírica de que la organización de masas con las niñeces es el camino real para transformar el futuro. En una época marcada por un entorno conflictivo y la vulnerabilidad de las calles, la apuesta colectiva de la organización no fue el aislamiento, sino disputarle la niñez al sistema a través de la conciencia, el arte y la dignidad territorial.</p><p>A través de núcleos de trabajo como el Grupo Tirúa, El Arca levantó un proyecto político-pedagógico específico que iba más allá de la entretención: era un acompañamiento diario en las tareas, en la nivelación de estudios y en el resguardo integral de las familias del sector. Los sábados, las canchas y los potreros del barrio eran tomados por talleres autogestionados de batucadas, teatro, expresión corporal y zancos. Estas herramientas no eran un pasatiempo; eran una alternativa real frente a la delincuencia y la marginalidad económica, enseñando a lxs niñxs que no estaban destinados al sometimiento, sino a ser sujetos conscientes de su propia historia.</p><p>Hoy, ese trabajo territorial da frutos concretos: aquellos niños y niñas que se criaron dentro del espacio son hoy adultos profesionales, críticos y conscientes que defienden el territorio y transmiten esa misma consecuencia a las nuevas generaciones.</p></div></div></article>' },
+        { id:'hc-arca-2', titulo:'La Navidad Popular', subtitulo:'Autogestión Comunitaria contra el Clasismo',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Navidad Popular</h2><p class="text-white/40 text-sm">Autogestión Comunitaria contra el Clasismo</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="card-mir md:order-2"><img src="images/navidad_popular2.jpg" alt="Navidad Popular" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La Navidad Popular: ningún niño sin celebrar en La Goya.</p></div><div class="space-y-4 text-white/70 leading-relaxed md:order-1"><p>Uno de los hitos más profundos arraigados en la memoria de la población es la Navidad Popular de El Arca, una demostración de soberanía vecinal que rompía de raíz con las lógicas del clasismo y la exclusión material. La organización se negaba a aceptar que la falta de recursos apagara la infancia en el territorio, transformando una fecha de consumo en una jornada de dignidad y alegría colectiva.</p><p>La gestión de este hito se sostenía enteramente a pulso: la comunidad de El Arca redactaba discursos y cartas formales que se entregaban directamente en distintas empresas para conseguir donaciones masivas de dulces y juguetes. Mientras tanto, el tejido vecinal se activaba en las calles: lxs pobladorxs ponían a disposición sus propias piscinas y organizaban juegos con bombitas de agua. Era un día consagrado por y para las infancias, donde sin importar la población de procedencia o la situación económica, cada niño y niña recibía exactamente lo mismo.</p><p>La Navidad Popular de El Arca demostró que la autogestión y la solidaridad horizontal son capaces de resolver las necesidades del pueblo sin mendigarle nada al sistema.</p></div></div></article>' },
+        { id:'hc-arca-3', titulo:'El Legado en las Calles', subtitulo:'El Frente Cultural y la Batalla de Francisco Franco',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">El Legado en las Calles</h2><p class="text-white/40 text-sm">El Frente Cultural y la Batalla de Francisco Franco</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="card-mir md:order-2"><img src="images/FB_IMG_1782701766075.jpg" alt="Marcha comunitaria en La Goya" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La comunidad organizada en las calles de La Pintana.</p></div><div class="space-y-4 text-white/70 leading-relaxed md:order-1"><p>La escuela de organización de El Arca demostró que la queja sin articulación es estéril, pero que la unión comunitaria es una fuerza imparable capaz de poner en jaque a la institucionalidad. El espacio funcionaba como un cuartel general de agitación donde las reuniones, los talleres y las asambleas territoriales se traducían en victorias políticas directas para la población.</p><p>El hito más grande de este frente de lucha fue la batalla cultural por la identidad del barrio. A través de un intenso trabajo de concientización y educación popular, El Arca impulsó a la comunidad a cuestionar por qué la avenida principal del territorio llevaba el nombre del dictador Francisco Franco. La organización politizó el cotidiano, activó a los vecinos y coordinó un proceso histórico que obligó a las autoridades municipales a ceder ante las demandas de los pobladores.</p><p>Esta gran victoria territorial, coronada con los históricos Carnavales del 30 que llenaban de comparsas el Paradero 30 de Santa Rosa, dejó una lección imborrable en La Goya: cuando existe organización real, los pueblos son dueños de su propia historia y de su geografía.</p></div></div></article>' },
+        { id:'hc-arca-4', titulo:'Medios de Emancipación', subtitulo:'La Radio Libre y Comunitaria 90.1 / 100.5 FM',
+          html:'<article class="relato"><div class="flex items-center gap-3 mb-4"><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">Medios de Emancipación</h2><p class="text-white/40 text-sm">La Radio Libre y Comunitaria 90.1 / 100.5 FM</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="card-mir md:order-2"><img src="images/radio_libre.jpg" alt="Radio Libre" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">La Radio Libre 90.1 / 100.5 FM: el sueño hecho frecuencia.</p></div><div class="space-y-4 text-white/70 leading-relaxed md:order-1"><p>La democratización de la palabra fue una trinchera fundamental para El Arca. Ante el monopolio de la información de los medios tradicionales, la organización entendió la urgencia de crear plataformas propias para visibilizar las problemáticas, luchas y alegrías de la misma población. Así se inició el largo y complejo camino de la autogestión comunicacional: instalando antenas a pulso y sosteniendo el proyecto colectivamente para dar vida a la Radio Libre y Comunitaria, transmitiendo primero en la frecuencia 90.1 y posteriormente en la 100.5 FM.</p><p>La radio se instaló en el segundo piso de la sede de El Arca, colindando con la biblioteca popular Libros para ser Libres. Lejos de ser un espacio de mera entretención, la emisora se convirtió en un parlante de soberanía popular con programas emblemáticos como "El Sartén por el Mango" y "La Gozadera", cruzando la identidad del barrio con la concientización política. El espacio radial fue completamente heterogéneo y abierto a la comunidad: los mismos vecinos daban vida a programas sobre hierbas naturales, bloques de rancheras, salsa y merengue.</p><p>La mística de este medio popular, donde cada transmisión iniciaba encendiendo inciensos y sintonizando la trova combativa de Silvio Rodríguez, permanece intacta. Hoy, este archivo digital es la continuación directa de esa soberanía radial: la memoria viva como el mayor enemigo del fascismo y del olvido.</p></div></div></article>' }
+      ],
+      'Relatos: Otras organizaciones': [
+        { id:'hc-org-1', titulo:'La Caleta y Antupeñi', subtitulo:'1998 — 2003 · Organización territorial en La Pintana',
+          html:'<div class="tab-menu-relatos"><div class="flex flex-wrap gap-2 mb-6 border-b border-mir/20 pb-4 overflow-x-auto"><button class="tab-btn active" data-tab="caleta">La Caleta y Antupeñi (1998-2003)</button></div><div id="tab-caleta" class="tab-content active"><article><div class="flex items-center gap-3 mb-6"><span class="text-mir font-title text-4xl">01</span><div><h2 class="text-mir font-title text-2xl md:text-3xl uppercase">La Caleta y Antupeñi</h2><p class="text-white/40 text-sm">1998 — 2003 · Organización territorial en La Pintana</p></div></div><div class="grid md:grid-cols-2 gap-6 items-start"><div class="space-y-4 text-white/70 leading-relaxed"><p class="font-bold text-white uppercase text-sm tracking-wider">Los primeros pasos y la llegada a La Caleta (1998)</p><p>El compromiso social de Carlos comenzó formalmente a finales de la década de los noventa, cuando apenas tenía 19 años. "Comencé el 98 en La Caleta y supe de la ONG por la Universidad donde estudiaba", recuerda. Su inserción territorial se dio de manera natural gracias a su ubicación, en el sector de Antumapu (paradero 32 de Santa Rosa): "como vivía cerca, me acerqué porque consideré interesante el proyecto".</p><p>La Corporación La Caleta poseía ya una trayectoria histórica. Según explica, "era una ONG chilena fundada el 85 y en sus orígenes estuvo ligado a educadores y agentes pastorales que trabajaban con niños en extrema vulneralidad durante la dictadura".</p><p class="font-bold text-white uppercase text-sm tracking-wider">Filosofía de trabajo y el verdadero objetivo preventivo</p><p>El enfoque institucional era moderno e integral. "La filosofía de La Caleta se basaba en la educación popular, trabajo comunitario y enfoque en los derechos de la niñez", detalla. La metodología priorizaba el trabajo territorial, "fortaleciendo las organizaciones comunitarias en lugar de intervenir solo de forma asistencial", viendo a los menores como "sujetos de derechos" y buscando incidir en las políticas públicas mediante el fomento del "\'Buen Vivir\', la diversidad cultural y el empoderamiento de los sectores populares".</p><p>Sin embargo, detrás del trabajo infantil existía una profunda y estratégica misión enfocada en la juventud. "Muchos piensan que nuestro trabajo iba enfocado a los niños, porque recibíamos niños desde 3 años, pero nuestro objetivo base era atacar la entrada de drogas en los jóvenes desde los 13 hasta los 18 y más", revela Carlos.</p><p>El método de prevención consistía en dotar de sentido y deber a los adolescentes locales, "Dándoles responsabilidades visibles dentro de la comunidad a hacerse cargo de niños que veían a diario, evitando así que ellos tuvieran acceso enlace misma población o sector a las drogas duras". Sumar a los jóvenes se lograba del "boca a boca", ya que "es una edad donde están dispuestos a conocer a otros y buscar una identidad en común".</p><p class="font-bold text-white uppercase text-sm tracking-wider">El territorio, los espacios y la labor comunitaria</p><p>El despliegue en la zona sur de Santiago era extenso. "La Caleta actuaba en 5 puntos de la comuna. El Bosque, Santo Tomás, El Castillo, Villa Colombia y (no recuerdo el nombre de la 5ta que estaba ahi mismo donde esta la Muni...)". Para asegurar un point de reunión fijo en su sector, Carlos relata que "El grupo se juntaba en una de las salas de la iglesia que estaba en la Villa El Bosque y se consiguió hablando con el cura". Este acuerdo fue un beneficio mutuo que "Justo coincidió con un Encuentro Latinoamericano de Jovenes y la iglesia requería de nuevos jóvenes en ella".</p><p>La capacitación de la ONG permitió entregar herramientas culturales y de liderazgo. "La Caleta nos aportó talleres de recreación para niños, batucadas (en esos años era la moda), zancos, pinta caras, circo teatro, talleres de monitores infantiles, pintura de murales", enumera. Estos aprendizajes se llevaban a la práctica mediante el modelo de prevención: "Y nosotros hacíamos talleres y aplicabamos lo aprendido con los niños desde 3 a 12 años con tíos desde los 13 a los 18 o más".</p><p>La dedicación era constante, abarcando "todos los fines de semana y durante el verano se hacían las colonias de verano donde comentábamos con un cupo de 150 niños y terminábamos con cerca de 300", apoyados por una sólida base humana donde "Los tios o monitores eran cerca de 30 jóvenes del sector".</p><p class="font-bold text-white uppercase text-sm tracking-wider">El fin del financiamiento y el nacimiento de "Antupeñi" (2000 - 2003)</p><p>El apoyo institucional no fue permanente. "Esta ONG nos apoyó por cerca de 2 años y luego se retiró por falta de recursos", narra Carlos. Frente a la ausencia de la Corporación original (alrededor del año 2000), los dirigentes barriales tomaron una decisión fundamental basada en el vínculo creado: "El tema es que no podíamos darle la espalda a los jóvenes y niños que habíamos acogido".</p><p>Fue la propia juventud empoderada la que salvó la iniciativa. "El mismo grupo de tíos a los que iba dirigido el proyecto se hizo cargo de la continuidad del mismo", señala con orgullo, marcando el origen de una nueva etapa puramente autogestionada: "Así nació el grupo Antupeñi \'Niños de la tierra\' hasta por el 2003".</p><p class="font-bold text-white uppercase text-sm tracking-wider">Reflexiones y el impacto en una generación</p><p>Al mirar hacia atrás y evaluar aquellos años de labor territorial ininterrumpida, Carlos aterriza las expectativas frente a un contexto adverso. "No se pretendia una efectividad total, pero sí hacer una mudanza en el pensamiento social de cada uno de ellos respecto a su entorno".</p><p>Reconoce abiertamente que "Muchos chicos se perdieron en la droga", pero rescata el legado invaluable y principal logro de la organización: "una gran mayoría consiguieron crear pensamiento crítico y razonamiento social".</p></div><div class="card-mir"><img src="images/antupeni.jpg" alt="Antupeñi" class="w-full border border-mir/30 mb-3"><p class="text-white/40 text-xs italic">"La semilla de la organización territorial germina en la memoria del pueblo."</p></div></div></article></div></div>' }
+      ]
+    };
+
+    /* ─── Config: qué secciones usan índice y cuáles son planas ─── */
+    var SECCIONES_RELATOS = {
+      'Relatos: El Jano': { tipo: 'indice', titulo: 'Relatos: El Jano' },
+      'Relatos: El Arca': { tipo: 'indice', titulo: 'Relatos: El Arca' },
+      'Relatos: Otras organizaciones': { tipo: 'indice', titulo: 'Relatos: Otras organizaciones' },
+      'Relatos: Anecdotas': { tipo: 'plana', titulo: 'Relatos: Anecdotas' }
+    };
+
+    /* ─── Estado global de navegación ─── */
+    var estadoRelatos = {
+      seccion: null,
+      items: [],     // todos los relatos (hardcodeados + DB) para la sección actual
+      modo: 'index'  // 'index' | 'individual'
+    };
+
+    /* ─── Navegar a una subsección: carga sidebar + primer relato ─── */
+    async function navegarASubseccion(nombreSeccion) {
+      var nav = document.getElementById('navegacion-subsecciones');
+      var section = document.getElementById('contenedor-indices-section');
+      var lista = document.getElementById('lista-titulos');
+      var dinamico = document.getElementById('contenido-dinamico');
+      if (!lista || !dinamico) return;
+      if (nav) nav.style.display = 'none';
+      if (section) section.style.display = '';
+      lista.innerHTML = '<li style="color:#666;cursor:default;">Cargando...</li>';
+      dinamico.innerHTML = '<h2>Cargando relato...</h2>';
+
+      var cfg = SECCIONES_RELATOS[nombreSeccion];
+      if (!cfg) { dinamico.innerHTML = '<p style="color:var(--color-mir);">Sección no encontrada.</p>'; return; }
+
+      // 1. Recolectar hardcodeados
+      var items = [];
+      var hard = RELATOS_HARDCODEADOS[nombreSeccion] || [];
+      hard.forEach(function(a) {
+        items.push({ id: a.id, titulo: a.titulo, subtitulo: a.subtitulo, html: a.html, fuente: 'hardcodeado' });
+      });
+
+      // 2. Fetch de Supabase
+      var supabaseClient = window.miSupabase;
+      if (supabaseClient) {
+        try {
+          var resp = await supabaseClient
+            .from('recuerdos')
+            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, nombre_serie, url_archivo, tipo_archivo')
+            .eq('seccion', nombreSeccion)
+            .eq('aprobado', true)
+            .not('titulo_relato', 'is', null)
+            .neq('titulo_relato', '')
+            .order('created_at', { ascending: false });
+          if (!resp.error) {
+            (resp.data || []).forEach(function(r) {
+              items.push({
+                id: r.id,
+                titulo: r.titulo_relato || 'Sin título',
+                subtitulo: (r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) : '') + (r.nombre_serie ? ' · Serie: ' + r.nombre_serie : '') + ' · por ' + (r.nombre || 'Anónimo'),
+                html: (function() {
+                  var imgHtml = '';
+                  if (r.url_archivo && r.tipo_archivo && r.tipo_archivo.indexOf('image') === 0) {
+                    imgHtml = '<div class="relato-img"><img src="' + r.url_archivo.replace(/"/g, '&quot;') + '" alt="' + escaparHTML(r.titulo_relato || '') + '" loading="lazy"></div>';
+                  }
+                  var metaHtml = (r.created_at ? '<span>' + new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) + '</span>' : '') + '<span>por ' + escaparHTML(r.nombre || 'Anónimo') + '</span>' + (r.nombre_serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escaparHTML(r.nombre_serie) + '</span>' : '');
+                  return '<div class="relato-detalle"><h2>' + escaparHTML(r.titulo_relato || 'Sin título') + '</h2><div class="meta">' + metaHtml + '</div><div class="relato-body">' + imgHtml + '<div class="contenido">' + sanitizarHTML(r.mensaje_largo || r.mensaje || '') + '</div></div></div>';
+                })(),
+                fuente: 'supabase'
+              });
+            });
+          }
+        } catch (err) {
+          console.error('[Relatos] Error Supabase:', err);
+        }
+      }
+
+      estadoRelatos.seccion = nombreSeccion;
+      estadoRelatos.items = items;
+      estadoRelatos.modo = 'index';
+
+      if (items.length === 0) {
+        lista.innerHTML = '<li style="color:#666;cursor:default;">Sin relatos aún</li>';
+        dinamico.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="font-size:48px;opacity:0.3;margin-bottom:12px;">📖</div><p style="color:#666;">No hay relatos en esta sección aún.</p></div>';
+        return;
+      }
+
+      // 3. Renderizar índice en la sidebar
+      lista.innerHTML = items.map(function(r) {
+        return '<li onclick="mostrarRelato(\'' + r.id + '\')" class="' + (r.id === items[0].id ? 'active' : '') + '">' + escaparHTML(r.titulo) + '</li>';
+      }).join('');
+
+      // 4. Mostrar el primer relato o saltar si hay deep-link
+      procesarDeepLink();
+      if (estadoRelatos.modo === 'index') {
+        mostrarRelato(items[0].id);
+      }
+    }
+
+    /* ─── Mostrar un relato específico en el panel derecho ─── */
+    function mostrarRelato(id) {
+      var dinamico = document.getElementById('contenido-dinamico');
+      if (!dinamico) return;
+
+      var item = null;
+      for (var i = 0; i < estadoRelatos.items.length; i++) {
+        if (estadoRelatos.items[i].id === id) { item = estadoRelatos.items[i]; break; }
+      }
+      if (!item) return;
+
+      estadoRelatos.modo = 'individual';
+
+      // Marcar activo en sidebar
+      var itemsSidebar = document.querySelectorAll('#lista-titulos li');
+      itemsSidebar.forEach(function(li) { li.classList.remove('active'); });
+      // Buscar el li que contiene este id en su onclick
+      itemsSidebar.forEach(function(li) {
+        if (li.getAttribute('onclick') && li.getAttribute('onclick').indexOf(id) !== -1) {
+          li.classList.add('active');
+        }
+      });
+
+      dinamico.innerHTML = item.html;
+    }
+
+    /* ─── Deep-link: auto-abrir relato destacado desde vitrina ─── */
+    function procesarDeepLink() {
+      var urlParams = new URLSearchParams(window.location.search);
+      var highlightId = urlParams.get('id');
+      if (!highlightId) return;
+      var match = null;
+      estadoRelatos.items.forEach(function(item) {
+        if (item.id === highlightId || item.id === 'db-' + highlightId) match = item;
+      });
+      if (!match) return;
+      estadoRelatos.modo = 'index'; // señal para que no muestre el primero
+      mostrarRelato(match.id);
+      setTimeout(function() {
+        var el = document.getElementById('relato-completo');
+        if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }, 300);
+    }
+
+    function volverCategorias() {
+      var nav = document.getElementById('navegacion-subsecciones');
+      var section = document.getElementById('contenedor-indices-section');
+      if (nav) nav.style.display = '';
+      if (section) section.style.display = 'none';
+    }
+
+    function sanitizarHTML(html) {
+      if (!html) return '';
+      return html
+        .replace(/<script[^>]*>.*?<\/script>/gi, '')
+        .replace(/on\w+=["'][^"']*["']/gi, '')
+        .replace(/<[^>]*>/g, function(m) {
+          var permitidas = ['<b>','</b>','<i>','</i>','<u>','</u>','<br>','<br/>','<br />','<p>','</p>','<div>','</div>','<span>','</span>','<strong>','</strong>','<em>','</em>'];
+          if (permitidas.indexOf(m.toLowerCase()) !== -1) return m;
+          if (/^<br\s*\/?>$/i.test(m)) return '<br>';
+          if (/^<\/?(p|div|span)>$/i.test(m)) return m.toLowerCase();
+          if (/^<(p|div|span)\s+[^>]*>$/i.test(m)) return m.replace(/on\w+=["'][^"']*["']/gi, '');
+          return '';
+        });
+    }
+
+    function escaparHTML(text) {
+      if (!text) return '';
+      return String(text).replace(/[&<>"']/g, function(c) {
+        return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[c];
+      });
+    }
+
+    /* ─── Toast ─── */
+    function showToast(msg, type) {
+      var c = document.getElementById('toast-container-relatos');
+      if (!c) {
+        c = document.createElement('div');
+        c.id = 'toast-container-relatos';
+        c.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:8px;pointer-events:none;';
+        document.body.appendChild(c);
+      }
+      var t = document.createElement('div');
+      t.style.cssText = 'padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;color:white;pointer-events:auto;animation:fadeSlideUp 0.3s ease-out;box-shadow:0 8px 32px rgba(0,0,0,0.4);';
+      var colors = { error: 'rgba(229,9,20,0.95)', success: 'rgba(46,125,50,0.95)', info: 'rgba(30,30,30,0.95)', warning: 'rgba(255,152,0,0.95)' };
+      t.style.background = colors[type] || colors.info;
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(function() { t.style.opacity = '0'; t.style.transform = 'translateX(40px)'; t.style.transition = '0.3s'; setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 300); }, 4000);
+    }
+
+    /* ─── waitForSupabase ─── */
+    function waitForSupabase(maxWait) {
+      maxWait = maxWait || 8000;
+      return new Promise(function (resolve) {
+        var waited = 0, step = 200;
+        function check() {
+          if (window.miSupabase) return resolve(window.miSupabase);
+          waited += step;
+          if (waited >= maxWait) return resolve(null);
+          setTimeout(check, step);
+        }
+        check();
+      });
+    }
+
+    /* ─── Auto-refresh: re-fetch DB relatos cada 30s ─── */
+    var _refreshTimer = null;
+
+    function iniciarAutoRefresh() {
+      detenerAutoRefresh();
+      _refreshTimer = setInterval(async function() {
+        var sec = estadoRelatos.seccion;
+        if (!sec) return;
+        var client = await waitForSupabase(3000);
+        if (!client) return;
+        try {
+          var resp = await client
+            .from('recuerdos')
+            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, nombre_serie, url_archivo, tipo_archivo')
+            .eq('seccion', sec)
+            .eq('aprobado', true)
+            .not('titulo_relato', 'is', null)
+            .neq('titulo_relato', '')
+            .order('created_at', { ascending: false });
+          if (resp.error || !resp.data) return;
+
+          // Merge: keep hardcoded, replace DB items
+          var hard = RELATOS_HARDCODEADOS[sec] || [];
+          var nuevos = [];
+          hard.forEach(function(a) {
+            nuevos.push({ id: a.id, titulo: a.titulo, subtitulo: a.subtitulo, html: a.html, fuente: 'hardcodeado' });
+          });
+          resp.data.forEach(function(r) {
+            // Avoid duplicates by ID
+            var dup = nuevos.some(function(n) { return n.id === r.id; });
+            if (!dup) {
+              nuevos.push({
+                id: r.id,
+                titulo: r.titulo_relato || 'Sin título',
+                subtitulo: (r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) : '') + (r.nombre_serie ? ' · Serie: ' + r.nombre_serie : '') + ' · por ' + (r.nombre || 'Anónimo'),
+                html: (function() {
+                  var imgHtml = '';
+                  if (r.url_archivo && r.tipo_archivo && r.tipo_archivo.indexOf('image') === 0) {
+                    imgHtml = '<div class="relato-img"><img src="' + r.url_archivo.replace(/"/g, '&quot;') + '" alt="' + escaparHTML(r.titulo_relato || '') + '" loading="lazy"></div>';
+                  }
+                  var metaHtml = (r.created_at ? '<span>' + new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) + '</span>' : '') + '<span>por ' + escaparHTML(r.nombre || 'Anónimo') + '</span>' + (r.nombre_serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escaparHTML(r.nombre_serie) + '</span>' : '');
+                  return '<div class="relato-detalle"><h2>' + escaparHTML(r.titulo_relato || 'Sin título') + '</h2><div class="meta">' + metaHtml + '</div><div class="relato-body">' + imgHtml + '<div class="contenido">' + sanitizarHTML(r.mensaje_largo || r.mensaje || '') + '</div></div></div>';
+                })(),
+                fuente: 'supabase'
+              });
+            }
+          });
+
+          var oldLen = estadoRelatos.items.length;
+          estadoRelatos.items = nuevos;
+
+          // Re-render sidebar preserving active item
+          var activeId = null;
+          var lista = document.getElementById('lista-titulos');
+          if (lista) {
+            var activeLi = lista.querySelector('li.active');
+            if (activeLi) {
+              var match = activeLi.getAttribute('onclick');
+              if (match) { var m = match.match(/'([^']+)'/); if (m) activeId = m[1]; }
+            }
+            lista.innerHTML = nuevos.map(function(r) {
+              var cls = r.id === activeId ? ' class="active"' : '';
+              return '<li' + cls + ' onclick="mostrarRelato(\'' + r.id + '\')">' + escaparHTML(r.titulo) + '</li>';
+            }).join('');
+          }
+
+          // If new items appeared and we're on index, show first new item
+          if (nuevos.length > oldLen && estadoRelatos.modo === 'index') {
+            mostrarRelato(nuevos[0].id);
+            showToast('Nuevo relato disponible', 'info');
+          }
+        } catch (_) {}
+      }, 30000);
+    }
+
+    function detenerAutoRefresh() {
+      if (_refreshTimer) { clearInterval(_refreshTimer); _refreshTimer = null; }
+    }
+
+    /* ─── Inicialización ─── */
+    (function() {
+      var menuToggle = document.getElementById('menu-toggle');
+      if (menuToggle) {
+        menuToggle.addEventListener('click', function() {
+          document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+      }
+      document.querySelectorAll('#mobile-menu a').forEach(function(l) {
+        l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
+      });
+
+      // Deep linking desde vitrina (?id=...&seccion=...)
+      var urlParams = new URLSearchParams(window.location.search);
+      var idRelato = urlParams.get('id');
+      var seccionRelato = urlParams.get('seccion');
+      var sec = seccionRelato || 'Relatos: El Arca';
+      navegarASubseccion(sec);
+      iniciarAutoRefresh();
+    })();
+  </script>
+  </main>
+
+  <script src="/search.js"></script>
+
+<footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
+        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
+        <span>|</span>
+        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
+      </nav>
+      <div style="margin-top:8px;"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:rgba(255,255,255,0.4);font-size:11px;text-decoration:none;">CC BY-NC-SA 4.0 — Contenido bajo licencia Creative Commons</a></div>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+</footer>
+
+  <style>
+    .divider-mir { width: 4rem; height: 0.25rem; background-color: var(--color-mir) !important; margin-top: 1.5rem; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
+    .hover\:bg-resistencia-700:hover { background-color: #b91c1c !important; }
+
+    /* ─── Relato detalle (SPA) ─── */
+    .relato-detalle { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.2) !important; padding: 2rem; margin-bottom: 2rem; border-radius: 0; }
+    .relato-detalle h2 { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; text-align: left !important; margin: 0 0 0.75rem 0; }
+    .relato-detalle .meta { display: flex; gap: 12px; font-size: 12px; color: #666; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(229,9,20,0.1); flex-wrap: wrap; text-align: left; }
+    .relato-detalle .contenido { font-size: 15px; line-height: 1.8; color: #ddd; text-align: justify; white-space: pre-wrap; }
+    .relato-detalle .contenido b, .relato-detalle .contenido strong { color: white; }
+    .relato-detalle .contenido i, .relato-detalle .contenido em { color: #ddd; }
+    .relato-detalle .contenido u { text-decoration: underline; }
+    .relato-detalle .relato-body { display: flex; gap: 24px; align-items: flex-start; }
+    .relato-detalle .relato-img { flex-shrink: 0; width: 200px; }
+    .relato-detalle .relato-img img { width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(229,9,20,0.2); }
+    .relato-detalle .relato-body .contenido { flex: 1; min-width: 0; }
+    @media (max-width: 640px) {
+      .relato-detalle .relato-body { flex-direction: column; }
+      .relato-detalle .relato-img { width: 100%; max-width: 300px; }
+    }
+
+    /* ─── Hardcodeado (textos recuperados de git) ─── */
+    .relato { margin-bottom: 4rem; }
+    .tab-btn { font-family: Arial, Helvetica, sans-serif; font-size: 0.8rem; font-weight: bold; padding: 0.65rem 1.25rem; border: 1px solid rgba(229,9,20,0.3); background: transparent; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+    .tab-btn:hover { border-color: var(--color-mir); color: white; }
+    .tab-btn.active { background: var(--color-mir); color: white; border-color: var(--color-mir); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeInUp 0.5s ease-out forwards; }
+    #contenedor-indices .card-mir { margin-bottom: 1rem; }
+
+    /* ─── Índice de relatos ─── */
+    .indice-relatos { max-width: 48rem; margin: 0 auto; }
+    .indice-item { background: var(--color-noche); border: 1px solid rgba(229,9,20,0.25); padding: 1.25rem 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease; text-align: left; }
+    .indice-item:hover { border-color: var(--color-mir); transform: translateX(6px); }
+    .indice-item h3 { font-family: Arial, Helvetica, sans-serif; color: var(--color-mir); text-transform: uppercase; letter-spacing: 0.05em; font-size: 1.15rem; margin: 0 0 0.25rem 0; }
+    .indice-item p { color: rgba(255,255,255,0.45); font-size: 0.85rem; margin: 0; }
+
+    /* ─── Relato individual ─── */
+    .relato-individual { max-width: 60rem; margin: 0 auto; }
+    .btn-volver-indice { background: transparent; border: 1px solid rgba(229,9,20,0.4); color: var(--color-mir); font-family: Arial, Helvetica, sans-serif; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.55rem 1.25rem; cursor: pointer; transition: all 0.3s; margin-bottom: 1.5rem; }
+    .btn-volver-indice:hover { background: var(--color-mir); color: white; }
+
+    /* ─── Layout SPA: sidebar + lector ─── */
+    .layout-relatos { display: flex; gap: 40px; padding: 20px 0; }
+    .sidebar { width: 300px; min-width: 260px; border-right: 1px solid rgba(229,9,20,0.25); padding-right: 20px; }
+    .sidebar .sidebar-titulo { font-family: Arial, Helvetica, sans-serif; color: var(--color-mir); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem; margin: 0 0 1rem 0; text-align: left !important; }
+    .sidebar ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar li { cursor: pointer; color: #ff0000; margin-bottom: 12px; padding: 8px 12px; font-size: 14px; border-left: 2px solid transparent; transition: all 0.3s; text-align: left; }
+    .sidebar li:hover { color: #fff; border-left-color: var(--color-mir); background: rgba(229,9,20,0.05); }
+    .sidebar li.active { color: #fff; border-left-color: var(--color-mir); background: rgba(229,9,20,0.08); }
+    .lector { flex: 1; padding: 0 20px 20px 20px; min-width: 0; }
+    .img-relato { max-width: 100%; height: auto; margin-bottom: 20px; border: 1px solid rgba(229,9,20,0.2); }
+
+    @media (max-width: 768px) {
+      .layout-relatos { flex-direction: column; gap: 20px; }
+      .sidebar { width: 100%; min-width: 0; border-right: none; border-bottom: 1px solid rgba(229,9,20,0.25); padding-right: 0; padding-bottom: 16px; }
+      .sidebar ul { display: flex; flex-wrap: wrap; gap: 6px; }
+      .sidebar li { margin-bottom: 0; padding: 6px 12px; border-left: none; border-bottom: 2px solid transparent; font-size: 13px; }
+      .sidebar li:hover { border-left-color: transparent; border-bottom-color: var(--color-mir); }
+    }
+  </style>
+
+  <script src="/app.js"></script>
+</body>
+</html>

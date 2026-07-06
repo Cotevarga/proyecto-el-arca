@@ -1,0 +1,3376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Control — El Arca</title>
+  <!-- <meta property="og:title" content="EL ARCA — Panel de Control"> -->
+  <!-- <meta property="og:description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes."> -->
+  <!-- <meta property="og:image" content="https://elarca.cl/images/og-image.jpg"> -->
+  <!-- <meta property="og:url" content="https://elarca.cl/admin.html"> -->
+  <!-- <meta property="og:type" content="website"> -->
+  <!-- <meta property="og:locale" content="es_CL"> -->
+  <!-- <meta name="description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes."> -->
+  <!-- <link rel="canonical" href="https://elarca.cl/admin.html"> -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script src="/config.js"></script>
+  <script src="/supabase.js" defer></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+  <style>
+    :root {
+      --color-mir: #E50914;
+      --color-mir-glow: rgba(229,9,20,0.15);
+      --color-noche: #0a0a0a;
+      --color-carbono: #121212;
+      --color-acero: #1e1e1e;
+      --color-plata: #2a2a2a;
+      --color-humo: #888;
+      --color-dorado: #D4A843;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--color-noche);
+      background-image: radial-gradient(ellipse at 20% 50%, rgba(229,9,20,0.03) 0%, transparent 50%);
+      color: #e0e0e0;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    /* ─── Premium animations ─── */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 8px var(--color-mir-glow); }
+      50% { box-shadow: 0 0 20px var(--color-mir-glow), 0 0 40px rgba(229,9,20,0.05); }
+    }
+    @keyframes gradientBorder {
+      0% { border-color: rgba(229,9,20,0.2); }
+      50% { border-color: rgba(212,168,67,0.3); }
+      100% { border-color: rgba(229,9,20,0.2); }
+    }
+    .content-section.active {
+      animation: fadeSlideUp 0.35s ease-out;
+    }
+    .stat-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .stat-card:hover {
+      border-color: var(--color-mir);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(229,9,20,0.08);
+    }
+    .sidebar {
+      background: linear-gradient(180deg, var(--color-carbono) 0%, #0d0d0d 100%);
+    }
+    .sidebar-brand h1 {
+      background: linear-gradient(135deg, #fff 0%, var(--color-dorado) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .sidebar-brand h1 span {
+      -webkit-text-fill-color: var(--color-mir);
+      color: var(--color-mir);
+    }
+    .login-card {
+      animation: fadeSlideUp 0.5s ease-out;
+    }
+    .login-card .fingerprint {
+      animation: pulseGlow 2s ease-in-out infinite;
+    }
+    .btn-login, .btn-primary {
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-login::after, .btn-primary::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -200%;
+      width: 200%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+      animation: shimmer 3s infinite;
+    }
+
+    /* ─── Layout ─── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 240px;
+      height: 100vh;
+      background: var(--color-carbono);
+      border-right: 1px solid rgba(229,9,20,0.15);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-brand {
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(229,9,20,0.15);
+    }
+    .sidebar-brand h1 {
+      font-size: 18px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: white;
+      margin: 0;
+    }
+    .sidebar-brand span {
+      color: var(--color-mir);
+    }
+    .sidebar-brand small {
+      display: block;
+      color: var(--color-humo);
+      font-size: 10px;
+      margin-top: 4px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 0;
+    }
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: #999;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar-nav a:hover, .sidebar-nav a.active {
+      color: white;
+      background: rgba(229,9,20,0.06);
+      border-left-color: var(--color-mir);
+    }
+    .sidebar-nav a.active {
+      color: var(--color-mir);
+    }
+    .sidebar-nav a .icon {
+      width: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(229,9,20,0.15);
+    }
+    .sidebar-footer a {
+      color: #666;
+      text-decoration: none;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s;
+    }
+    .sidebar-footer a:hover { color: var(--color-mir); }
+
+    .main-area {
+      margin-left: 240px;
+      min-height: 100vh;
+      padding: 0;
+    }
+    .main-header {
+      padding: 20px 32px;
+      background: var(--color-carbono);
+      border-bottom: 1px solid rgba(229,9,20,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #security-banner {
+      display: none;
+      padding: 8px 32px;
+      background: linear-gradient(90deg, rgba(229,9,20,0.1), rgba(229,9,20,0.04));
+      border-bottom: 1px solid rgba(229,9,20,0.15);
+      font-size: 12px;
+      color: var(--color-mir);
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    #security-banner:hover { background: linear-gradient(90deg, rgba(229,9,20,0.15), rgba(229,9,20,0.06)); }
+    #security-banner .sec-icon { font-size: 16px; }
+    #security-banner .sec-text { flex: 1; }
+    #security-banner .sec-cta {
+      background: var(--color-mir);
+      color: white;
+      padding: 4px 14px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .main-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: white;
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+    .main-header .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #999;
+    }
+    .main-header .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--color-mir);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .main-content {
+      padding: 32px;
+    }
+
+    /* ─── Login ─── */
+    #login-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at center, #1a1a1a 0%, #000 100%);
+    }
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      padding: 48px 40px;
+      background: var(--color-carbono);
+      border: 1px solid rgba(229,9,20,0.2);
+      border-radius: 16px;
+      text-align: center;
+    }
+    .login-card .logo {
+      font-size: 28px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: white;
+      margin-bottom: 4px;
+    }
+    .login-card .logo span { color: var(--color-mir); }
+    .login-card .subtitle {
+      color: #666;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 32px;
+    }
+    .login-card label {
+      display: block;
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .login-card input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--color-acero);
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 20px;
+    }
+    .login-card input:focus {
+      border-color: var(--color-mir);
+    }
+    .login-card .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: var(--color-mir);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .login-card .btn-login:hover { background: #c50812; }
+    .login-card .btn-login:disabled { opacity: 0.5; cursor: not-allowed; }
+    .login-error {
+      color: var(--color-mir);
+      font-size: 13px;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+    .login-card .fingerprint {
+      font-size: 40px;
+      margin-bottom: 16px;
+      opacity: 0.6;
+    }
+
+    /* ─── Cards ─── */
+    .stat-card {
+      background: var(--color-carbono);
+      border: 1px solid rgba(229,9,20,0.12);
+      border-radius: 12px;
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+    .stat-card:hover { border-color: rgba(229,9,20,0.3); }
+    .stat-card .stat-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: white;
+      margin: 0;
+    }
+    .stat-card .stat-label {
+      font-size: 12px;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 4px;
+    }
+
+    .table-container {
+      background: var(--color-carbono);
+      border: 1px solid rgba(229,9,20,0.12);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .table-header h3 {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: white;
+      margin: 0;
+    }
+    .table-header .badge-count {
+      background: rgba(229,9,20,0.15);
+      color: var(--color-mir);
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th {
+      text-align: left;
+      padding: 12px 20px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #666;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    td {
+      padding: 14px 20px;
+      font-size: 13px;
+      color: #ccc;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(229,9,20,0.02); }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-pending { background: rgba(255,183,77,0.15); color: #ffb74d; }
+    .badge-approved { background: rgba(76,175,80,0.15); color: #66bb6a; }
+    .badge-image { background: rgba(33,150,243,0.15); color: #42a5f5; }
+    .badge-audio { background: rgba(229,9,20,0.15); color: var(--color-mir); }
+    .badge-video { background: rgba(156,39,176,0.15); color: #ab47bc; }
+
+    .editor-btn:hover { background: rgba(229,9,20,0.2) !important; border-color: var(--color-mir) !important; }
+    .editor-btn.active { background: rgba(229,9,20,0.3) !important; border-color: var(--color-mir) !important; }
+
+    .btn-sm {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-sm-approve { background: rgba(76,175,80,0.15); color: #66bb6a; }
+    .btn-sm-approve:hover { background: rgba(76,175,80,0.3); }
+    .btn-sm-reject { background: rgba(229,9,20,0.1); color: var(--color-mir); }
+    .btn-sm-reject:hover { background: rgba(229,9,20,0.25); }
+    .btn-ver-completo { background:none;border:none;color:var(--color-mir);font-size:11px;font-weight:700;letter-spacing:0.05em;cursor:pointer;padding:4px 0;display:block;margin-top:4px; }
+    .btn-ver-completo:hover { text-decoration:underline; }
+    .btn-sm-danger { background: rgba(229,9,20,0.12); color: var(--color-mir); }
+    .btn-sm-danger:hover { background: rgba(229,9,20,0.25); }
+    .btn-sm-edit { background: rgba(33,150,243,0.12); color: #42a5f5; }
+    .btn-sm-edit:hover { background: rgba(33,150,243,0.25); }
+
+    .truncate { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ─── Music Upload ─── */
+    .upload-area {
+      background: var(--color-carbono);
+      border: 1px dashed rgba(229,9,20,0.3);
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .upload-area:hover { border-color: var(--color-mir); background: rgba(229,9,20,0.02); }
+    .upload-area .icon { font-size: 36px; margin-bottom: 12px; opacity: 0.5; }
+    .upload-area .text { color: #888; font-size: 14px; }
+    .upload-area .hint { color: #555; font-size: 11px; margin-top: 8px; }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--color-acero);
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: white;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus { border-color: var(--color-mir); }
+
+    .btn-primary {
+      padding: 10px 24px;
+      background: var(--color-mir);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { background: #c50812; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary {
+      padding: 10px 24px;
+      background: transparent;
+      color: #999;
+      border: 1px solid #333;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: #555; color: white; }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: #555;
+    }
+    .empty-state .icon { font-size: 48px; opacity: 0.3; margin-bottom: 12px; }
+    .empty-state .text { font-size: 14px; }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-top-color: var(--color-mir);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Now Playing ─── */
+    .now-playing {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 0;
+    }
+    .now-playing .eq-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 28px;
+    }
+    .now-playing .eq-bars span {
+      display: block;
+      width: 4px;
+      background: var(--color-mir);
+      border-radius: 2px;
+      animation: eqAnim 0.8s ease-in-out infinite alternate;
+    }
+    .now-playing .eq-bars span:nth-child(1) { height: 10px; animation-delay: 0s; }
+    .now-playing .eq-bars span:nth-child(2) { height: 18px; animation-delay: 0.2s; }
+    .now-playing .eq-bars span:nth-child(3) { height: 24px; animation-delay: 0.4s; }
+    .now-playing .eq-bars span:nth-child(4) { height: 14px; animation-delay: 0.1s; }
+    .now-playing .eq-bars span:nth-child(5) { height: 20px; animation-delay: 0.3s; }
+    @keyframes eqAnim {
+      0% { opacity: 0.3; transform: scaleY(0.5); }
+      100% { opacity: 1; transform: scaleY(1); }
+    }
+    .now-playing .np-info { flex: 1; min-width: 0; }
+    .now-playing .np-title { font-size: 15px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .now-playing .np-artist { font-size: 12px; color: #888; }
+    .now-playing .np-empty { color: #555; font-size: 13px; font-style: italic; }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+      margin: 0 0 20px 0;
+      letter-spacing: 0.02em;
+    }
+    .section-divider {
+      height: 1px;
+      background: rgba(229,9,20,0.1);
+      margin: 32px 0;
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main-area { margin-left: 0; }
+      .main-header { padding: 16px; flex-wrap: wrap; gap: 8px; }
+      .main-content { padding: 16px; }
+      table { font-size: 12px; }
+      td, th { padding: 10px 12px; }
+      .truncate { max-width: 100px; }
+      .hide-mobile { display: none; }
+    }
+    .content-section { display: none; }
+    .content-section.active { display: block; }
+
+    .file-info { font-size: 12px; color: #666; margin-top: 6px; }
+
+    .song-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .song-item:last-child { border-bottom: none; }
+    .song-info { flex: 1; }
+    .song-title { font-size: 14px; color: #e0e0e0; font-weight: 500; }
+    .song-artist { font-size: 12px; color: #666; }
+    .song-actions { display: flex; gap: 8px; align-items: center; }
+    .toggle-active {
+      width: 36px; height: 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .toggle-active.on { background: #2e7d32; }
+    .toggle-active.off { background: #333; }
+    .toggle-active::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: white;
+      transition: transform 0.2s;
+    }
+    .toggle-active.on::after { transform: translateX(16px); }
+    .toggle-active.off::after { transform: translateX(0); }
+  </style>
+</head>
+<body>
+  <div id="toast-container" style="position:fixed;top:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:8px;pointer-events:none;"></div>
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="fingerprint">🛡️</div>
+      <div class="logo">EL <span>ARCA</span></div>
+      <div class="subtitle">Panel de Control</div>
+      <form id="login-form" autocomplete="off">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" placeholder="admin@elarca.cl" required autocomplete="email">
+        <label for="login-password">Contraseña</label>
+        <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+        <button type="submit" class="btn-login" id="btn-login" aria-label="Iniciar sesión en el panel de administración">Acceder al Panel</button>
+        <div class="login-error" id="login-error"></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="dashboard-screen" style="display:none;">
+    <div class="sidebar">
+      <div class="sidebar-brand">
+        <h1>EL <span>ARCA</span></h1>
+        <small>Panel de Administración</small>
+      </div>
+      <div class="sidebar-nav">
+        <a href="#" data-section="dashboard" class="active"><span class="icon">📊</span> Dashboard</a>
+        <a href="#" data-section="pending"><span class="icon">⏳</span> Pendientes</a>
+        <a href="#" data-section="approved"><span class="icon">✅</span> Aprobados</a>
+        <a href="#" data-section="history"><span class="icon">📋</span> Historial</a>
+        <a href="#" data-section="music"><span class="icon">🎵</span> Música</a>
+        <a href="#" data-section="upload"><span class="icon">📤</span> Subida Manual</a>
+        <a href="#" data-section="security"><span class="icon">🛡️</span> Seguridad <span id="security-alert-badge" style="display:none;background:var(--color-mir);color:white;font-size:10px;padding:1px 7px;border-radius:10px;margin-left:auto;">0</span></a>
+      </div>
+      <div class="sidebar-footer">
+        <a href="/index.html" target="_blank"><span>🌐</span> Ver sitio público</a>
+        <a href="#" id="btn-logout"><span>🚪</span> Cerrar sesión</a>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <div class="main-header">
+        <h2 id="section-title">Dashboard</h2>
+        <div class="user-badge" id="user-badge" style="position:relative;cursor:pointer;">
+          <span id="user-name-display">Admin</span>
+          <div class="user-avatar" id="user-avatar">A</div>
+          <div id="user-dropdown" style="display:none;position:absolute;top:100%;right:0;margin-top:8px;background:var(--color-acero);border:1px solid rgba(229,9,20,0.2);border-radius:10px;padding:6px;min-width:200px;z-index:1000;box-shadow:0 12px 40px rgba(0,0,0,0.5);">
+            <div onclick="document.getElementById('password-modal').style.display='flex'" style="padding:10px 14px;font-size:13px;color:#ccc;border-radius:6px;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+              <span style="font-size:16px;">🔑</span> Cambiar Contraseña
+            </div>
+            <div class="btn-logout-dropdown" style="padding:10px 14px;font-size:13px;color:var(--color-mir);border-radius:6px;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='rgba(229,9,20,0.1)'" onmouseout="this.style.background='transparent'">
+              <span style="font-size:16px;">🚪</span> Cerrar Sesión
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="security-banner" onclick="document.querySelector('[data-section=&quot;security&quot;]').click()">
+        <span class="sec-icon">🛡️</span>
+        <span class="sec-text" id="security-banner-text">Eventos de seguridad detectados</span>
+        <span class="sec-cta">Revisar</span>
+      </div>
+      <div class="main-content">
+
+        <!-- DASHBOARD -->
+        <div class="content-section active" id="section-dashboard">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+            <div class="stat-card">
+              <div class="stat-value" id="stat-pending">—</div>
+              <div class="stat-label">Pendientes de revisión</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-approved">—</div>
+              <div class="stat-label">Recuerdos aprobados</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-music">—</div>
+              <div class="stat-label">Canciones activas</div>
+            </div>
+            <div class="stat-card" id="now-playing-card">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#777;margin-bottom:4px;">REPRODUCIÉNDOSE AHORA</div>
+              <div class="now-playing" id="now-playing-content">
+                <div class="eq-bars">
+                  <span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="np-info">
+                  <div class="np-title" id="np-title">—</div>
+                  <div class="np-artist" id="np-artist">Esperando canción...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="stat-card-memoria" style="background:var(--color-carbono);border:1px solid rgba(229,9,20,0.12);border-radius:12px;padding:20px;margin-bottom:24px;">
+            <h3 style="font-size:13px;font-weight:700;color:white;margin:0 0 16px 0;letter-spacing:0.05em;text-transform:uppercase;">📊 Estadísticas de Memoria</h3>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+              <div style="text-align:center;">
+                <div style="font-size:28px;font-weight:800;color:var(--color-mir);" id="stat-total-recuerdos">—</div>
+                <div style="font-size:11px;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:0.05em;">Total recuerdos</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:28px;font-weight:800;color:var(--color-mir);" id="stat-vecinos-unicos">—</div>
+                <div style="font-size:11px;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:0.05em;">Vecinos participantes</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:28px;font-weight:800;color:var(--color-mir);" id="stat-gb-preservados">—</div>
+                <div style="font-size:11px;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:0.05em;">GB preservados</div>
+              </div>
+            </div>
+            <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.04);">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div>
+                  <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Evolución de subidas</div>
+                  <canvas id="uploads-chart" width="400" height="160" style="max-height:160px;"></canvas>
+                </div>
+                <div>
+                  <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Distribución por tipo</div>
+                  <canvas id="type-chart" width="400" height="160" style="max-height:160px;"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+            <div class="stat-card">
+              <h3 style="font-size:13px;font-weight:700;color:white;margin:0 0 12px 0;letter-spacing:0.05em;text-transform:uppercase;">🌍 Subidas por País</h3>
+              <div id="country-stats-container" style="max-height:240px;overflow-y:auto;">
+                <div class="empty-state" style="padding:20px 0;">
+                  <div class="icon">🌍</div>
+                  <div class="text">Cargando...</div>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <h3 style="font-size:13px;font-weight:700;color:white;margin:0 0 12px 0;letter-spacing:0.05em;text-transform:uppercase;">📁 Distribución por Sección</h3>
+              <div id="section-stats-container" style="max-height:240px;overflow-y:auto;">
+                <div class="empty-state" style="padding:20px 0;">
+                  <div class="icon">📁</div>
+                  <div class="text">Cargando...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Últimos recuerdos recibidos</h3>
+              <span style="font-size:11px;color:#555;">Tiempo real activo <span id="realtime-badge" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#4caf50;margin-left:6px;vertical-align:middle;"></span></span>
+            </div>
+            <div id="recent-recuerdos-list">
+              <div class="empty-state">
+                <div class="icon">📭</div>
+                <div class="text">No hay recuerdos aún</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PENDING -->
+        <div class="content-section" id="section-pending">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Recuerdos <span class="badge-count" id="pending-count">0</span></h3>
+            </div>
+            <div id="pending-list">
+              <div class="empty-state">
+                <div class="icon">✅</div>
+                <div class="text">Todo revisado — no hay pendientes</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- APPROVED -->
+        <div class="content-section" id="section-approved">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Recuerdos Aprobados</h3>
+            </div>
+            <div id="approved-list">
+              <div class="empty-state">
+                <div class="icon">📸</div>
+                <div class="text">No hay recuerdos aprobados</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORIAL -->
+        <div class="content-section" id="section-history">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Historial completo de subidas</h3>
+              <span style="font-size:11px;color:#555;">Total: <span id="history-count">0</span> registros</span>
+            </div>
+            <div id="history-toolbar" style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;">
+              <input type="text" id="history-search" placeholder="Buscar por nombre, título, relato..." style="flex:1;min-width:180px;padding:8px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+              <select id="history-filter-section" style="padding:8px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+                <option value="">Todas las secciones</option>
+                <option value="Galeria">Galería</option>
+                <option value="Videos y Audios">Videos y Audios</option>
+                <option value="Relatos: El Jano">Relatos: El Jano</option>
+                <option value="Relatos: El Arca">Relatos: El Arca</option>
+                <option value="Relatos: Otras organizaciones">Relatos: Otras organizaciones</option>
+                <option value="Relatos: Anecdotas">Relatos: Anecdotas</option>
+              </select>
+              <select id="history-filter-status" style="padding:8px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+                <option value="">Todos los estados</option>
+                <option value="aprobado">Publicado</option>
+                <option value="pendiente">Pendiente</option>
+              </select>
+            </div>
+            <div id="history-list" style="overflow-x:auto;">
+              <div class="empty-state">
+                <div class="icon">📋</div>
+                <div class="text">No hay registros</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MUSIC -->
+        <div class="content-section" id="section-music">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+            <div>
+              <h3 class="section-title">Subir nueva canción</h3>
+              <div style="background:var(--color-carbono);border:1px solid rgba(229,9,20,0.12);border-radius:12px;padding:24px;">
+                <form id="music-upload-form">
+                  <div class="form-group">
+                    <label>Título de la canción</label>
+                    <input type="text" id="music-titulo" placeholder="Radio Libre 90.1" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Artista</label>
+                    <input type="text" id="music-artista" placeholder="El Arca">
+                  </div>
+                  <div class="form-group">
+                    <label>Archivo MP3</label>
+                    <div class="upload-area" id="music-upload-area">
+                      <div class="icon">🎵</div>
+                      <div class="text" id="music-upload-text">Haz clic para seleccionar archivo MP3</div>
+                      <div class="hint">Máximo 50 MB · Formato MP3</div>
+                      <input type="file" id="music-file" accept=".mp3,audio/mpeg" style="display:none">
+                    </div>
+                    <div class="file-info" id="music-file-info"></div>
+                  </div>
+                  <button type="submit" class="btn-primary" id="btn-upload-music" aria-label="Subir nueva canción a la plataforma">Subir canción</button>
+                </form>
+              </div>
+            </div>
+            <div>
+              <h3 class="section-title">Canciones actuales</h3>
+              <div style="background:var(--color-carbono);border:1px solid rgba(229,9,20,0.12);border-radius:12px;padding:24px;">
+                <div id="contenedor-canciones">
+                  <div class="empty-state">
+                    <div class="icon">🎶</div>
+                    <div class="text">No hay canciones subidas</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBIDA MANUAL -->
+        <div class="content-section" id="section-upload">
+          <div style="max-width:700px;">
+            <h3 class="section-title">Subir contenido manualmente</h3>
+            <p style="font-size:13px;color:#888;margin-bottom:20px;">Se publica automáticamente con <strong style="color:#66bb6a;">aprobado=true</strong>. Si incluyes archivo se sube al bucket <strong style="color:#42a5f5;">elarca-uploads</strong>.</p>
+            <div style="background:var(--color-carbono);border:1px solid rgba(229,9,20,0.12);border-radius:12px;padding:24px;">
+              <form id="admin-upload-form">
+                <div class="form-group">
+                  <label>Sección / Subsección</label>
+                  <select id="admin-upload-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" aria-label="Seleccionar sección del archivo">
+                    <option value="Galeria">Galería</option>
+                    <option value="Videos y Audios">Videos y Audios</option>
+                    <option value="Relatos: El Jano">Relatos: El Jano</option>
+                    <option value="Relatos: El Arca">Relatos: El Arca</option>
+                    <option value="Relatos: Otras organizaciones">Relatos: Otras organizaciones</option>
+                    <option value="Relatos: Anecdotas">Relatos: Anecdotas</option>
+                  </select>
+                </div>
+
+                <!-- ─── Título (compartido por todas) ─── -->
+                <div class="form-group">
+                  <label>Título <span style="color:var(--color-mir);">*</span></label>
+                  <input type="text" id="admin-upload-titulo" placeholder="Título del contenido" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+                </div>
+
+                <!-- ─── Campos dinámicos según sección ─── -->
+                <div id="dynamic-fields-container"></div>
+
+                <!-- ─── Metadatos estándar (siempre visibles) ─── -->
+                <div style="padding:12px 16px;background:rgba(229,9,20,0.04);border:1px solid rgba(229,9,20,0.1);border-radius:8px;margin-bottom:20px;">
+                  <p style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:12px;">Metadatos</p>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label>Ubicación</label>
+                      <input type="text" id="admin-upload-geo" placeholder="Ej: La Pintana, Santiago">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label>Fecha del original</label>
+                      <input type="date" id="admin-upload-fecha" style="color-scheme:dark;">
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;margin-top:8px;">
+                    <label>Etiquetas (separadas por coma)</label>
+                    <input type="text" id="admin-upload-tags" placeholder="Ej: marcha, pobladores, años 90">
+                  </div>
+                </div>
+
+                <!-- ─── Vitrina checkbox ─── -->
+                <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;background:rgba(229,9,20,0.04);border:1px solid rgba(229,9,20,0.15);border-radius:8px;margin-bottom:20px;">
+                  <input type="checkbox" id="admin-upload-destacado" style="margin-top:2px;accent-color:var(--color-mir);width:18px;height:18px;flex-shrink:0;">
+                  <label for="admin-upload-destacado" style="font-size:13px;color:#ccc;cursor:pointer;line-height:1.4;">
+                    <strong style="color:white;">Publicar extracto en vitrina (index)</strong><br>
+                    <span style="font-size:11px;color:#888;">Si activas esto, aparecerá en la vitrina principal de la página de inicio.</span>
+                  </label>
+                </div>
+
+                <button type="submit" class="btn-primary" id="btn-admin-upload" aria-label="Publicar contenido en el archivo">Publicar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEGURIDAD -->
+        <div class="content-section" id="section-security">
+          <div style="margin-bottom:24px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+              <h3 class="section-title" style="margin:0;">🛡️ Centro de Seguridad</h3>
+              <span id="security-count-badge" style="background:rgba(229,9,20,0.12);color:var(--color-mir);padding:2px 12px;border-radius:20px;font-size:11px;font-weight:700;">0 eventos</span>
+            </div>
+            <p style="font-size:13px;color:#888;">Registro de intentos de acceso, archivos rechazados y actividad sospechosa. Los eventos se conservan por 90 días.</p>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;">
+            <div class="stat-card" style="text-align:center;padding:16px;">
+              <div style="font-size:24px;font-weight:800;color:#4caf50;" id="sec-ok-count">0</div>
+              <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-top:4px;">Accesos exitosos</div>
+            </div>
+            <div class="stat-card" style="text-align:center;padding:16px;">
+              <div style="font-size:24px;font-weight:800;color:var(--color-mir);" id="sec-fail-count">0</div>
+              <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-top:4px;">Intentos fallidos</div>
+            </div>
+            <div class="stat-card" style="text-align:center;padding:16px;">
+              <div style="font-size:24px;font-weight:800;color:#ff9800;" id="sec-rejected-count">0</div>
+              <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-top:4px;">Archivos rechazados</div>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Eventos de seguridad recientes</h3>
+              <span style="font-size:11px;color:#555;">Últimos 50 eventos</span>
+            </div>
+            <div id="security-events-list">
+              <div class="empty-state"><div class="icon">🛡️</div><div class="text">No hay eventos de seguridad registrados</div></div>
+            </div>
+          </div>
+
+          <div style="background:var(--color-carbono);border:1px solid rgba(229,9,20,0.12);border-radius:12px;padding:24px;margin-top:20px;">
+            <h3 style="font-size:14px;font-weight:700;color:white;margin:0 0 12px 0;letter-spacing:0.02em;">📋 Protocolo de respuesta ante incidentes</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:12px;color:#bbb;line-height:1.6;">
+              <div>
+                <strong style="color:var(--color-mir);display:block;margin-bottom:8px;">🚨 Si detectas actividad sospechosa:</strong>
+                <ol style="margin:0;padding-left:18px;">
+                  <li style="margin-bottom:6px;">Cambia la contraseña del panel admin inmediatamente.</li>
+                  <li style="margin-bottom:6px;">Revisa los eventos de seguridad para identificar el origen (IP, email, fecha).</li>
+                  <li style="margin-bottom:6px;">Contacta a soporte si el incidente persiste.</li>
+                </ol>
+              </div>
+              <div>
+                <strong style="color:#4caf50;display:block;margin-bottom:8px;">🛡️ Medidas preventivas activas:</strong>
+                <ul style="margin:0;padding-left:18px;">
+                  <li style="margin-bottom:6px;">✅ Validación de tipo de archivo por contenido (magic bytes).</li>
+                  <li style="margin-bottom:6px;">✅ Límite de tasa (5 solicitudes cada 15 minutos para uploads).</li>
+                  <li style="margin-bottom:6px;">✅ Honeypot anti-bot en formulario público.</li>
+                  <li style="margin-bottom:6px;">✅ Todas las subidas requieren aprobación admin.</li>
+                  <li style="margin-bottom:6px;">✅ Auditoría completa de acciones admin.</li>
+                  <li style="margin-bottom:6px;">✅ Monitoreo de intentos de login fallidos.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Approval Modal ─── -->
+  <div id="approval-modal" style="display:none;position:fixed;z-index:99999;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
+    <div style="background:#121212;border:1px solid rgba(229,9,20,0.2);border-radius:16px;padding:32px;max-width:560px;width:90%;max-height:90vh;overflow-y:auto;">
+      <h3 style="font-size:18px;font-weight:700;color:white;margin:0 0 4px 0;">Aprobar recuerdo</h3>
+      <p style="font-size:12px;color:#888;margin:0 0 20px 0;">Asigna una categoría y edita el texto antes de publicar.</p>
+      <div class="form-group">
+        <label>Sección / Categoría</label>
+        <select id="approval-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" aria-label="Seleccionar sección del archivo">
+          <option value="Galeria">Galería</option>
+          <option value="Videos y Audios">Videos y Audios</option>
+          <option value="Relatos: El Jano">Relatos: El Jano</option>
+          <option value="Relatos: El Arca">Relatos: El Arca</option>
+          <option value="Relatos: Otras organizaciones">Relatos: Otras organizaciones</option>
+          <option value="Relatos: Anecdotas">Relatos: Anecdotas</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Título</label>
+        <input type="text" id="approval-titulo" placeholder="Título del contenido" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+      </div>
+      <div id="approval-relato-fields" style="display:none;">
+        <div class="form-group">
+          <label>Serie / Colección</label>
+          <input type="text" id="approval-serie" placeholder="Ej: Memorias de La Pintana, Archivo sonoro..." style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+        </div>
+        <div class="form-group">
+          <label>Texto largo (cuerpo del relato)</label>
+          <textarea id="approval-textolargo" rows="10" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Completa o edita el relato... (puede incluir HTML: &lt;b&gt;, &lt;i&gt;, &lt;u&gt;)"></textarea>
+        </div>
+      </div>
+      <div id="approval-standard-fields">
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="approval-textolargo-std" rows="5" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Descripción opcional..."></textarea>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;">
+        <input type="checkbox" id="approval-destacado" style="accent-color:var(--color-mir);width:16px;height:16px;">
+        <label for="approval-destacado" style="font-size:12px;color:#aaa;cursor:pointer;">Publicar en vitrina (index)</label>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
+        <button class="btn-secondary" id="btn-approval-cancel" aria-label="Cancelar aprobación y cerrar modal">Cancelar</button>
+        <button class="btn-primary" id="btn-approval-confirm" aria-label="Confirmar publicación del recuerdo">✓ CONFIRMAR PUBLICACIÓN</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="review-modal" style="display:none;position:fixed;z-index:99998;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
+    <div style="background:#121212;border:1px solid rgba(229,9,20,0.2);border-radius:16px;padding:32px;max-width:680px;width:90%;max-height:90vh;overflow-y:auto;">
+      <h3 style="font-size:18px;font-weight:700;color:white;margin:0 0 20px 0;">Revisión detallada</h3>
+      <img id="review-img" src="" style="width:100%;max-height:400px;object-fit:contain;border-radius:8px;margin-bottom:20px;display:none;background:#000;" alt="Vista previa">
+      <div id="review-text" style="font-size:14px;color:#ccc;line-height:1.7;white-space:pre-wrap;word-break:break-word;"></div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
+        <button class="btn-secondary" id="btn-review-close" aria-label="Cerrar ventana de revisión detallada">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Rejection Modal ─── -->
+  <div id="rejection-modal" style="display:none;position:fixed;z-index:99997;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
+    <div style="background:#121212;border:1px solid rgba(229,9,20,0.2);border-radius:16px;padding:32px;max-width:480px;width:90%;">
+      <h3 style="font-size:18px;font-weight:700;color:white;margin:0 0 4px 0;">Eliminar recuerdo</h3>
+      <p style="font-size:12px;color:#888;margin:0 0 20px 0;">Esta acción es irreversible. Selecciona el motivo del rechazo para el registro de auditoría.</p>
+      <div class="form-group">
+        <label>Razón del Rechazo</label>
+        <select id="rejection-razon" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" aria-label="Seleccionar motivo de rechazo">
+          <option value="Falta de valor patrimonial">Falta de valor patrimonial</option>
+          <option value="Contenido ofensivo">Contenido ofensivo</option>
+          <option value="Calidad técnica insuficiente">Calidad técnica insuficiente</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Detalle (opcional)</label>
+        <textarea id="rejection-detalle" rows="3" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Comentarios adicionales..." aria-label="Detalle opcional sobre el rechazo"></textarea>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
+        <button class="btn-secondary" id="btn-rejection-cancel" aria-label="Cancelar y volver">Cancelar</button>
+        <button class="btn-primary" id="btn-rejection-confirm" style="background:#c50812;" aria-label="Confirmar eliminación del recuerdo">✕ ELIMINAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Edit Modal ─── -->
+  <div id="edit-modal" style="display:none;position:fixed;z-index:99996;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
+    <div style="background:#121212;border:1px solid rgba(229,9,20,0.2);border-radius:16px;padding:32px;max-width:560px;width:90%;max-height:90vh;overflow-y:auto;">
+      <h3 style="font-size:18px;font-weight:700;color:white;margin:0 0 4px 0;">Editar recuerdo</h3>
+      <p style="font-size:12px;color:#888;margin:0 0 20px 0;">Corrige el texto, cambia la sección o actualiza los metadatos.</p>
+      <div class="form-group">
+        <label>Sección</label>
+        <select id="edit-seccion" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+          <option value="Galeria">Galería</option>
+          <option value="Videos y Audios">Videos y Audios</option>
+          <option value="Relatos: El Jano">Relatos: El Jano</option>
+          <option value="Relatos: El Arca">Relatos: El Arca</option>
+          <option value="Relatos: Otras organizaciones">Relatos: Otras organizaciones</option>
+          <option value="Relatos: Anecdotas">Relatos: Anecdotas</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Pseudónimo / Nombre</label>
+        <input type="text" id="edit-nombre" placeholder="Nombre del colaborador" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+      </div>
+      <div class="form-group">
+        <label>Título del relato</label>
+        <input type="text" id="edit-titulo" placeholder="Título" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+      </div>
+      <div class="form-group">
+        <label>Serie / Colección</label>
+        <input type="text" id="edit-serie" placeholder="Ej: Memorias de La Pintana" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+      </div>
+      <div class="form-group">
+        <label>Texto del relato / descripción</label>
+        <textarea id="edit-texto" rows="8" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Relato o descripción..."></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Ubicación</label>
+          <input type="text" id="edit-geo" placeholder="Ej: La Pintana, Santiago" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Tags (separados por coma)</label>
+          <input type="text" id="edit-tags" placeholder="marcha, pobladores, años 90" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
+        <button class="btn-secondary" id="btn-edit-cancel" aria-label="Cancelar edición">Cancelar</button>
+        <button class="btn-primary" id="btn-edit-save" aria-label="Guardar cambios">✓ GUARDAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Password Change Modal ─── -->
+  <div id="password-modal" style="display:none;position:fixed;z-index:99998;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
+    <div style="background:#121212;border:1px solid rgba(229,9,20,0.2);border-radius:16px;padding:32px;max-width:440px;width:90%;">
+      <h3 style="font-size:18px;font-weight:700;color:white;margin:0 0 4px 0;">🔑 Cambiar Contraseña</h3>
+      <p style="font-size:12px;color:#888;margin:0 0 20px 0;">Ingresa tu contraseña actual y la nueva.</p>
+      <div class="form-group">
+        <label>Contraseña actual</label>
+        <input type="password" id="pw-current" placeholder="••••••••" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" autocomplete="current-password">
+      </div>
+      <div class="form-group">
+        <label>Nueva contraseña</label>
+        <input type="password" id="pw-new" placeholder="••••••••" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label>Confirmar nueva contraseña</label>
+        <input type="password" id="pw-confirm" placeholder="••••••••" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" autocomplete="new-password">
+      </div>
+      <div id="pw-error" style="font-size:12px;color:var(--color-mir);margin-bottom:12px;display:none;"></div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
+        <button class="btn-secondary" id="btn-pw-cancel" aria-label="Cancelar cambio de contraseña">Cancelar</button>
+        <button class="btn-primary" id="btn-pw-save" style="min-width:140px;" aria-label="Cambiar contraseña">✓ CAMBIAR</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    'use strict';
+
+    const supabaseAnonKey = window.SUPABASE_ANON_KEY || '';
+    const API_BASE = window.API_BASE || window.location.origin;
+    let token = localStorage.getItem('admin_token');
+    let userData = null;
+
+    // ─── DOM refs ───
+    const loginScreen = document.getElementById('login-screen');
+    const dashboardScreen = document.getElementById('dashboard-screen');
+    const loginForm = document.getElementById('login-form');
+    const loginError = document.getElementById('login-error');
+    const btnLogin = document.getElementById('btn-login');
+    const btnLogout = document.getElementById('btn-logout');
+    const userNameDisplay = document.getElementById('user-name-display');
+    const userAvatar = document.getElementById('user-avatar');
+    const sectionTitle = document.getElementById('section-title');
+
+    // ─── Navigation ───
+    var navLinks = document.querySelectorAll('.sidebar-nav a');
+    navLinks.forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        navLinks.forEach(function(l) { l.classList.remove('active'); });
+        this.classList.add('active');
+        var section = this.getAttribute('data-section');
+        document.querySelectorAll('.content-section').forEach(function(s) { s.classList.remove('active'); });
+        var target = document.getElementById('section-' + section);
+        if (target) target.classList.add('active');
+        var titles = { dashboard: 'Dashboard', pending: 'Pendientes', approved: 'Aprobados', history: 'Historial', music: 'Gestión de Música', upload: 'Subida Manual', security: 'Centro de Seguridad' };
+        sectionTitle.textContent = titles[section] || 'Dashboard';
+        if (section === 'pending') loadPending();
+        if (section === 'approved') loadApproved();
+        if (section === 'history') loadHistory();
+        if (section === 'music') { actualizarListadoMusica(); iniciarRealtimeMusica(); }
+        if (section === 'dashboard') loadDashboard();
+        if (section === 'security') loadSecurityEvents();
+      });
+    });
+
+    // ─── Toast notifications ───
+    function showToast(message, type) {
+      type = type || 'info';
+      var container = document.getElementById('toast-container');
+      if (!container) return;
+      var t = document.createElement('div');
+      t.style.cssText = 'padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;color:white;pointer-events:auto;cursor:pointer;animation:fadeSlideUp 0.3s ease-out;box-shadow:0 8px 32px rgba(0,0,0,0.4);backdrop-filter:blur(12px);';
+      var colors = { error: 'rgba(229,9,20,0.95)', success: 'rgba(46,125,50,0.95)', info: 'rgba(30,30,30,0.95)', warning: 'rgba(255,152,0,0.95)' };
+      t.style.background = colors[type] || colors.info;
+      t.textContent = message;
+      t.onclick = function() { t.style.opacity = '0'; t.style.transform = 'translateX(40px)'; t.style.transition = '0.3s'; setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 300); };
+      container.appendChild(t);
+      setTimeout(function() { if (t.parentNode) { t.style.opacity = '0'; t.style.transform = 'translateX(40px)'; t.style.transition = '0.3s'; setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 300); } }, 5000);
+    }
+
+    // Panic button: Escape navigates to Security
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !e.target.closest('input, textarea, select, [contenteditable]')) {
+        var secLink = document.querySelector('.sidebar-nav a[data-section="security"]');
+        if (secLink) secLink.click();
+      }
+    });
+
+    // ─── Seguridad: registrar intento de login ───
+    async function logLoginAttempt(email, success, errorMsg) {
+      var entry = {
+        accion: success ? 'login_success' : 'login_failed',
+        entidad: 'admin_user',
+        usuario_email: email,
+        metadata: {
+          error: errorMsg || null,
+          user_agent: navigator.userAgent,
+          timestamp: new Date().toISOString(),
+        },
+      };
+      // Try edge function (works after login)
+      try {
+        var fnUrl = window.EDGE_FUNCTIONS_URL;
+        if (token && fnUrl) {
+          await fetch(fnUrl + '/auditoria', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify(entry),
+          });
+        }
+      } catch (_) {}
+      // Fallback: localStorage audit trail
+      try {
+        var localLog = JSON.parse(localStorage.getItem('_audit_local') || '[]');
+        localLog.push({ ts: Date.now(), email: email, success: success, error: errorMsg });
+        if (localLog.length > 200) localLog = localLog.slice(-200);
+        localStorage.setItem('_audit_local', JSON.stringify(localLog));
+      } catch (_) {}
+    }
+
+    // ─── Login via Supabase Auth SDK ───
+    loginForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var email = document.getElementById('login-email').value.trim();
+      var password = document.getElementById('login-password').value;
+      if (!email || !password) { loginError.textContent = 'Completa todos los campos.'; return; }
+      loginError.textContent = '';
+      btnLogin.textContent = 'Ingresando...';
+      btnLogin.disabled = true;
+
+      try {
+        var s = await waitForSupabase();
+        if (!s) throw new Error('Cliente Supabase no disponible');
+
+        var { data: authData, error: authError } = await s.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+        if (authError) throw new Error(authError.message);
+        if (!authData.session) throw new Error('No se pudo iniciar sesi\u00f3n');
+
+        token = authData.session.access_token;
+        userData = {
+          id: authData.user.id,
+          email: authData.user.email,
+          nombre: authData.user.email ? authData.user.email.split('@')[0] : 'Admin'
+        };
+
+        localStorage.setItem('admin_token', token);
+        localStorage.setItem('admin_user', JSON.stringify(userData));
+
+        // Log successful login
+        await logLoginAttempt(email, true, null);
+
+        showDashboard();
+        showToast('Bienvenido, ' + userData.nombre, 'success');
+      } catch (err) {
+        // Log failed login attempt
+        await logLoginAttempt(email, false, err.message);
+
+        loginError.textContent = err.message || 'Error al conectar con el servidor.';
+
+        // Alert on repeated failures
+        var failedAttempts = parseInt(localStorage.getItem('login_failures') || '0', 10) + 1;
+        localStorage.setItem('login_failures', String(failedAttempts));
+        if (failedAttempts >= 5) {
+          showToast('⚠️ Múltiples intentos fallidos detectados. Revisa el registro de seguridad.', 'error');
+        }
+      } finally {
+        btnLogin.textContent = 'Acceder al Panel';
+        btnLogin.disabled = false;
+      }
+    });
+
+    // Reset failure counter on successful session restore
+    if (localStorage.getItem('admin_token')) {
+      localStorage.removeItem('login_failures');
+    }
+
+    btnLogout.addEventListener('click', function(e) {
+      e.preventDefault();
+      detenerRealtime();
+      token = null;
+      userData = null;
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_user');
+      loginScreen.style.display = 'flex';
+      dashboardScreen.style.display = 'none';
+      showToast('Sesión cerrada', 'info');
+    });
+
+    // Also wire dropdown logout
+    document.querySelector('.btn-logout-dropdown')?.addEventListener('click', function() {
+      btnLogout.click();
+    });
+
+    // ─── User dropdown toggle ───
+    var userBadge = document.getElementById('user-badge');
+    var userDropdown = document.getElementById('user-dropdown');
+    if (userBadge && userDropdown) {
+      userBadge.addEventListener('click', function(e) {
+        e.stopPropagation();
+        userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+      });
+      document.addEventListener('click', function() { userDropdown.style.display = 'none'; });
+      userDropdown.addEventListener('click', function(e) { e.stopPropagation(); });
+    }
+
+    // ─── Password change ───
+    var pwModal = document.getElementById('password-modal');
+    var pwCurrent = document.getElementById('pw-current');
+    var pwNew = document.getElementById('pw-new');
+    var pwConfirm = document.getElementById('pw-confirm');
+    var pwError = document.getElementById('pw-error');
+    var btnPwCancel = document.getElementById('btn-pw-cancel');
+    var btnPwSave = document.getElementById('btn-pw-save');
+
+    function closePwModal() {
+      if (pwModal) pwModal.style.display = 'none';
+      if (pwError) pwError.style.display = 'none';
+      if (pwCurrent) pwCurrent.value = '';
+      if (pwNew) pwNew.value = '';
+      if (pwConfirm) pwConfirm.value = '';
+    }
+
+    if (pwModal) {
+      pwModal.addEventListener('click', function(e) { if (e.target === pwModal) closePwModal(); });
+    }
+    if (btnPwCancel) btnPwCancel.addEventListener('click', closePwModal);
+
+    function showPwError(msg) {
+      if (pwError) { pwError.textContent = msg; pwError.style.display = 'block'; }
+    }
+
+    if (btnPwSave) {
+      btnPwSave.addEventListener('click', async function() {
+        var current = pwCurrent ? pwCurrent.value.trim() : '';
+        var newPw = pwNew ? pwNew.value.trim() : '';
+        var confirmPw = pwConfirm ? pwConfirm.value.trim() : '';
+
+        if (!current) { showPwError('Ingresa tu contraseña actual.'); return; }
+        if (!newPw) { showPwError('Ingresa la nueva contraseña.'); return; }
+        if (newPw.length < 8) { showPwError('La nueva contraseña debe tener al menos 8 caracteres.'); return; }
+        if (newPw !== confirmPw) { showPwError('Las contraseñas nuevas no coinciden.'); return; }
+        if (newPw === current) { showPwError('La nueva contraseña debe ser diferente a la actual.'); return; }
+
+        btnPwSave.textContent = 'Cambiando...';
+        btnPwSave.disabled = true;
+        if (pwError) pwError.style.display = 'none';
+
+        try {
+          // Re-authenticate with current password first (required by Supabase)
+          var s = await waitForSupabase();
+          if (!s) throw new Error('Cliente Supabase no disponible');
+
+          var { error: signInError } = await s.auth.signInWithPassword({
+            email: userData.email,
+            password: current
+          });
+          if (signInError) throw new Error('Contraseña actual incorrecta');
+
+          // Update password
+          var { error: updateError } = await s.auth.updateUser({ password: newPw });
+          if (updateError) throw new Error(updateError.message);
+
+          showToast('Contraseña cambiada exitosamente', 'success');
+          registrarAuditoria('password_change', 'admin_user', userData.id, {});
+          closePwModal();
+        } catch (err) {
+          showPwError(err.message || 'Error al cambiar contraseña');
+        } finally {
+          btnPwSave.textContent = '✓ CAMBIAR';
+          btnPwSave.disabled = false;
+        }
+      });
+    }
+
+    // ─── Supabase helpers ───
+    function sb() { return window._supabase; }
+
+    async function adminFetch(path, options) {
+      var url = (window.fnUrl ? window.fnUrl(path.split('/')[0]) : null)
+        || (API_BASE + '/api/v1/admin/' + path);
+      var opts = options || {};
+      opts.headers = opts.headers || {};
+      opts.headers['Authorization'] = 'Bearer ' + token;
+      if (!opts.method) opts.method = 'GET';
+      if (opts.body && typeof opts.body === 'object' && !(opts.body instanceof FormData)) {
+        opts.headers['Content-Type'] = 'application/json';
+        opts.body = JSON.stringify(opts.body);
+      }
+      var res = await fetch(url, opts);
+      if (res.status === 401 || res.status === 403) { handleUnauthorized(); throw new Error('Sesión expirada'); }
+      return res.json();
+    }
+
+    function handleUnauthorized() {
+      detenerRealtime();
+      token = null;
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_user');
+      loginScreen.style.display = 'flex';
+      dashboardScreen.style.display = 'none';
+      showToast('Sesión expirada. Ingresa nuevamente.', 'error');
+    }
+
+    // ─── Auditoría: registrar acción admin en audit_log ───
+    async function registrarAuditoria(accion, entidad, entidadId, metadata) {
+      try {
+        var fnUrl = window.EDGE_FUNCTIONS_URL;
+        if (!fnUrl || !token) return;
+        await fetch(fnUrl + '/auditoria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            accion: accion,
+            entidad: entidad,
+            entidad_id: entidadId || null,
+            usuario_id: (userData && userData.id) || null,
+            usuario_email: (userData && userData.email) || null,
+            metadata: metadata || null
+          })
+        });
+      } catch (err) {
+        console.warn('[Auditoría] Error al registrar:', err.message);
+      }
+    }
+
+    // ─── Cliente Supabase unificado ───
+    function getSupabaseClient() {
+      return window.miSupabase || window._supabase;
+    }
+
+    async function waitForSupabase(maxWaitMs) {
+      maxWaitMs = maxWaitMs || 10000;
+      var start = Date.now();
+      while (!getSupabaseClient() && (Date.now() - start) < maxWaitMs) {
+        await new Promise(function(r) { setTimeout(r, 200); });
+      }
+      return getSupabaseClient();
+    }
+
+    // ─── Helper unificado de feedback ───
+    function mostrarToastExito(msg) { showToast(msg, 'success'); }
+    function mostrarToastError(msg) { showToast('Error al subir: ' + msg, 'error'); }
+
+    // ─── Manejador de eventos unificado para formularios ───
+    async function procesarSubida(btn, fn) {
+      if (!btn) return;
+      var textoOriginal = btn.textContent;
+      btn.textContent = 'Publicando...';
+      btn.disabled = true;
+      try {
+        await fn();
+        mostrarToastExito('Subido correctamente');
+      } catch (err) {
+        console.error('[procesarSubida] Error completo:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
+        console.error('[procesarSubida] Mensaje:', err.message);
+        console.error('[procesarSubida] Detalle:', err.details || '(sin detalle)');
+        console.error('[procesarSubida] Código:', err.code || '(sin código)');
+        console.error('[procesarSubida] Sugerencia:', err.hint || '(sin sugerencia)');
+        mostrarToastError(err.message || 'Error desconocido');
+      } finally {
+        btn.textContent = textoOriginal;
+        btn.disabled = false;
+      }
+    }
+
+    // ─── Subir archivo a Storage + insertar en recuerdos ───
+    async function subirArchivo(file, seccion, extraData) {
+      var s = await waitForSupabase();
+      if (!s) throw new Error('Cliente Supabase no disponible');
+
+      var bucket = 'elarca-uploads';
+
+      if (!validarSeccion(seccion)) throw new Error('Sección inválida');
+
+      // ─── 1. Insertar registro primero para obtener ID ───
+      var now = new Date().toISOString();
+      var linkUrl = extraData.url_externo || null;
+      var tipoArchivo = null;
+      if (linkUrl) {
+        var l = linkUrl.toLowerCase();
+        if (l.indexOf('youtube.com') !== -1 || l.indexOf('youtu.be') !== -1) tipoArchivo = 'video/youtube';
+        else if (l.indexOf('facebook.com') !== -1) tipoArchivo = 'video/facebook';
+        else if (l.match(/\.(mp3|wav|ogg|aac|m4a|flac)(\?|$)/)) tipoArchivo = 'audio/external';
+        else if (l.match(/\.(mp4|webm|ogg|mov|avi)(\?|$)/)) tipoArchivo = 'video/external';
+        else tipoArchivo = 'link';
+      }
+
+      var insertData = {
+        nombre: extraData.nombre || 'Admin',
+        mensaje: extraData.descripcion || null,
+        mensaje_largo: extraData.texto_largo || null,
+        titulo_relato: extraData.titulo_relato || null,
+        nombre_serie: extraData.nombre_serie || null,
+        url_archivo: linkUrl || null,
+        tipo_archivo: tipoArchivo,
+        seccion: seccion,
+        aprobado: true,
+        destacado: extraData.destacado === true,
+        es_efimero: extraData.es_efimero === true,
+        fecha_subida: now,
+        geolocalizacion: extraData.geolocalizacion || null,
+        tags: extraData.tags || null,
+        fecha_creacion_archivo: extraData.fecha_creacion_archivo || null
+      };
+
+      console.log('[subirArchivo] Insertando registro previo:', JSON.stringify(insertData));
+
+      var { data: inserted, error: insertError } = await s
+        .from('recuerdos')
+        .insert(insertData)
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('[subirArchivo] Error insert detallado:', JSON.stringify(insertError, Object.getOwnPropertyNames(insertError)));
+        console.error('[subirArchivo] Código:', insertError.code);
+        console.error('[subirArchivo] Detalle:', insertError.details);
+        console.error('[subirArchivo] Sugerencia:', insertError.hint);
+        throw new Error(insertError.message + (insertError.details ? ' — ' + insertError.details : ''));
+      }
+
+      var recordId = inserted.id;
+      console.log('[subirArchivo] Registro creado ID:', recordId);
+
+      // ─── 2. Subir archivo a recuerdos/{id}/ ───
+      var sanitize = function (name) {
+        return name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.\./g, '.');
+      };
+      var ext = file.name.lastIndexOf('.') !== -1 ? file.name.slice(file.name.lastIndexOf('.')) : '';
+      var baseName = file.name.replace(/\.[^/.]+$/, '').substring(0, 40);
+      var storagePath = 'recuerdos/' + recordId + '/' + sanitize(baseName) + ext;
+
+      console.log('[subirArchivo] Subiendo a:', storagePath, 'tamaño:', file.size);
+
+      var { error: uploadError } = await s.storage
+        .from(bucket)
+        .upload(storagePath, file, { contentType: file.type, upsert: false });
+
+      if (uploadError) {
+        console.error('[subirArchivo] Error upload:', uploadError);
+        // Clean up: delete the orphan record
+        await s.from('recuerdos').delete().eq('id', recordId);
+        throw new Error('Error al subir archivo: ' + uploadError.message);
+      }
+
+      console.log('[subirArchivo] Upload exitoso');
+
+      // ─── 3. URL pública ───
+      var { data: { publicUrl } } = s.storage
+        .from(bucket)
+        .getPublicUrl(storagePath);
+
+      console.log('[subirArchivo] URL pública:', publicUrl);
+
+      // ─── 4. Actualizar registro con datos del archivo ───
+      var { error: updateError } = await s
+        .from('recuerdos')
+        .update({
+          url_archivo: publicUrl,
+          storage_path: storagePath,
+          tipo_archivo: file.type,
+          nombre_original: file.name,
+          tamanio_bytes: file.size
+        })
+        .eq('id', recordId);
+
+      if (updateError) {
+        console.error('[subirArchivo] Error update detallado:', JSON.stringify(updateError, Object.getOwnPropertyNames(updateError)));
+        throw new Error('Error al vincular archivo: ' + updateError.message + (updateError.details ? ' — ' + updateError.details : ''));
+      }
+
+      inserted.url_archivo = publicUrl;
+      inserted.storage_path = storagePath;
+      inserted.tipo_archivo = file.type;
+      inserted.nombre_original = file.name;
+      inserted.tamanio_bytes = file.size;
+
+      console.log('[subirArchivo] Archivo vinculado al recuerdo ID:', recordId);
+
+      // ─── Auditoría ───
+      registrarAuditoria('admin_upload', 'recuerdo', recordId, {
+        seccion: seccion,
+        nombre: extraData.nombre,
+        tipo_archivo: file.type,
+        tamanio_bytes: file.size
+      });
+
+      showToast((extraData.nombre || 'Archivo') + ' subido exitosamente a ' + (NOMBRES_SECCION[seccion] || seccion), 'success');
+      return inserted;
+    }
+
+    // ═══════════════════════════════════════════════
+    // CONTADORES
+    // ═══════════════════════════════════════════════
+
+    async function contarPendientes() {
+      var s = await waitForSupabase();
+      if (!s) return 0;
+      var { count, error } = await s.from('recuerdos').select('*', { count: 'exact', head: true }).eq('aprobado', false);
+      if (error) { console.error('[contarPendientes]', error); return 0; }
+      return count ?? 0;
+    }
+
+    async function contarAprobados() {
+      var s = await waitForSupabase();
+      if (!s) return 0;
+      var { count, error } = await s.from('recuerdos').select('*', { count: 'exact', head: true }).eq('aprobado', true);
+      if (error) { console.error('[contarAprobados]', error); return 0; }
+      return count ?? 0;
+    }
+
+    async function contarCancionesActivas() {
+      var s = await waitForSupabase();
+      if (!s) return 0;
+      var { count, error } = await s.from('musica_reproductor').select('*', { count: 'exact', head: true }).eq('activo', true);
+      if (error) { console.error('[contarCancionesActivas]', error); return 0; }
+      return count ?? 0;
+    }
+
+    async function refrescarContadores() {
+      var [pend, aprob, music] = await Promise.all([
+        contarPendientes(),
+        contarAprobados(),
+        contarCancionesActivas()
+      ]);
+      var elPend = document.getElementById('stat-pending');
+      var elAprob = document.getElementById('stat-approved');
+      var elMusic = document.getElementById('stat-music');
+      if (elPend) elPend.textContent = pend;
+      if (elAprob) elAprob.textContent = aprob;
+      if (elMusic) elMusic.textContent = music;
+    }
+
+    // ═══════════════════════════════════════════════
+    // REPRODUCIÉNDOSE AHORA
+    // ═══════════════════════════════════════════════
+
+    async function cargarAhoraSuena() {
+      try {
+        var s = await waitForSupabase();
+        if (!s) return;
+        var { data, error } = await s.from('musica_reproductor').select('*').eq('activo', true).order('orden', { ascending: true }).limit(1);
+        if (error) throw error;
+        var titleEl = document.getElementById('np-title');
+        var artistEl = document.getElementById('np-artist');
+        if (!titleEl || !artistEl) return;
+        if (data && data.length > 0) {
+          titleEl.textContent = data[0].titulo || '—';
+          artistEl.textContent = data[0].artista || 'El Arca';
+        } else {
+          titleEl.textContent = 'Radio en vivo';
+          artistEl.textContent = 'Esperando transmisión...';
+        }
+      } catch (err) {
+        console.error('[AhoraSuena] Error:', err);
+      }
+    }
+
+    // ═══════════════════════════════════════════════
+    // ESTADÍSTICAS DE MEMORIA
+    // ═══════════════════════════════════════════════
+
+    var _uploadsChart = null;
+    var _typeChart = null;
+
+    async function cargarEstadisticasMemoria() {
+      try {
+        var s = await waitForSupabase();
+        if (!s) return;
+
+        var [rTotal, rVecinos, rBytes, rTimeline] = await Promise.all([
+          s.from('recuerdos').select('*', { count: 'exact', head: true }),
+          s.from('recuerdos').select('nombre', { count: 'exact', head: true }).not('nombre', 'is', null).neq('nombre', ''),
+          s.from('recuerdos').select('tamanio_bytes').not('tamanio_bytes', 'is', null),
+          s.from('recuerdos').select('created_at, tipo_archivo').order('created_at', { ascending: true })
+        ]);
+
+        var elTotal = document.getElementById('stat-total-recuerdos');
+        var elVecinos = document.getElementById('stat-vecinos-unicos');
+        var elGb = document.getElementById('stat-gb-preservados');
+
+        if (elTotal) elTotal.textContent = (rTotal.count ?? 0).toLocaleString('es-CL');
+
+        if (elVecinos) {
+          try {
+            var { data: nombresData, error: nombresErr } = await s
+              .from('recuerdos')
+              .select('nombre')
+              .not('nombre', 'is', null)
+              .neq('nombre', '');
+            if (!nombresErr && nombresData) {
+              var unicos = {};
+              nombresData.forEach(function(r) { if (r.nombre) unicos[r.nombre.toLowerCase().trim()] = true; });
+              elVecinos.textContent = Object.keys(unicos).length.toLocaleString('es-CL');
+            }
+          } catch (e) {
+            elVecinos.textContent = '—';
+          }
+        }
+
+        if (elGb) {
+          var totalBytes = 0;
+          if (rBytes.data) {
+            rBytes.data.forEach(function(r) { totalBytes += Number(r.tamanio_bytes || 0); });
+          }
+          elGb.textContent = (totalBytes / (1024 * 1024 * 1024)).toFixed(2);
+        }
+
+        // ─── Charts ───
+        if (rTimeline.data && window.Chart) {
+          var timelineData = rTimeline.data;
+
+          // Uploads over time (by month)
+          var monthCount = {};
+          timelineData.forEach(function(r) {
+            if (!r.created_at) return;
+            var m = r.created_at.substring(0, 7); // YYYY-MM
+            monthCount[m] = (monthCount[m] || 0) + 1;
+          });
+          var months = Object.keys(monthCount).sort();
+          var counts = months.map(function(m) { return monthCount[m]; });
+
+          var uplCanvas = document.getElementById('uploads-chart');
+          if (uplCanvas) {
+            if (_uploadsChart) { _uploadsChart.destroy(); _uploadsChart = null; }
+            _uploadsChart = new Chart(uplCanvas, {
+              type: 'line',
+              data: {
+                labels: months.map(function(m) { var p = m.split('-'); return p[1] + '/' + p[0].slice(2); }),
+                datasets: [{
+                  label: 'Subidas',
+                  data: counts,
+                  borderColor: '#E50914',
+                  backgroundColor: 'rgba(229,9,20,0.08)',
+                  fill: true,
+                  tension: 0.4,
+                  pointRadius: 2,
+                  pointHoverRadius: 5,
+                  borderWidth: 2,
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                  x: { ticks: { color: '#666', font: { size: 8 }, maxTicksLimit: 12 }, grid: { color: 'rgba(255,255,255,0.03)' } },
+                  y: { ticks: { color: '#666', font: { size: 8 }, stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.03)' }, beginAtZero: true }
+                }
+              }
+            });
+          }
+
+          // Type distribution
+          var typeCount = {};
+          timelineData.forEach(function(r) {
+            var t = r.tipo_archivo || 'texto';
+            if (t.indexOf('image') === 0) t = 'Imagen';
+            else if (t.indexOf('audio') === 0) t = 'Audio';
+            else if (t.indexOf('video') === 0) t = 'Video';
+            else if (t === 'application/pdf') t = 'PDF';
+            else t = 'Texto';
+            typeCount[t] = (typeCount[t] || 0) + 1;
+          });
+          var typeLabels = Object.keys(typeCount);
+          var typeValues = typeLabels.map(function(l) { return typeCount[l]; });
+          var typeColors = ['#E50914','#2196F3','#4CAF50','#FF9800','#9C27B0','#00BCD4'];
+
+          var typeCanvas = document.getElementById('type-chart');
+          if (typeCanvas) {
+            if (_typeChart) { _typeChart.destroy(); _typeChart = null; }
+            _typeChart = new Chart(typeCanvas, {
+              type: 'doughnut',
+              data: {
+                labels: typeLabels,
+                datasets: [{
+                  data: typeValues,
+                  backgroundColor: typeColors.slice(0, typeLabels.length),
+                  borderColor: 'transparent',
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: 'right', labels: { color: '#888', font: { size: 9 }, boxWidth: 10, padding: 8 } }
+                },
+                cutout: '55%',
+              }
+            });
+          }
+        }
+      } catch (err) {
+        console.error('[Estadisticas] Error:', err);
+      }
+    }
+
+    // ═══════════════════════════════════════════════
+    // DASHBOARD — listado + contadores
+    // ═══════════════════════════════════════════════
+
+    var NOMBRES_SECCION = {
+      'Galeria': 'Galería',
+      'Videos y Audios': 'Videos y Audios',
+      'Relatos: El Jano': 'Relatos: El Jano',
+      'Relatos: El Arca': 'Relatos: El Arca',
+      'Relatos: Otras organizaciones': 'Relatos: Otras organizaciones',
+      'Relatos: Anecdotas': 'Relatos: Anecdotas',
+      'musica': 'Música'
+    };
+
+    function nombreSeccion(raw) {
+      return NOMBRES_SECCION[raw] || (raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : 'General');
+    }
+
+    async function renderRecentRecuerdos() {
+      try {
+        var s = await waitForSupabase();
+        if (!s) return;
+        var { data, error } = await s.from('recuerdos').select('*').order('created_at', { ascending: false }).limit(20);
+        if (error) throw error;
+        var recuerdos = data || [];
+        var recentList = document.getElementById('recent-recuerdos-list');
+        if (!recentList) return;
+
+        if (recuerdos.length === 0) {
+          recentList.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div class="text">No hay recuerdos aún</div></div>';
+          return;
+        }
+
+        var html = '<table><thead><tr><th>Fecha</th><th>Pseudónimo</th><th>Sección</th><th>Estado</th><th class="hide-mobile">Acción</th></tr></thead><tbody>';
+        recuerdos.forEach(function(r) {
+          var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL') : '—';
+          var nombre = escapeHtml(r.nombre || 'Anónimo');
+          var seccionLabel = nombreSeccion(r.seccion);
+
+          var estadoBadge = '';
+          var acciones = '';
+          var editAccion = '<button class="btn-sm btn-sm-edit" onclick="window.editRecuerdo(\'' + r.id + '\')" aria-label="Editar recuerdo de ' + escapeHtml(nombre) + '" style="margin-right:4px;">✎ Editar</button>';
+          if (r.aprobado) {
+            estadoBadge = '<span class="badge badge-approved">Publicado</span>';
+            acciones = editAccion + '<button class="btn-sm btn-sm-danger" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo de ' + escapeHtml(nombre) + '">✕ Eliminar</button>';
+          } else {
+            estadoBadge = '<span class="badge badge-pending">Pendiente</span>';
+            acciones =
+              '<button class="btn-sm btn-sm-approve" onclick="window.approveRecuerdo(\'' + r.id + '\')" style="margin-right:4px;" aria-label="Abrir modal de aprobación para recuerdo de ' + escapeHtml(nombre) + '">✓ Aprobar</button>' +
+              editAccion +
+              '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo pendiente de ' + escapeHtml(nombre) + '">✕ Eliminar</button>';
+          }
+
+          html += '<tr>' +
+            '<td style="white-space:nowrap;">' + fecha + '</td>' +
+            '<td class="truncate">' + nombre + '</td>' +
+            '<td>' + seccionLabel + '</td>' +
+            '<td>' + estadoBadge + '</td>' +
+            '<td class="hide-mobile" style="white-space:nowrap;">' + acciones + '</td>' +
+            '</tr>';
+        });
+        html += '</tbody></table>';
+        recentList.innerHTML = html;
+      } catch (err) {
+        console.error('[renderRecentRecuerdos] Error:', err);
+      }
+    }
+
+    async function cargarStatsPorPais() {
+      try {
+        var s = await waitForSupabase();
+        if (!s) return;
+        var { data, error } = await s.from('recuerdos').select('pais');
+        if (error) throw error;
+        var conteo = {};
+        (data || []).forEach(function(r) {
+          var p = (r.pais || 'Sin país').trim();
+          if (!p) p = 'Sin país';
+          conteo[p] = (conteo[p] || 0) + 1;
+        });
+        var sorted = Object.keys(conteo).sort(function(a, b) { return conteo[b] - conteo[a]; });
+        var total = sorted.reduce(function(s, k) { return s + conteo[k]; }, 0);
+        var maxVal = sorted.length > 0 ? conteo[sorted[0]] : 1;
+        var container = document.getElementById('country-stats-container');
+        if (!container) return;
+        if (sorted.length === 0) {
+          container.innerHTML = '<div class="empty-state" style="padding:20px 0;"><div class="icon">🌍</div><div class="text">Sin datos de ubicación</div></div>';
+          return;
+        }
+        var html = '';
+        sorted.forEach(function(pais) {
+          var pct = (conteo[pais] / total * 100).toFixed(1);
+          var barW = (conteo[pais] / maxVal * 100).toFixed(0);
+          html += '<div style="margin-bottom:8px;">' +
+            '<div style="display:flex;justify-content:space-between;font-size:11px;color:#ccc;margin-bottom:2px;">' +
+              '<span>' + escapeHtml(pais) + '</span>' +
+              '<span>' + conteo[pais] + ' (' + pct + '%)</span>' +
+            '</div>' +
+            '<div style="height:6px;background:rgba(229,9,20,0.08);border-radius:3px;overflow:hidden;">' +
+              '<div style="height:100%;width:' + barW + '%;background:var(--color-mir);border-radius:3px;transition:width 0.6s ease;"></div>' +
+            '</div></div>';
+        });
+        container.innerHTML = html;
+      } catch (err) {
+        console.error('[StatsPais] Error:', err);
+        var container = document.getElementById('country-stats-container');
+        if (container && (err.code === '42703' || (err.message && err.message.indexOf('42703') !== -1))) {
+          container.innerHTML = '<div class="empty-state" style="padding:20px 0;"><div class="icon">🗄️</div><div class="text" style="font-size:12px;color:#999;">La columna <code style="background:rgba(255,255,255,0.06);padding:1px 6px;border-radius:3px;">pais</code> no existe. Ejecuta en el SQL Editor:<br><code style="background:rgba(255,255,255,0.06);padding:4px 10px;border-radius:4px;display:inline-block;margin-top:8px;font-size:11px;">ALTER TABLE public.recuerdos ADD COLUMN IF NOT EXISTS pais VARCHAR(100) DEFAULT \'Chile\';<br>NOTIFY pgrst, \'reload schema\';</code></div></div>';
+        }
+      }
+    }
+
+    async function cargarStatsPorSeccion() {
+      try {
+        var s = await waitForSupabase();
+        if (!s) return;
+        var { data, error } = await s.from('recuerdos').select('seccion');
+        if (error) throw error;
+        var conteo = {};
+        (data || []).forEach(function(r) {
+          var sec = r.seccion || 'general';
+          conteo[sec] = (conteo[sec] || 0) + 1;
+        });
+        var sorted = Object.keys(conteo).sort(function(a, b) { return conteo[b] - conteo[a]; });
+        var total = sorted.reduce(function(s, k) { return s + conteo[k]; }, 0);
+        var maxVal = sorted.length > 0 ? conteo[sorted[0]] : 1;
+        var container = document.getElementById('section-stats-container');
+        if (!container) return;
+        if (sorted.length === 0) {
+          container.innerHTML = '<div class="empty-state" style="padding:20px 0;"><div class="icon">📁</div><div class="text">Sin datos</div></div>';
+          return;
+        }
+        var COLORS = ['#E50914','#2196F3','#4CAF50','#FF9800','#9C27B0','#00BCD4','#FF5722','#607D8B'];
+        var html = '';
+        sorted.forEach(function(sec, i) {
+          var pct = (conteo[sec] / total * 100).toFixed(1);
+          var color = COLORS[i % COLORS.length];
+          html += '<div style="margin-bottom:6px;">' +
+            '<div style="display:flex;justify-content:space-between;font-size:11px;color:#ccc;margin-bottom:2px;">' +
+              '<span>' + escapeHtml(nombreSeccion(sec)) + '</span>' +
+              '<span>' + conteo[sec] + ' (' + pct + '%)</span>' +
+            '</div></div>';
+        });
+        container.innerHTML = html;
+      } catch (err) {
+        console.error('[StatsSeccion] Error:', err);
+      }
+    }
+
+    async function loadDashboard() {
+      var s = await waitForSupabase();
+      if (!s) { showToast('Error de conexión con la base de datos', 'error'); return; }
+      await Promise.all([
+        refrescarContadores(),
+        cargarAhoraSuena(),
+        renderRecentRecuerdos(),
+        cargarEstadisticasMemoria(),
+        cargarStatsPorPais(),
+        cargarStatsPorSeccion(),
+        loadSecurityEvents()
+      ]);
+    }
+
+    // ═══════════════════════════════════════════════
+    // SUPABASE REALTIME
+    // ═══════════════════════════════════════════════
+
+    var _realtimeChannel = null;
+
+    function iniciarRealtime() {
+      var s = getSupabaseClient();
+      if (!s) { console.warn('[Realtime] Cliente no disponible'); return; }
+
+      if (_realtimeChannel) {
+        try { s.removeChannel(_realtimeChannel); } catch(e) {}
+      }
+
+      console.log('[Realtime] Suscribiendo a cambios en recuerdos...');
+
+      _realtimeChannel = s.channel('db-changes')
+        .on('postgres_changes',
+          { event: '*', schema: 'public', table: 'recuerdos' },
+          function(payload) {
+            console.log('[Realtime] Cambio en recuerdos:', payload.eventType);
+            refrescarContadores();
+            renderRecentRecuerdos();
+          }
+        )
+        .subscribe(function(status) {
+          console.log('[Realtime] Estado:', status);
+          var badge = document.getElementById('realtime-badge');
+          if (badge) {
+            badge.style.background = status === 'SUBSCRIBED' ? '#4caf50' : '#f44336';
+          }
+        });
+    }
+
+    function detenerRealtime() {
+      var s = getSupabaseClient();
+      if (s && _realtimeChannel) {
+        s.removeChannel(_realtimeChannel);
+        _realtimeChannel = null;
+      }
+      if (s && _musicaChannel) {
+        s.removeChannel(_musicaChannel);
+        _musicaChannel = null;
+      }
+    }
+
+    // ─── Realtime: Música ───
+    var _musicaChannel = null;
+
+    function iniciarRealtimeMusica() {
+      var s = getSupabaseClient();
+      if (!s) return;
+
+      if (_musicaChannel) {
+        try { s.removeChannel(_musicaChannel); } catch(e) {}
+      }
+
+      _musicaChannel = s.channel('musica-channel')
+        .on('postgres_changes',
+          { event: '*', schema: 'public', table: 'musica_reproductor' },
+          function(payload) {
+            console.log('[Realtime] Cambio en musica_reproductor:', payload.eventType);
+            actualizarListadoMusica();
+            refrescarContadores();
+            cargarAhoraSuena();
+          }
+        )
+        .subscribe(function(status) {
+          console.log('[Realtime] Estado musica-channel:', status);
+        });
+    }
+
+    // ─── Pending ───
+    async function loadPending() {
+      try {
+        var s = await waitForSupabase();
+        if (!s) return;
+        var { data, error } = await s
+          .from('recuerdos')
+          .select('*')
+          .eq('aprobado', false)
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        var pending = data || [];
+        window._pendingRecords = pending;
+        document.getElementById('pending-count').textContent = pending.length;
+        var list = document.getElementById('pending-list');
+        if (pending.length === 0) {
+          list.innerHTML = '<div class="empty-state"><div class="icon">✅</div><div class="text">Todo revisado — no hay pendientes</div></div>';
+          return;
+        }
+        var html = '<table><thead><tr><th>Vista previa</th><th>Relato</th><th>Acción</th></tr></thead><tbody>';
+        pending.forEach(function(r) {
+          var imgHtml = r.url_archivo
+            ? '<img src="' + r.url_archivo + '" width="100" style="border-radius:8px;object-fit:cover;max-height:80px;" alt="Vista previa de ' + escapeHtml(r.nombre || 'recuerdo') + '">'
+            : '<span style="color:#666;font-size:11px;">Archivo no disponible</span>';
+
+          var textoRelato = r.mensaje_largo || r.mensaje || '';
+          var relatoHtml = '';
+          if (textoRelato) {
+            var textoTruncado = textoRelato.length > 200 ? textoRelato.substring(0, 200) + '...' : textoRelato;
+            relatoHtml = '<div style="max-height:100px;overflow-y:auto;font-size:12px;color:#ccc;line-height:1.5;">' + escapeHtml(textoTruncado) + '</div>';
+            if (textoRelato.length > 200) {
+              relatoHtml += '<button class="btn-ver-completo" onclick="window.verCompleto(\'' + r.id + '\')" aria-label="Ver texto completo del relato">VER COMPLETO</button>';
+            }
+          } else {
+            relatoHtml = '<span style="color:#555;font-size:11px;">Sin relato</span>';
+          }
+
+          html += '<tr>' +
+            '<td style="vertical-align:middle;">' + imgHtml + '</td>' +
+            '<td style="vertical-align:middle;">' + relatoHtml + '</td>' +
+            '<td style="vertical-align:middle;white-space:nowrap;">' +
+              '<button class="btn-sm btn-sm-approve" onclick="window.approveRecuerdo(\'' + r.id + '\')" aria-label="Abrir modal de aprobación">✓ APROBAR</button> ' +
+              '<button class="btn-sm btn-sm-edit" onclick="window.editRecuerdo(\'' + r.id + '\')" aria-label="Editar recuerdo">✎ Editar</button> ' +
+              '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo permanentemente">✕ ELIMINAR</button>' +
+            '</td></tr>';
+        });
+        html += '</tbody></table>';
+        list.innerHTML = html;
+      } catch (err) {
+        if (err.message !== 'Sesión expirada') showToast('Error al cargar pendientes', 'error');
+      }
+    }
+
+    // ─── Modal de revisión detallada ───
+    var _reviewTargetId = null;
+    var reviewModal = document.getElementById('review-modal');
+    var reviewImg = document.getElementById('review-img');
+    var reviewText = document.getElementById('review-text');
+
+    function closeReviewModal() {
+      _reviewTargetId = null;
+      if (reviewModal) reviewModal.style.display = 'none';
+    }
+
+    window.verCompleto = async function(id) {
+      try {
+        var s = await waitForSupabase();
+        if (!s) return;
+        var { data, error } = await s
+          .from('recuerdos')
+          .select('id, nombre, url_archivo, mensaje_largo, mensaje')
+          .eq('id', id)
+          .single();
+        if (error) throw error;
+        if (!data) return;
+
+        _reviewTargetId = id;
+
+        if (reviewImg) {
+          reviewImg.src = data.url_archivo || '';
+          reviewImg.style.display = data.url_archivo ? 'block' : 'none';
+          if (!data.url_archivo) {
+          reviewImg.alt = data.nombre ? 'Imagen aportada por ' + data.nombre : 'Archivo no disponible';
+          }
+        }
+        if (reviewText) {
+          reviewText.textContent = data.mensaje_largo || data.mensaje || 'Sin contenido.';
+        }
+        if (reviewModal) reviewModal.style.display = 'flex';
+      } catch (err) {
+        console.error('[Review] Error:', err);
+        showToast('Error al cargar detalle', 'error');
+      }
+    };
+
+    if (reviewModal) {
+      var btnReviewClose = document.getElementById('btn-review-close');
+      if (btnReviewClose) btnReviewClose.addEventListener('click', closeReviewModal);
+      reviewModal.addEventListener('click', function (e) {
+        if (e.target === reviewModal) closeReviewModal();
+      });
+    }
+
+    // ─── Approved ───
+    async function loadApproved() {
+      try {
+        var s = await waitForSupabase();
+        if (!s) return;
+        var { data } = await s.from('recuerdos').select('*').eq('aprobado', true).order('created_at', { ascending: false });
+        var approved = data || [];
+        var list = document.getElementById('approved-list');
+        if (approved.length === 0) {
+          list.innerHTML = '<div class="empty-state"><div class="icon">📸</div><div class="text">No hay recuerdos aprobados</div></div>';
+          return;
+        }
+        var html = '<table><thead><tr><th>Nombre</th><th class="hide-mobile">Tipo</th><th class="hide-mobile">Fecha</th><th>Acción</th></tr></thead><tbody>';
+        approved.forEach(function(r) {
+          var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL') : '—';
+          html += '<tr>' +
+            '<td class="truncate">' + escapeHtml(r.nombre) + '</td>' +
+            '<td class="hide-mobile"><span class="badge badge-approved">' + (r.tipo_archivo && r.tipo_archivo.indexOf('audio') !== -1 ? 'Audio' : 'Imagen') + '</span></td>' +
+            '<td class="hide-mobile">' + fecha + '</td>' +
+            '<td style="white-space:nowrap;">' +
+              '<button class="btn-sm btn-sm-edit" onclick="window.editRecuerdo(\'' + r.id + '\')" aria-label="Editar recuerdo de ' + escapeHtml(r.nombre) + '" style="margin-right:4px;">✎ Editar</button>' +
+              '<button class="btn-sm btn-sm-danger" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo aprobado de ' + escapeHtml(r.nombre) + '">✕ Eliminar</button></td></tr>';
+        });
+        html += '</tbody></table>';
+        list.innerHTML = html;
+      } catch (err) {
+        if (err.message !== 'Sesión expirada') showToast('Error al cargar aprobados', 'error');
+      }
+    }
+
+    // ─── Edit Modal ───
+    var _editTargetId = null;
+    var editModal = document.getElementById('edit-modal');
+    var editSeccion = document.getElementById('edit-seccion');
+    var editNombre = document.getElementById('edit-nombre');
+    var editTitulo = document.getElementById('edit-titulo');
+    var editSerie = document.getElementById('edit-serie');
+    var editTexto = document.getElementById('edit-texto');
+    var editGeo = document.getElementById('edit-geo');
+    var editTags = document.getElementById('edit-tags');
+    var btnEditCancel = document.getElementById('btn-edit-cancel');
+    var btnEditSave = document.getElementById('btn-edit-save');
+
+    window.editRecuerdo = async function(id) {
+      _editTargetId = id;
+      try {
+        var s = await waitForSupabase();
+        if (!s) { showToast('Cliente Supabase no disponible', 'error'); return; }
+        var { data: r, error } = await s.from('recuerdos').select('*').eq('id', id).single();
+        if (error) { showToast('Error al cargar datos', 'error'); return; }
+        if (editSeccion) editSeccion.value = r.seccion || 'Galeria';
+        if (editNombre) editNombre.value = r.nombre || '';
+        if (editTitulo) editTitulo.value = r.titulo_relato || '';
+        if (editSerie) editSerie.value = r.nombre_serie || '';
+        if (editTexto) editTexto.value = r.mensaje_largo || r.mensaje || '';
+        if (editGeo) editGeo.value = r.geolocalizacion || '';
+        if (editTags) editTags.value = (r.tags && Array.isArray(r.tags)) ? r.tags.join(', ') : (r.tags || '');
+        if (editModal) editModal.style.display = 'flex';
+      } catch (err) {
+        showToast('Error al cargar datos', 'error');
+      }
+    };
+
+    function closeEditModal() {
+      _editTargetId = null;
+      if (editModal) editModal.style.display = 'none';
+    }
+
+    if (btnEditCancel) btnEditCancel.addEventListener('click', closeEditModal);
+    if (editModal) {
+      editModal.addEventListener('click', function (e) {
+        if (e.target === editModal) closeEditModal();
+      });
+    }
+
+    if (btnEditSave) {
+      btnEditSave.addEventListener('click', async function () {
+        var id = _editTargetId;
+        if (!id) { closeEditModal(); return; }
+
+        var seccion = editSeccion ? editSeccion.value : 'Galeria';
+        var nombre = editNombre ? editNombre.value.trim() : '';
+        var titulo = editTitulo ? editTitulo.value.trim() : '';
+        var serie = editSerie ? editSerie.value.trim() : '';
+        var texto = editTexto ? editTexto.value.trim() : '';
+        var geo = editGeo ? editGeo.value.trim() : '';
+        var tagsRaw = editTags ? editTags.value.trim() : '';
+        var tags = tagsRaw ? tagsRaw.split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t.length > 0; }) : null;
+
+        btnEditSave.textContent = 'Guardando...';
+        btnEditSave.disabled = true;
+
+        try {
+          var s = getSupabaseClient();
+          if (!s) throw new Error('Cliente Supabase no disponible');
+
+          var updateData = {
+            seccion: seccion,
+            nombre: nombre || null,
+            titulo_relato: titulo || null,
+            nombre_serie: serie || null,
+            mensaje_largo: texto || null,
+            geolocalizacion: geo || null,
+            tags: tags
+          };
+
+          var { error: updateError } = await s
+            .from('recuerdos')
+            .update(updateData)
+            .eq('id', id);
+
+          if (updateError) throw updateError;
+
+          showToast('Recuerdo actualizado', 'success');
+          registrarAuditoria('update', 'recuerdo', id, { seccion: seccion, campos: Object.keys(updateData) });
+          closeEditModal();
+          loadPending();
+          loadApproved();
+          loadHistory();
+          loadDashboard();
+        } catch (err) {
+          console.error('[Editar] Error:', err);
+          showToast('Error al guardar: ' + (err.message || 'desconocido'), 'error');
+        } finally {
+          btnEditSave.textContent = '✓ GUARDAR';
+          btnEditSave.disabled = false;
+        }
+      });
+    }
+
+    // ─── Historial ───
+    var _historyData = [];
+
+    async function loadHistory() {
+      try {
+        var s = await waitForSupabase();
+        if (!s) return;
+        var [recuerdosResult, auditResult] = await Promise.all([
+          s.from('recuerdos').select('*').order('created_at', { ascending: false }),
+          s.from('audit_log').select('*').eq('accion', 'reject').order('created_at', { ascending: false })
+        ]);
+        if (recuerdosResult.error) throw recuerdosResult.error;
+
+        var records = (recuerdosResult.data || []).slice();
+
+        // Add soft-deleted records reconstructed from audit_log snapshots
+        if (auditResult.data && !auditResult.error) {
+          auditResult.data.forEach(function(log) {
+            var snap = log.metadata && log.metadata.record_snapshot;
+            if (snap) {
+              snap._deleted = true;
+              snap._deleted_at = log.created_at;
+              snap._deleted_reason = (log.metadata && log.metadata.razon) || 'Eliminado';
+              // Ensure id is a number for compatibility
+              if (typeof snap.id === 'string') snap.id = Number(snap.id);
+              records.push(snap);
+            }
+          });
+        }
+
+        // Sort by created_at descending
+        records.sort(function(a, b) {
+          var da = a.created_at ? new Date(a.created_at).getTime() : 0;
+          var db = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return db - da;
+        });
+
+        _historyData = records;
+        document.getElementById('history-count').textContent = _historyData.length;
+        renderHistoryTable(_historyData);
+      } catch (err) {
+        if (err.message !== 'Sesión expirada') showToast('Error al cargar historial', 'error');
+      }
+    }
+
+    function renderHistoryTable(records) {
+      var list = document.getElementById('history-list');
+      if (!list) return;
+
+      if (records.length === 0) {
+        list.innerHTML = '<div class="empty-state"><div class="icon">📋</div><div class="text">No hay registros</div></div>';
+        return;
+      }
+
+      var html = '<table><thead><tr><th>Fecha</th><th>Pseudónimo</th><th>Título</th><th>Sección</th><th>Estado</th><th>Acción</th></tr></thead><tbody>';
+      records.forEach(function(r) {
+        var fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL') : '—';
+        var nombre = escapeHtml(r.nombre || 'Anónimo');
+        var titulo = escapeHtml(r.titulo_relato || r.nombre || '—');
+        var seccionLabel = nombreSeccion(r.seccion);
+
+        var estadoBadge;
+        if (r._deleted) {
+          var razon = r._deleted_reason || 'Eliminado';
+          fecha = r._deleted_at ? new Date(r._deleted_at).toLocaleDateString('es-CL') : fecha;
+          estadoBadge = '<span class="badge" style="background:rgba(229,9,20,0.12);color:#ef5350;text-decoration:line-through;">✕ ' + escapeHtml(razon) + '</span>';
+        } else if (r.aprobado) {
+          estadoBadge = '<span class="badge badge-approved">Publicado</span>';
+        } else {
+          estadoBadge = '<span class="badge badge-pending">Pendiente</span>';
+        }
+
+        var actionsHtml;
+        if (r._deleted) {
+          actionsHtml = '<span style="color:#555;font-size:11px;">Registro histórico</span>';
+        } else {
+          var editBtn = '<button class="btn-sm btn-sm-edit" onclick="window.editRecuerdo(\'' + r.id + '\')" aria-label="Editar recuerdo de ' + nombre + '">✎ Editar</button>';
+          var deleteBtn = '<button class="btn-sm btn-sm-reject" onclick="window.rejectRecuerdo(\'' + r.id + '\')" aria-label="Eliminar recuerdo de ' + nombre + '" style="margin-left:4px;">✕ Eliminar</button>';
+          actionsHtml = editBtn + deleteBtn;
+        }
+
+        html += '<tr' + (r._deleted ? ' style="opacity:0.6;"' : '') + '>' +
+          '<td style="white-space:nowrap;">' + fecha + '</td>' +
+          '<td class="truncate">' + nombre + '</td>' +
+          '<td class="truncate">' + titulo + '</td>' +
+          '<td>' + seccionLabel + '</td>' +
+          '<td>' + estadoBadge + '</td>' +
+          '<td style="white-space:nowrap;">' + actionsHtml + '</td></tr>';
+      });
+      html += '</tbody></table>';
+      list.innerHTML = html;
+    }
+
+    // ─── History search / filter ───
+    function applyHistoryFilters() {
+      var search = document.getElementById('history-search');
+      var filterSection = document.getElementById('history-filter-section');
+      var filterStatus = document.getElementById('history-filter-status');
+      if (!search || !filterSection || !filterStatus) return;
+
+      var query = (search.value || '').toLowerCase().trim();
+      var sectionVal = filterSection.value;
+      var statusVal = filterStatus.value;
+
+      var filtered = _historyData.filter(function(r) {
+        if (sectionVal && r.seccion !== sectionVal) return false;
+        if (statusVal === 'aprobado' && (r._deleted || !r.aprobado)) return false;
+        if (statusVal === 'pendiente' && (r._deleted || r.aprobado)) return false;
+        if (query) {
+          var haystack = ((r.nombre || '') + ' ' + (r.titulo_relato || '') + ' ' + (r.mensaje_largo || r.mensaje || '') + ' ' + (r.seccion || '')).toLowerCase();
+          if (haystack.indexOf(query) === -1) return false;
+        }
+        return true;
+      });
+
+      renderHistoryTable(filtered);
+    }
+
+    // Debounced search
+    var _searchTimer = null;
+    function setupHistoryFilters() {
+      var search = document.getElementById('history-search');
+      var filterSection = document.getElementById('history-filter-section');
+      var filterStatus = document.getElementById('history-filter-status');
+      if (search) {
+        search.addEventListener('input', function() {
+          clearTimeout(_searchTimer);
+          _searchTimer = setTimeout(applyHistoryFilters, 250);
+        });
+      }
+      if (filterSection) filterSection.addEventListener('change', applyHistoryFilters);
+      if (filterStatus) filterStatus.addEventListener('change', applyHistoryFilters);
+    }
+    setTimeout(setupHistoryFilters, 200);
+
+    // ─── Modal de aprobación ───
+    var _approvalTargetId = null;
+    var approvalModal = document.getElementById('approval-modal');
+    var approvalSeccion = document.getElementById('approval-seccion');
+    var approvalTextoLargo = document.getElementById('approval-textolargo');
+    var approvalTextoLargoStd = document.getElementById('approval-textolargo-std');
+    var approvalTitulo = document.getElementById('approval-titulo');
+    var approvalSerie = document.getElementById('approval-serie');
+    var approvalRelatoFields = document.getElementById('approval-relato-fields');
+    var approvalStdFields = document.getElementById('approval-standard-fields');
+    var approvalDestacado = document.getElementById('approval-destacado');
+    var btnApprovalCancel = document.getElementById('btn-approval-cancel');
+    var btnApprovalConfirm = document.getElementById('btn-approval-confirm');
+
+    function toggleApprovalRelatoFields() {
+      var val = approvalSeccion ? approvalSeccion.value : '';
+      if (val === 'Relatos: El Jano' || val === 'Relatos: El Arca' || val === 'Relatos: Otras organizaciones' || val === 'Relatos: Anecdotas') {
+        approvalRelatoFields.style.display = 'block';
+        approvalStdFields.style.display = 'none';
+      } else {
+        approvalRelatoFields.style.display = 'none';
+        approvalStdFields.style.display = 'block';
+      }
+    }
+
+    if (approvalSeccion) {
+      approvalSeccion.addEventListener('change', toggleApprovalRelatoFields);
+    }
+
+    window.approveRecuerdo = function(id) {
+      _approvalTargetId = id;
+      var record = null;
+      if (window._pendingRecords) {
+        for (var i = 0; i < window._pendingRecords.length; i++) {
+          if (String(window._pendingRecords[i].id) === String(id)) { record = window._pendingRecords[i]; break; }
+        }
+      }
+      if (approvalSeccion) {
+        var seccionActual = (record && record.seccion) || 'Galeria';
+        var validSections = ['Galeria','Videos y Audios','Relatos: El Jano','Relatos: El Arca','Relatos: Otras organizaciones','Relatos: Anecdotas'];
+        if (validSections.indexOf(seccionActual) !== -1) {
+          approvalSeccion.value = seccionActual;
+        }
+      }
+      toggleApprovalRelatoFields();
+      var txt = (record && (record.mensaje_largo || record.mensaje)) || '';
+      if (approvalTextoLargo) approvalTextoLargo.value = txt;
+      if (approvalTextoLargoStd) approvalTextoLargoStd.value = txt;
+      if (approvalTitulo) approvalTitulo.value = (record && (record.titulo_relato || record.nombre || '')) || '';
+      if (approvalSerie) approvalSerie.value = (record && record.nombre_serie) || '';
+      if (approvalDestacado) approvalDestacado.checked = (record && record.destacado === true);
+      if (approvalModal) approvalModal.style.display = 'flex';
+    };
+
+    function closeApprovalModal() {
+      _approvalTargetId = null;
+      if (approvalModal) approvalModal.style.display = 'none';
+    }
+
+    if (btnApprovalCancel) btnApprovalCancel.addEventListener('click', closeApprovalModal);
+
+    if (approvalModal) {
+      approvalModal.addEventListener('click', function (e) {
+        if (e.target === approvalModal) closeApprovalModal();
+      });
+    }
+
+    if (btnApprovalConfirm) {
+      btnApprovalConfirm.addEventListener('click', async function () {
+        var id = _approvalTargetId;
+        if (!id) { closeApprovalModal(); return; }
+
+        var seccion = approvalSeccion ? approvalSeccion.value : 'Galeria';
+        if (!validarSeccion(seccion)) return;
+        var textoLargo = '';
+        var tituloRelato = '';
+        var nombreSerie = '';
+        if (seccion === 'Relatos: El Jano' || seccion === 'Relatos: El Arca' || seccion === 'Relatos: Otras organizaciones' || seccion === 'Relatos: Anecdotas') {
+          textoLargo = approvalTextoLargo ? approvalTextoLargo.value.trim() : '';
+          tituloRelato = approvalTitulo ? approvalTitulo.value.trim() : '';
+          nombreSerie = approvalSerie ? approvalSerie.value.trim() : '';
+        } else {
+          textoLargo = approvalTextoLargoStd ? approvalTextoLargoStd.value.trim() : '';
+          tituloRelato = approvalTitulo ? approvalTitulo.value.trim() : '';
+        }
+        var destacado = approvalDestacado ? approvalDestacado.checked : false;
+
+        btnApprovalConfirm.textContent = 'Publicando...';
+        btnApprovalConfirm.disabled = true;
+
+        try {
+          var s = getSupabaseClient();
+          if (!s) throw new Error('Cliente Supabase no disponible');
+
+          var updateData = {
+            aprobado: true,
+            seccion: seccion,
+            titulo_relato: tituloRelato || null,
+            nombre_serie: nombreSerie || null,
+            mensaje_largo: textoLargo || null,
+            destacado: destacado,
+            es_efimero: destacado
+          };
+
+          var { error: updateError } = await s
+            .from('recuerdos')
+            .update(updateData)
+            .eq('id', id);
+
+          if (updateError) {
+            console.error('[Aprobar] Error update:', JSON.stringify(updateError, Object.getOwnPropertyNames(updateError)));
+            throw updateError;
+          }
+
+          showToast('Recuerdo aprobado y publicado en ' + (NOMBRES_SECCION[seccion] || seccion), 'success');
+          registrarAuditoria('approve', 'recuerdo', id, { seccion: seccion, titulo: tituloRelato });
+          closeApprovalModal();
+          loadPending();
+          loadDashboard();
+          loadApproved();
+        } catch (err) {
+          console.error('[Aprobar] Error:', err);
+          showToast('Error al aprobar: ' + (err.message || 'desconocido'), 'error');
+        } finally {
+          btnApprovalConfirm.textContent = '✓ CONFIRMAR PUBLICACIÓN';
+          btnApprovalConfirm.disabled = false;
+        }
+      });
+    }
+
+    // ─── Modal de rechazo ───
+    var _rejectionTargetId = null;
+    var rejectionModal = document.getElementById('rejection-modal');
+    var rejectionRazon = document.getElementById('rejection-razon');
+    var rejectionDetalle = document.getElementById('rejection-detalle');
+    var btnRejectionCancel = document.getElementById('btn-rejection-cancel');
+    var btnRejectionConfirm = document.getElementById('btn-rejection-confirm');
+
+    window.rejectRecuerdo = function(id) {
+      _rejectionTargetId = id;
+      if (rejectionModal) rejectionModal.style.display = 'flex';
+    };
+
+    function closeRejectionModal() {
+      _rejectionTargetId = null;
+      if (rejectionModal) rejectionModal.style.display = 'none';
+    }
+
+    if (btnRejectionCancel) btnRejectionCancel.addEventListener('click', closeRejectionModal);
+
+    if (rejectionModal) {
+      rejectionModal.addEventListener('click', function (e) {
+        if (e.target === rejectionModal) closeRejectionModal();
+      });
+    }
+
+    if (btnRejectionConfirm) {
+      btnRejectionConfirm.addEventListener('click', async function () {
+        var id = _rejectionTargetId;
+        if (!id) { closeRejectionModal(); return; }
+
+        var razon = rejectionRazon ? rejectionRazon.value : 'Otro';
+        var detalle = rejectionDetalle ? rejectionDetalle.value.trim() : '';
+
+        btnRejectionConfirm.textContent = 'Eliminando...';
+        btnRejectionConfirm.disabled = true;
+
+        try {
+          var s = await waitForSupabase();
+          if (!s) throw new Error('Cliente Supabase no disponible');
+
+          // 1. Fetch full record before deleting (for history)
+          var { data: recordToDelete, error: fetchError } = await s
+            .from('recuerdos')
+            .select('*')
+            .eq('id', id)
+            .single();
+          if (fetchError) throw fetchError;
+
+          // 2. Save full record + rejection reason in audit_log as soft-delete backup
+          var { error: auditError } = await s
+            .from('audit_log')
+            .insert({
+              accion: 'reject',
+              entidad: 'recuerdo',
+              entidad_id: Number(id),
+              usuario_id: (userData && userData.id) || null,
+              usuario_email: (userData && userData.email) || null,
+              metadata: {
+                razon: razon,
+                detalle: detalle || null,
+                record_snapshot: recordToDelete
+              }
+            });
+          if (auditError) console.warn('[Rechazo] Error al guardar snapshot en audit_log:', auditError.message);
+
+          // 3. Also save to rechazos table
+          var { error: logError } = await s
+            .from('rechazos')
+            .insert({
+              recuerdo_id: Number(id),
+              razon: razon,
+              detalle: detalle || null,
+              revisado_por: (userData && userData.email) || 'admin'
+            });
+          if (logError) console.warn('[Rechazo] No se pudo registrar en rechazos:', logError.message);
+
+          // 4. Hard delete from recuerdos
+          var { error: deleteError } = await s.from('recuerdos').delete().eq('id', id);
+          if (deleteError) throw deleteError;
+
+          showToast('Recuerdo eliminado (motivo: ' + razon + ')', 'info');
+          closeRejectionModal();
+          loadPending();
+          loadApproved();
+          loadHistory();
+          loadDashboard();
+        } catch (err) {
+          console.error('[Rechazar] Error:', err);
+          if (err.message !== 'Sesión expirada') showToast('Error al eliminar', 'error');
+        } finally {
+          btnRejectionConfirm.textContent = '✕ ELIMINAR';
+          btnRejectionConfirm.disabled = false;
+        }
+      });
+    }
+
+    window.rejectRecuerdoDirecto = window.rejectRecuerdo;
+
+    // ─── Música: Reproductor de previsualización ───
+    var _musicPreviewAudio = null;
+
+    function getMusicPreviewAudio() {
+      if (!_musicPreviewAudio) {
+        _musicPreviewAudio = new Audio();
+        _musicPreviewAudio.style.display = 'none';
+        document.body.appendChild(_musicPreviewAudio);
+      }
+      return _musicPreviewAudio;
+    }
+
+    function detenerPreview() {
+      var a = getMusicPreviewAudio();
+      a.pause();
+      a.currentTime = 0;
+      a.src = '';
+    }
+
+    // ─── Listado único de canciones (con PLAY + ELIMINAR) ───
+    var _cancionesRenderizadas = {};
+
+    async function actualizarListadoMusica() {
+      try {
+        var s = await waitForSupabase();
+        if (!s) return;
+        var { data, error } = await s
+          .from('musica_reproductor')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        var canciones = data || [];
+
+        var contenedor = document.getElementById('contenedor-canciones');
+        if (!contenedor) return;
+
+        contenedor.innerHTML = '';
+
+        if (canciones.length === 0) {
+          contenedor.innerHTML = '<div class="empty-state" style="padding:20px 0;"><div class="icon">🎶</div><div class="text">No hay canciones subidas</div></div>';
+          _cancionesRenderizadas = {};
+          return;
+        }
+
+        var added = {};
+        canciones.forEach(function(c) {
+          var id = String(c.id);
+          if (added[id]) return;
+          added[id] = true;
+
+          var card = document.createElement('div');
+          card.className = 'song-item';
+          card.dataset.id = id;
+          var badgeHtml = c.activo
+            ? '<span class="badge badge-approved" style="font-size:10px;margin-left:8px;">AL AIRE</span>'
+            : '';
+          card.innerHTML =
+            '<div class="song-info">' +
+              '<div class="song-title">' + escapeHtml(c.titulo) + ' ' + badgeHtml + '</div>' +
+              '<div class="song-artist">' + escapeHtml(c.artista || 'El Arca') + '</div>' +
+            '</div>' +
+            '<div class="song-actions">' +
+              '<button class="btn-sm btn-sm-approve" onclick="window.previsualizarMusica(\'' + escapeHtml(c.url_mp3) + '\')" title="Previsualizar" aria-label="Reproducir previsualización de ' + escapeHtml(c.titulo) + '">▶ PLAY</button> ' +
+              '<button class="btn-sm btn-sm-reject" onclick="window.eliminarCancion(\'' + id + '\')" aria-label="Eliminar canción ' + escapeHtml(c.titulo) + '">✕ ELIMINAR</button>' +
+            '</div>';
+          contenedor.appendChild(card);
+        });
+        _cancionesRenderizadas = added;
+      } catch (err) {
+        if (err.message !== 'Sesión expirada') showToast('Error al cargar canciones', 'error');
+      }
+    }
+
+    window.previsualizarMusica = function(url) {
+      if (!url) { showToast('URL de audio no disponible', 'error'); return; }
+      var a = getMusicPreviewAudio();
+      if (a.src === url && !a.paused) {
+        a.pause();
+        showToast('Previsualización detenida', 'info');
+        return;
+      }
+      a.src = url;
+      a.play().then(function() {
+        showToast('Reproduciendo previsualización', 'success');
+      }).catch(function(err) {
+        console.error('[Preview] Error al reproducir:', err);
+        showToast('Error al reproducir audio', 'error');
+      });
+    };
+
+    // ─── Eliminar canción (BD + Storage) ───
+    window.eliminarCancion = async function(id) {
+      if (!confirm('¿Eliminar esta canción permanentemente?')) return;
+      try {
+        var s = getSupabaseClient();
+        if (!s) throw new Error('Cliente Supabase no disponible');
+
+        var { data: cancion, error: fetchError } = await s
+          .from('musica_reproductor')
+          .select('storage_path')
+          .eq('id', id)
+          .single();
+        if (fetchError) throw fetchError;
+
+        if (cancion && cancion.storage_path) {
+          var { error: storageError } = await s.storage
+            .from('elarca-uploads')
+            .remove([cancion.storage_path]);
+          if (storageError) console.error('[EliminarCancion] Error al eliminar de Storage:', storageError);
+        }
+
+        var { error: deleteError } = await s.from('musica_reproductor').delete().eq('id', id);
+        if (deleteError) throw deleteError;
+
+        detenerPreview();
+        showToast('Canción eliminada', 'info');
+        registrarAuditoria('delete', 'musica', id, { storage_path: cancion?.storage_path });
+        actualizarListadoMusica();
+        refrescarContadores();
+        cargarAhoraSuena();
+      } catch (err) {
+        if (err.message !== 'Sesión expirada') showToast('Error al eliminar', 'error');
+      }
+    };
+
+    // Mantener alias para compatibilidad
+    window.deleteMusic = window.eliminarCancion;
+
+    // ─── Music Upload ───
+    var musicUploadArea = document.getElementById('music-upload-area');
+    var musicFileInput = document.getElementById('music-file');
+    var musicFileInfo = document.getElementById('music-file-info');
+    var musicUploadText = document.getElementById('music-upload-text');
+
+    musicUploadArea.addEventListener('click', function() { musicFileInput.click(); });
+    musicFileInput.addEventListener('change', function() {
+      var file = musicFileInput.files ? musicFileInput.files[0] : null;
+      if (file) {
+        if (file.type !== 'audio/mpeg' && !file.name.toLowerCase().endsWith('.mp3')) {
+          musicFileInfo.textContent = 'Formato no válido. Solo MP3.';
+          musicFileInfo.style.color = '#E50914';
+          musicFileInput.value = '';
+          return;
+        }
+        if (file.size > 50 * 1024 * 1024) {
+          musicFileInfo.textContent = 'El archivo supera los 50 MB.';
+          musicFileInfo.style.color = '#E50914';
+          musicFileInput.value = '';
+          return;
+        }
+        musicFileInfo.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(1) + ' MB)';
+        musicFileInfo.style.color = '#66bb6a';
+        musicUploadText.textContent = file.name;
+      }
+    });
+
+    document.getElementById('music-upload-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var titulo = document.getElementById('music-titulo').value.trim();
+      var artista = document.getElementById('music-artista').value.trim() || 'El Arca';
+      var file = musicFileInput && musicFileInput.files ? musicFileInput.files[0] : null;
+      if (!file) { showToast('Selecciona un archivo MP3', 'error'); return; }
+      if (!titulo) { showToast('Ingresa el título', 'error'); return; }
+
+      var btn = document.getElementById('btn-upload-music');
+
+      procesarSubida(btn, async function() {
+        var s = getSupabaseClient();
+        if (!s) throw new Error('Cliente Supabase no disponible');
+
+        var fileName = 'musica/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+        var { error: uploadError } = await s.storage
+          .from('elarca-uploads')
+          .upload(fileName, file, { contentType: file.type });
+        if (uploadError) throw uploadError;
+
+        var { data: { publicUrl } } = s.storage
+          .from('elarca-uploads')
+          .getPublicUrl(fileName);
+
+        var { error: insertError } = await s
+          .from('musica_reproductor')
+          .insert({
+            titulo: titulo,
+            artista: artista,
+            url_mp3: publicUrl,
+            storage_path: fileName,
+            activo: true,
+            orden: 0
+          });
+        if (insertError) throw insertError;
+
+        registrarAuditoria('admin_upload', 'musica', null, { titulo: titulo, artista: artista, archivo: fileName });
+
+        document.getElementById('music-upload-form').reset();
+        musicFileInfo.textContent = '';
+        musicUploadText.textContent = 'Haz clic para seleccionar archivo MP3';
+        actualizarListadoMusica();
+        loadDashboard();
+      });
+    });
+
+    // ═══════════════════════════════════════════════
+    // FORMULARIO DINÁMICO — Subida Manual
+    // ═══════════════════════════════════════════════
+
+    var SECCIONES_VALIDAS = [
+      'Galeria', 'Videos y Audios',
+      'Relatos: El Jano', 'Relatos: El Arca', 'Relatos: Otras organizaciones',
+      'Relatos: Anecdotas'
+    ];
+
+    function validarSeccion(seccion) {
+      if (!seccion || SECCIONES_VALIDAS.indexOf(seccion) === -1) {
+        alert('Error: Categoría no válida. Selecciona una sección correcta.');
+        return false;
+      }
+      return true;
+    }
+
+    var SECCIONES_CONFIG = {
+      'Galeria': {
+        label: 'Galería',
+        fields: ['imagen'],
+        requireFile: true,
+        requireTexto: false
+      },
+      'Videos y Audios': {
+        label: 'Videos y Audios',
+        fields: ['multimedia'],
+        requireFile: true,
+        requireTexto: false
+      },
+      'Relatos: El Jano': {
+        label: 'Relatos: El Jano',
+        fields: ['archivo_opcional', 'texto_largo'],
+        requireFile: false,
+        requireTexto: true
+      },
+      'Relatos: El Arca': {
+        label: 'Relatos: El Arca',
+        fields: ['archivo_opcional', 'texto_largo'],
+        requireFile: false,
+        requireTexto: true
+      },
+      'Relatos: Otras organizaciones': {
+        label: 'Relatos: Otras organizaciones',
+        fields: ['archivo_opcional', 'texto_largo'],
+        requireFile: false,
+        requireTexto: true
+      },
+      'Relatos: Anecdotas': {
+        label: 'Relatos: Anecdotas',
+        fields: ['archivo_opcional', 'texto_largo'],
+        requireFile: false,
+        requireTexto: true
+      }
+    };
+
+    var adminUploadSeccion = document.getElementById('admin-upload-seccion');
+    var dynamicContainer = document.getElementById('dynamic-fields-container');
+
+    function renderDynamicFields(val) {
+      var cfg = SECCIONES_CONFIG[val];
+      if (!cfg) { dynamicContainer.innerHTML = ''; return; }
+
+      var html = '';
+
+      // ─── Archivo (obligatorio para galeria/videos, opcional para relatos) ───
+      var isRelato = val.indexOf('Relatos:') === 0;
+      var fileRequired = cfg.requireFile;
+      var acceptAttr = val === 'Galeria' ? '.jpg,.jpeg,.png,.webp' : '.jpg,.jpeg,.png,.webp,.mp4,.mp3,.wav';
+      var hintText = val === 'Galeria' ? 'JPG, PNG, WebP · Máximo 50 MB' : (val === 'Videos y Audios' ? 'MP4, MP3, WAV, JPG, PNG · Máximo 50 MB' : 'JPG, PNG, MP4, MP3, WAV · Opcional · Máximo 50 MB');
+
+      html += '<div class="form-group">' +
+        '<label>Archivo' + (fileRequired ? ' <span style="color:var(--color-mir);">*</span>' : ' (opcional)') + '</label>' +
+        '<div style="font-size:11px;color:#666;margin-bottom:6px;">Sube un archivo <strong>o</strong> ingresa un link externo (YouTube, Facebook, audio directo).</div>' +
+        '<div class="upload-area" id="admin-upload-area">' +
+          '<div class="icon">📁</div>' +
+          '<div class="text" id="admin-upload-text">Haz clic para seleccionar archivo</div>' +
+          '<div class="hint">' + hintText + '</div>' +
+          '<input type="file" id="admin-upload-file" accept="' + acceptAttr + '" style="display:none">' +
+        '</div>' +
+        '<div class="file-info" id="admin-upload-file-info"></div>' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label>Link externo (opcional)</label>' +
+        '<input type="url" id="admin-upload-link" placeholder="https://www.youtube.com/watch?v=... o https://facebook.com/... o https://ejemplo.com/audio.mp3" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">' +
+        '<div style="font-size:11px;color:#666;margin-top:4px;">Si no adjuntas archivo, este link se usará para mostrar el contenido embebido en la página.</div>' +
+      '</div>';
+
+      // ─── Texto largo (solo para relatos) ───
+      if (isRelato) {
+        html += '<div class="form-group">' +
+          '<label>Serie / Colección</label>' +
+          '<input type="text" id="admin-upload-serie" placeholder="Ej: Memorias de La Pintana, Archivo sonoro..." style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label>Texto largo (cuerpo del relato) <span style="color:var(--color-mir);">*</span></label>' +
+          '<div style="background:var(--color-acero);border:1px solid #333;border-radius:8px;overflow:hidden;">' +
+            '<div id="editor-toolbar" style="display:flex;gap:4px;padding:6px 8px;border-bottom:1px solid #333;background:var(--color-plata);">' +
+              '<button type="button" class="editor-btn" data-tag="b" title="Negrita" style="padding:6px 12px;background:transparent;border:1px solid #555;border-radius:4px;color:white;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s;">B</button>' +
+              '<button type="button" class="editor-btn" data-tag="i" title="Cursiva" style="padding:6px 12px;background:transparent;border:1px solid #555;border-radius:4px;color:white;font-style:italic;font-size:13px;cursor:pointer;transition:all 0.2s;">I</button>' +
+              '<button type="button" class="editor-btn" data-tag="u" title="Subrayado" style="padding:6px 12px;background:transparent;border:1px solid #555;border-radius:4px;color:white;text-decoration:underline;font-size:13px;cursor:pointer;transition:all 0.2s;">U</button>' +
+              '<span style="flex:1;"></span>' +
+              '<span style="font-size:10px;color:#666;align-self:center;">Modo HTML</span>' +
+            '</div>' +
+            '<textarea id="admin-upload-textolargo" rows="12" style="width:100%;padding:10px 14px;background:var(--color-acero);border:none;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Escribe o pega aquí el contenido del relato... Puedes usar los botones B / I / U para dar formato."></textarea>' +
+          '</div>' +
+        '</div>';
+      }
+
+      // ─── Descripción (galeria / videos) ───
+      if (!isRelato) {
+        html += '<div class="form-group">' +
+          '<label>Descripción</label>' +
+          '<textarea id="admin-upload-descripcion" rows="4" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Descripción del contenido..."></textarea>' +
+        '</div>';
+      }
+
+      dynamicContainer.innerHTML = html;
+
+      // ─── Re-bind file input ───
+      bindFileUpload();
+
+      // ─── Re-bind editor toolbar ───
+      bindEditorToolbar();
+    }
+
+    function bindFileUpload() {
+      var area = document.getElementById('admin-upload-area');
+      var input = document.getElementById('admin-upload-file');
+      var info = document.getElementById('admin-upload-file-info');
+      var text = document.getElementById('admin-upload-text');
+      if (!area || !input) return;
+
+      area.onclick = function() { input.click(); };
+      input.onchange = function() {
+        var file = input.files ? input.files[0] : null;
+        if (!file) { if (info) info.textContent = ''; return; }
+        if (file.size > 50 * 1024 * 1024) {
+          if (info) { info.textContent = 'El archivo supera los 50 MB.'; info.style.color = '#E50914'; }
+          input.value = '';
+          return;
+        }
+        if (info) { info.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(1) + ' MB)'; info.style.color = '#66bb6a'; }
+        if (text) text.textContent = file.name;
+      };
+    }
+
+    function bindEditorToolbar() {
+      document.querySelectorAll('.editor-btn').forEach(function(btn) {
+        btn.onclick = function(e) {
+          e.preventDefault();
+          var tag = this.getAttribute('data-tag');
+          var textarea = document.getElementById('admin-upload-textolargo');
+          if (!textarea) return;
+          var start = textarea.selectionStart;
+          var end = textarea.selectionEnd;
+          var text = textarea.value;
+          var selected = text.substring(start, end);
+          var replacement = selected
+            ? '<' + tag + '>' + selected + '</' + tag + '>'
+            : '<' + tag + '></' + tag + '>';
+          textarea.value = text.substring(0, start) + replacement + text.substring(end);
+          textarea.focus();
+          textarea.setSelectionRange(start + replacement.length, start + replacement.length);
+        };
+      });
+    }
+
+    // ─── Sección change ───
+    if (adminUploadSeccion) {
+      adminUploadSeccion.addEventListener('change', function() {
+        renderDynamicFields(this.value);
+      });
+    }
+
+    // ─── Init first render ───
+    setTimeout(function() {
+      if (adminUploadSeccion) renderDynamicFields(adminUploadSeccion.value);
+    }, 100);
+
+    // ─── Submit ───
+    document.getElementById('admin-upload-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      var btn = document.getElementById('btn-admin-upload');
+      var s = getSupabaseClient();
+      if (!s) { showToast('Cliente Supabase no disponible', 'error'); return; }
+
+      var seccion = adminUploadSeccion.value;
+      var cfg = SECCIONES_CONFIG[seccion];
+      var isRelato = seccion.indexOf('Relatos:') === 0;
+
+      var titulo = document.getElementById('admin-upload-titulo').value.trim();
+      var descripcion = isRelato ? '' : (document.getElementById('admin-upload-descripcion') ? document.getElementById('admin-upload-descripcion').value.trim() : '');
+      var textoLargo = isRelato ? (document.getElementById('admin-upload-textolargo') ? document.getElementById('admin-upload-textolargo').value.trim() : '') : '';
+      var nombreSerie = isRelato ? (document.getElementById('admin-upload-serie') ? document.getElementById('admin-upload-serie').value.trim() : '') : '';
+      var fileInput = document.getElementById('admin-upload-file');
+      var file = fileInput && fileInput.files ? fileInput.files[0] : null;
+      var linkInput = document.getElementById('admin-upload-link');
+      var linkUrl = linkInput ? linkInput.value.trim() : '';
+      var destacado = document.getElementById('admin-upload-destacado').checked;
+
+      // ─── Sanitizar HTML (solo b, i, u) ───
+      if (textoLargo) {
+        textoLargo = textoLargo
+          .replace(/<script[^>]*>.*?<\/script>/gi, '')
+          .replace(/on\w+=["'][^"']*["']/gi, '')
+          .replace(/<[^>]*>/g, function(m) {
+            var allowed = ['<b>','</b>','<i>','</i>','<u>','</u>','<br>','<br/>','<br />'];
+            if (allowed.indexOf(m.toLowerCase()) !== -1) return m;
+            if (/^<br\s*\/?>$/i.test(m)) return '<br>';
+            return '';
+          });
+      }
+
+      // ─── Validaciones ───
+      if (!titulo) { showToast('El campo "Título" es obligatorio.', 'error'); return; }
+      if (cfg.requireFile && !file && !linkUrl) { showToast('Debes seleccionar un archivo o ingresar un link para esta sección.', 'error'); return; }
+      if (isRelato && !textoLargo) { showToast('El campo "Texto largo" es obligatorio para relatos.', 'error'); return; }
+      if (!file && !linkUrl && !textoLargo && !descripcion) { showToast('Agrega al menos un archivo, link, texto o descripción.', 'error'); return; }
+
+      // ─── Metadatos ───
+      var adminGeo = document.getElementById('admin-upload-geo');
+      var adminFecha = document.getElementById('admin-upload-fecha');
+      var adminTags = document.getElementById('admin-upload-tags');
+
+      var extraData = {
+        nombre: 'Admin',
+        titulo_relato: titulo,
+        nombre_serie: nombreSerie || null,
+        descripcion: descripcion || textoLargo ? (descripcion || textoLargo.substring(0, 200)) : null,
+        texto_largo: textoLargo || null,
+        url_externo: linkUrl || null,
+        destacado: destacado,
+        es_efimero: destacado,
+        geolocalizacion: adminGeo ? adminGeo.value.trim() || null : null,
+        fecha_creacion_archivo: adminFecha ? adminFecha.value || null : null,
+        tags: null
+      };
+      if (adminTags && adminTags.value.trim()) {
+        extraData.tags = adminTags.value.trim().split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t.length > 0; });
+      }
+
+      procesarSubida(btn, async function() {
+        if (!validarSeccion(seccion)) throw new Error('Sección inválida');
+        if (file && file.size > 0) {
+          await subirArchivo(file, seccion, extraData);
+        } else {
+          var now = new Date().toISOString();
+
+          // Detect type from link URL
+          var tipoDetectado = null;
+          if (linkUrl) {
+            var l = linkUrl.toLowerCase();
+            if (l.indexOf('youtube.com') !== -1 || l.indexOf('youtu.be') !== -1) tipoDetectado = 'video/youtube';
+            else if (l.indexOf('facebook.com') !== -1) tipoDetectado = 'video/facebook';
+            else if (l.match(/\.(mp3|wav|ogg|aac|m4a|flac)(\?|$)/)) tipoDetectado = 'audio/external';
+            else if (l.match(/\.(mp4|webm|ogg|mov|avi)(\?|$)/)) tipoDetectado = 'video/external';
+            else tipoDetectado = 'link';
+          }
+
+          var insertData = {
+            nombre: 'Admin',
+            titulo_relato: titulo || null,
+            nombre_serie: nombreSerie || null,
+            mensaje: extraData.descripcion || null,
+            mensaje_largo: textoLargo || null,
+            url_archivo: linkUrl || null,
+            tipo_archivo: tipoDetectado,
+            seccion: seccion,
+            aprobado: true,
+            destacado: destacado,
+            es_efimero: destacado,
+            fecha_subida: now,
+            geolocalizacion: extraData.geolocalizacion || null,
+            tags: extraData.tags || null,
+            fecha_creacion_archivo: extraData.fecha_creacion_archivo || null
+          };
+          console.log('[submit] InsertData sin archivo:', JSON.stringify(insertData));
+          var { error: insertError } = await s.from('recuerdos').insert(insertData);
+          if (insertError) {
+            console.error('[submit] Error insert sin archivo:', insertError);
+            throw insertError;
+          }
+        }
+
+        document.getElementById('admin-upload-form').reset();
+        if (adminUploadSeccion) renderDynamicFields(adminUploadSeccion.value);
+        if (typeof loadApproved === 'function') loadApproved();
+        if (typeof loadDashboard === 'function') loadDashboard();
+      });
+    });
+
+    // ═══════════════════════════════════════════════
+    // SEGURIDAD — Alertas y monitoreo
+    // ═══════════════════════════════════════════════
+
+    async function loadSecurityEvents() {
+      try {
+        var s = await waitForSupabase();
+        if (!s) return;
+
+        var cutoff = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+
+        var { data, error } = await s
+          .from('audit_log')
+          .select('*')
+          .in('accion', ['login_success', 'login_failed', 'security_file_rejected'])
+          .gte('created_at', cutoff)
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (error) throw error;
+
+        var events = data || [];
+        var countOk = 0, countFail = 0, countRejected = 0;
+
+        events.forEach(function(e) {
+          if (e.accion === 'login_success') countOk++;
+          else if (e.accion === 'login_failed') countFail++;
+          else if (e.accion === 'security_file_rejected') countRejected++;
+        });
+
+        // Merge localStorage events (failed logins captured when table/edge unavailable)
+        try {
+          var localLog = JSON.parse(localStorage.getItem('_audit_local') || '[]');
+          localLog.forEach(function(e) {
+            if (e.success) countOk++;
+            else countFail++;
+          });
+          // Also show recent local events in the events list
+          if (localLog.length > 0 && events.length < 50) {
+            localLog.slice(-10).reverse().forEach(function(e) {
+              events.push({
+                created_at: new Date(e.ts).toISOString(),
+                accion: e.success ? 'login_success' : 'login_failed',
+                usuario_email: e.email,
+                metadata: { error: e.error || null, local: true }
+              });
+            });
+          }
+        } catch (_) {}
+
+        // Update badge in sidebar
+        var alertBadge = document.getElementById('security-alert-badge');
+        var totalAlerts = countFail + countRejected;
+        if (alertBadge) {
+          if (totalAlerts > 0) {
+            alertBadge.style.display = 'inline';
+            alertBadge.textContent = totalAlerts > 99 ? '99+' : String(totalAlerts);
+          } else {
+            alertBadge.style.display = 'none';
+          }
+        }
+
+        // Update security banner
+        var secBanner = document.getElementById('security-banner');
+        var secBannerText = document.getElementById('security-banner-text');
+        if (secBanner && secBannerText) {
+          if (totalAlerts > 0) {
+            secBanner.style.display = 'flex';
+            secBannerText.textContent = countFail + ' intentos de login fallidos · ' + countRejected + ' archivos rechazados';
+          } else {
+            secBanner.style.display = 'none';
+          }
+        }
+
+        // Update stat cards
+        var elOk = document.getElementById('sec-ok-count');
+        var elFail = document.getElementById('sec-fail-count');
+        var elRejected = document.getElementById('sec-rejected-count');
+        if (elOk) elOk.textContent = countOk;
+        if (elFail) elFail.textContent = countFail;
+        if (elRejected) elRejected.textContent = countRejected;
+
+        // Update count badge
+        var countBadge = document.getElementById('security-count-badge');
+        if (countBadge) countBadge.textContent = events.length + ' eventos';
+
+        // Render table
+        var list = document.getElementById('security-events-list');
+        if (!list) return;
+
+        if (events.length === 0) {
+          list.innerHTML = '<div class="empty-state"><div class="icon">🛡️</div><div class="text">No hay eventos de seguridad registrados</div></div>';
+          return;
+        }
+
+        var html = '<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Email / Detalle</th><th>Info adicional</th></tr></thead><tbody>';
+        events.forEach(function(e) {
+          var fecha = e.created_at ? new Date(e.created_at).toLocaleString('es-CL') : new Date(e.ts || Date.now()).toLocaleString('es-CL');
+          var email = e.usuario_email || '—';
+          var meta = e.metadata || {};
+
+          var tipoLabel, tipoColor;
+          if (e.accion === 'login_success') {
+            tipoLabel = '✅ Acceso exitoso';
+            tipoColor = '#4caf50';
+          } else if (e.accion === 'login_failed') {
+            tipoLabel = '❌ Login fallido';
+            tipoColor = 'var(--color-mir)';
+          } else if (e.accion === 'security_file_rejected') {
+            tipoLabel = '🚫 Archivo rechazado';
+            tipoColor = '#ff9800';
+          } else {
+            tipoLabel = e.accion;
+            tipoColor = '#888';
+          }
+
+          var detalle = '';
+          if (e.accion === 'security_file_rejected') {
+            detalle = '<span style="font-size:11px;color:#999;">' +
+              escapeHtml(meta.filename || '') +
+              ' (' + escapeHtml(meta.declared_type || '') + ')' +
+              '</span>';
+          } else if (e.accion === 'login_failed') {
+            detalle = '<span style="font-size:11px;color:#999;">' +
+              (meta.error ? escapeHtml(meta.error) : '') +
+              '</span>';
+          }
+
+          html += '<tr>' +
+            '<td style="white-space:nowrap;font-size:12px;">' + fecha + '</td>' +
+            '<td><span style="color:' + tipoColor + ';font-size:12px;font-weight:600;">' + tipoLabel + '</span></td>' +
+            '<td style="font-size:12px;">' + escapeHtml(email) + '</td>' +
+            '<td style="font-size:12px;">' + detalle + '</td></tr>';
+        });
+        html += '</tbody></table>';
+        list.innerHTML = html;
+      } catch (err) {
+        console.error('[Security] Error:', err);
+        if (err.message !== 'Sesión expirada') {
+          var list = document.getElementById('security-events-list');
+          if (list && (err.code === 'PGRST116' || err.code === 'PGRST205' || (err.message && err.message.indexOf('audit_log') !== -1))) {
+            // 404 — table doesn't exist yet
+            list.innerHTML = '<div class="empty-state" style="border:1px dashed rgba(229,9,20,0.3);border-radius:12px;padding:32px;"><div class="icon">🗄️</div><div class="text" style="font-size:14px;color:#bbb;max-width:480px;margin:0 auto;line-height:1.6;">La tabla <code style="background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:4px;font-size:12px;">audit_log</code> no existe en la base de datos.<br><br>Para crearla, abre el <strong>SQL Editor</strong> de Supabase y ejecuta el script de migración desde <code style="background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:4px;font-size:12px;">supabase/migrations/011_audit_log.sql</code>.<br><br>Mientras tanto, los eventos de seguridad no podrán registrarse.</div></div>';
+          } else {
+            showToast('Error al cargar eventos de seguridad', 'error');
+          }
+        }
+      }
+    }
+
+    // ─── Helpers ───
+    function escapeHtml(text) {
+      if (!text) return '';
+      var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return String(text).replace(/[&<>"']/g, function(c) { return map[c]; });
+    }
+
+    // ─── Init ───
+    function showDashboard() {
+      loginScreen.style.display = 'none';
+      dashboardScreen.style.display = 'block';
+      if (userData) {
+        userNameDisplay.textContent = userData.nombre;
+        userAvatar.textContent = userData.nombre.charAt(0).toUpperCase();
+      }
+      loadDashboard();
+      setTimeout(iniciarRealtime, 1000);
+    }
+
+    function init() {
+      var savedToken = localStorage.getItem('admin_token');
+      var savedUser = localStorage.getItem('admin_user');
+      if (savedToken && savedUser) {
+        token = savedToken;
+        try { userData = JSON.parse(savedUser); } catch(e) { userData = null; }
+        if (userData) { showDashboard(); return; }
+      }
+      loginScreen.style.display = 'flex';
+      dashboardScreen.style.display = 'none';
+    }
+
+    init();
+  })();
+  </script>
+</body>
+</html>

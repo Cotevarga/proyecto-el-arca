@@ -1,0 +1,25 @@
+{
+  "name": "El Arca — Archivo Comunitario",
+  "short_name": "El Arca",
+  "description": "Memoria Viva de la Población Francisco de Goya, La Pintana. Archivo comunitario de patrimonio inmaterial, relatos y memoria popular.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#E50914",
+  "orientation": "any",
+  "categories": ["education", "culture", "history"],
+  "lang": "es-CL",
+  "scope": "/",
+  "icons": [
+    { "src": "/images/icon-192.svg", "type": "image/svg+xml", "sizes": "192x192", "purpose": "any" },
+    { "src": "/images/icon-512.svg", "type": "image/svg+xml", "sizes": "512x512", "purpose": "any" }
+  ],
+  "screenshots": [
+    { "src": "/images/screenshot-home.png", "type": "image/png", "sizes": "1280x720", "form_factor": "wide" }
+  ],
+  "shortcuts": [
+    { "name": "Subir recuerdo", "short_name": "Subir", "url": "/subir.html" },
+    { "name": "Archivo", "short_name": "Archivo", "url": "/archivo.html" },
+    { "name": "Mapa", "short_name": "Mapa", "url": "/mapa.html" }
+  ]
+}

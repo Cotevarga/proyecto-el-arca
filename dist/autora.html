@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autora — El Arca</title>
+  <meta property="og:title" content="EL ARCA — Autora">
+  <meta property="og:description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <meta property="og:image" content="https://elarca.cl/images/og-image.jpg">
+  <meta property="og:url" content="https://elarca.cl/autora.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta name="description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <link rel="canonical" href="https://elarca.cl/autora.html">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✊</text></svg>">
+  <style>
+    :root { --color-mir: #E50914; --color-noche: #111111; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000 !important; color: #fff !important; }
+    h1, h2, h3, h4, h5, h6, footer, p { text-align: center !important; }
+    .card-mir p, article p { text-align: justify !important; }
+    .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
+    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; }
+    .text-mir { color: var(--color-mir) !important; }
+    .border-mir { border-color: var(--color-mir) !important; }
+    .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
+    .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
+    .hover\:text-mir:hover { color: var(--color-mir) !important; }
+    .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+    .manifesto-text { font-size: 1.05rem; line-height: 1.9; color: rgba(255,255,255,0.85); }
+    .manifesto-text p { margin-bottom: 1.5rem; }
+    .signature { font-size: 1rem; color: var(--color-mir); font-weight: 600; letter-spacing: 0.02em; }
+  </style>
+  <script src="/audio-player.js" defer></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0M3Q8DQ3QF');
+  </script>
+</head>
+<body class="bg-black text-white antialiased">
+
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div id="nav-player" class="flex items-center gap-1 md:gap-2 mx-1 md:mx-3"></div>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+      </div>
+      <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-mir/30 px-4 py-4">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition">Archivo</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content">
+    <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
+      <div class="max-w-4xl mx-auto px-4 animate-fade-in-up">
+        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Manifiesto</span>
+        <h1 class="heading-mir text-4xl md:text-6xl mt-4 mb-2">MANIFIESTO DE UNA INFORMÁTICA POPULAR</h1>
+        <p class="text-white/60 text-lg max-w-2xl mx-auto mb-4">programando por amor y memoria combativa.</p>
+        <div style="width:4rem;height:0.25rem;background-color:var(--color-mir);margin:1.5rem auto;"></div>
+      </div>
+    </header>
+
+    <section class="py-16" style="background-color:#111111">
+      <div class="max-w-4xl mx-auto px-4">
+        <div class="card-mir manifesto-text">
+          <p>Hay quienes ven la informática como una simple herramienta técnica, un puente para optimizar las ganancias de una empresa o una carrera para el éxito individual. Pero para mí, el código, los servidores y el desarrollo web tienen un sentido profundamente distinto: son mi trinchera, mis herramientas de sabotaje contra la historia oficial y mi forma de aportar a la lucha de clases de mi pueblo.</p>
+
+          <p>Este proyecto de memoria viva no nació en una oficina con presupuesto, ni busca el lucro, ni pretende ser un adorno académico estático. Nació de manera completamente gratuita, voluntaria y autogestionada, financiado únicamente por un amor desbordante y combativo. Lo levanté porque tengo una profunda capacidad de amar a los míos y porque, como dijo Allende: <em>"Tengo fe en Chile y su destino. Sigan ustedes sabiendo que, mucho más temprano que tarde, de nuevo se abrirán las grandes alamedas por donde pase el hombre libre, para construir una sociedad mejor".</em></p>
+
+          <p>Esta página web nace de la observación diaria de nuestro territorio. Nace de la rabia y la pena transformadas en acción al ver el cansancio de nuestra gente bajo el sometimiento de un sistema que precariza la vida. Entender que esa precariedad no es "mala suerte", sino una decisión política, es lo que me obliga a no ser indiferente.</p>
+
+          <p>Pero mi historia con la tecnología y el territorio no empezó frente a una pantalla moderna. Nació hace 23 años en la sede social de nuestra población. Nació gracias a un hombre, el fundador de la organización que plantó en mí la primera semilla. Él era la encarnación misma de la militancia territorial; un compañero que andaba siempre corriendo de aquí pa' allá, gestionando proyectos y entregando la vida con un amor tan inmenso que se le transmitía a cualquiera que cruzara palabra con él. Esta página web es también un homenaje eterno a su vida, a su obra y una forma de decirle: Gracias.</p>
+
+          <p>Por eso, este archivo histórico no es un museo del pasado. Es, ante todo, la prueba viva de que el trabajo social de masas con las infancias en los territorios funciona. RETOMAR ese trabajo es fundamental si queremos formar los adultos pensantes, críticos, solidarios y con conciencia social del mañana.</p>
+
+          <p>A través de fotos, videos y relatos reales de las organizaciones de la población, esta plataforma es una evidencia empírica y política: los adultos conscientes, organizados y consecuentes que hoy defienden el territorio son la semilla viva de la organización infantil que hombres como el Jano sembraron en nosotros hace años.</p>
+
+          <p>Como decía el Che, como nos enseñaron con su vida Víctor Jara y la comandante Cecilia Magni, el verdadero revolucionario está guiado por grandes sentimientos de amor. Es ese amor el que me llevó a pasar noches enteras programando. Hice esto porque un pueblo que olvida su historia está condenado, y porque tengo la certeza absoluta de que la memoria viva es el principal enemigo del fascismo.</p>
+
+          <p>Hoy pongo mis conocimientos técnicos al servicio del pueblo, de manera voluntaria, con el corazón desbordante y honrando la memoria de quien me abrió las puertas de la tecnología en la sede del Arca. Porque la informática solo tiene sentido si sirve para emancipar a nuestra clase, rescatar nuestra identidad y proteger el futuro de nuestros niños.</p>
+
+          <div class="text-center pt-8 border-t border-white/10 mt-12">
+            <p class="signature">— Autora y Técnico Analista Programador 🛠️🔥🌹</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
+        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
+        <span>|</span>
+        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
+      </nav>
+      <div style="margin-top:8px;"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:rgba(255,255,255,0.4);font-size:11px;text-decoration:none;">CC BY-NC-SA 4.0 — Contenido bajo licencia Creative Commons</a></div>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+  </footer>
+
+  <script>
+    var menuToggle = document.getElementById('menu-toggle');
+    if (menuToggle) {
+      menuToggle.addEventListener('click', function() {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+      });
+    } else {
+      console.warn('[Nav] menu-toggle no encontrado');
+    }
+    document.querySelectorAll('#mobile-menu a').forEach(function(l) {
+      l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
+    });
+  </script>
+  <script src="/app.js"></script>
+</body>
+</html>

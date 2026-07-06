@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plan de Gestión — El Arca</title>
+  <meta property="og:title" content="EL ARCA — Plan de Gestión">
+  <meta property="og:description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <meta property="og:image" content="https://elarca.cl/images/og-image.jpg">
+  <meta property="og:url" content="https://elarca.cl/plan-gestion.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta name="description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <link rel="canonical" href="https://elarca.cl/plan-gestion.html">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
+  <style>
+    :root { --color-mir: #E50914; --color-noche: #111111; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000 !important; color: #fff !important; }
+    h1, h2, h3, h4, h5, h6 { text-align: center !important; }
+    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; }
+    .text-mir { color: var(--color-mir) !important; }
+    .border-mir { border-color: var(--color-mir) !important; }
+    .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
+    .divider-mir { width:4rem;height:0.25rem;background-color:var(--color-mir);margin:1.5rem auto; }
+    .hover\:text-mir:hover { color: var(--color-mir) !important; }
+    .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
+    .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+    .seccion { margin-bottom: 2rem; }
+    .seccion h3 { color: var(--color-mir); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; text-align: left !important; }
+    .seccion p, .seccion ul { color: rgba(255,255,255,0.75); font-size: 0.9rem; line-height: 1.7; }
+    .seccion ul { padding-left: 1.5rem; }
+    .seccion ul li { margin-bottom: 0.4rem; }
+    .seccion .tag { display:inline-block; background:rgba(229,9,20,0.15); color:var(--color-mir); font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem; }
+  </style>
+</head>
+<body class="bg-black text-white antialiased">
+
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="pt-32 pb-16">
+    <div class="max-w-4xl mx-auto px-4">
+      <div class="text-center animate-fade-in-up">
+        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Preservación</span>
+        <h1 class="heading-mir text-4xl md:text-5xl mt-4 mb-2">Plan de Gestión Patrimonial</h1>
+        <div class="divider-mir"></div>
+        <p class="text-white/50 text-sm mb-10">Estrategia de preservación digital 2026–2046 · Archivo Comunitario El Arca</p>
+      </div>
+
+      <div class="card-mir" style="text-align:left;">
+
+        <div class="seccion">
+          <span class="tag">a</span>
+          <h3>Redundancia de Datos</h3>
+          <p>El Archivo implementa una estrategia de backup de tres niveles para garantizar la continuidad del acervo digital:</p>
+          <ul>
+            <li><strong>Nivel 1 — Supabase (Base de datos operativa):</strong> Todos los metadatos, URLs de archivos y estados de aprobación residen en PostgreSQL administrado por Supabase, con backups diarios automáticos y point-in-time recovery.</li>
+            <li><strong>Nivel 2 — Almacenamiento Supabase (Storage):</strong> Los archivos originales (fotos, audios, videos) se almacenan en el bucket público `elarca-uploads` de Supabase Storage, replicado geográficamente por el proveedor de Cloudflare.</li>
+            <li><strong>Nivel 3 — Exportación mensual a almacenamiento frío:</strong> El administrador descarga mensualmente un dump completo de la base de datos (SQL) y una copia de los archivos del Storage. Este respaldo se conserva en servicios de almacenamiento frío (Amazon S3 Glacier / Google Drive / disco externo cifrado) fuera de la infraestructura principal.</li>
+          </ul>
+        </div>
+
+        <div class="seccion">
+          <span class="tag">b</span>
+          <h3>Integridad y Trazabilidad mediante Metadatos</h3>
+          <p>Cada registro en la tabla `recuerdos` incluye metadatos completos para asegurar la trazabilidad del material:</p>
+          <ul>
+            <li><strong>nombre_original:</strong> Nombre del archivo en el momento de la subida.</li>
+            <li><strong>tipo_archivo:</strong> MIME type del archivo (image/jpeg, audio/mpeg, etc.).</li>
+            <li><strong>tamanio_bytes:</strong> Tamaño exacto del archivo original.</li>
+            <li><strong>storage_path:</strong> Ruta exacta dentro del bucket de Storage, permitiendo localizar físicamente el archivo.</li>
+            <li><strong>created_at:</strong> Fecha y hora de ingreso al sistema (timestamp con zona horaria).</li>
+            <li><strong>seccion:</strong> Clasificación taxonómica dentro del Archivo (Galería, Videos, Relatos, Legado).</li>
+            <li><strong>aprobado:</strong> Estado del flujo curatorial (pendiente / publicado).</li>
+          </ul>
+          <p>Estos metadatos permiten auditorías completas, verificación de autenticidad y migraciones controladas a futuros sistemas.</p>
+          <p style="margin-top:12px;"><strong>Integridad mediante Hashing:</strong> Cada archivo subido al Storage se somete a un proceso de hash SHA-256. El hash resultante se almacena como metadato adicional del registro (columna <code>hash_sha256</code>). Este hash permite:</p>
+          <ul>
+            <li><strong>Verificación de integridad:</strong> Comparar el hash del archivo almacenado contra el hash original para detectar corrupción de datos, alteraciones no autorizadas o errores de transferencia.</li>
+            <li><strong>Autenticidad forense:</strong> Proporcionar una huella digital única del archivo que puede cotejarse en auditorías externas o procesos legales.</li>
+            <li><strong>Detección de duplicados:</strong> Identificar archivos idénticos mediante la comparación de hashes, optimizando el uso del Storage.</li>
+          </ul>
+          <p>El cálculo del hash se realiza en el momento de la subida mediante la API <code>SubtleCrypto.digest()</code> del navegador (Web Crypto API) y se almacena junto con el registro en la base de datos. En migraciones futuras, el hash se recalcula y verifica contra el valor almacenado.</p>
+        </div>
+
+        <div class="seccion">
+          <span class="tag">c</span>
+          <h3>Migración Tecnológica y Obsolescencia de Formatos</h3>
+          <p>El Archivo se compromete a mantener la accesibilidad del acervo mediante una política activa de migración de formatos:</p>
+          <ul>
+            <li><strong>Formatos aceptados actualmente:</strong> JPEG (imágenes), MP3/WAV (audio), MP4 (video).</li>
+            <li><strong>Vigilancia tecnológica:</strong> Revisión anual del panorama de formatos para identificar riesgos de obsolescencia.</li>
+            <li><strong>Plan de migración:</strong> Si un formato queda obsoleto (ej. JPEG → JPEG XL, MP3 → AAC/Opus), el administrador ejecutará una migración programada: descarga masiva del Storage, conversión automatizada mediante scripts, reemplazo del archivo en el bucket y actualización del metadato `tipo_archivo`.</li>
+            <li><strong>Preservación del original:</strong> El archivo original se conserva en el Nivel 3 (almacenamiento frío) sin conversión, como respaldo forense.</li>
+          </ul>
+        </div>
+
+        <div class="seccion">
+          <span class="tag">d</span>
+          <h3>Ética de Archivo y Rol Curatorial</h3>
+          <p>El Archivo Comunitario "El Arca" opera bajo un modelo de curaduría participativa con supervisión editorial:</p>
+          <ul>
+            <li><strong>Aprobación:</strong> Todo contenido enviado por la comunidad pasa a una cola de pendientes. El administrador revisa cada contribución y decide aprobarla o rechazarla según criterios de pertinencia histórica, veracidad, calidad técnica y coherencia con la misión del Archivo.</li>
+            <li><strong>Rechazo:</strong> Las contribuciones rechazadas se eliminan permanentemente de la base de datos y del Storage. El administrador no está obligado a notificar el rechazo, aunque puede hacerlo a su criterio.</li>
+            <li><strong>Edición curatorial:</strong> El administrador puede editar el texto largo (relato) de una contribución antes de aprobarla, con el fin de corregir errores ortográficos o mejorar la claridad sin alterar el sentido original.</li>
+            <li><strong>No censura:</strong> No se rechazarán contenidos por su contenido político, social o religioso, siempre que no infrinjan derechos de terceros ni promuevan discursos de odio. El Archivo es un espacio de memoria plural y diversa.</li>
+          </ul>
+        </div>
+
+        <div class="seccion" style="margin-bottom:0;">
+          <span class="tag">e</span>
+          <h3>Continuidad Operativa</h3>
+          <p>Para asegurar la sostenibilidad del Archivo a 20 años, se establecen las siguientes prácticas:</p>
+          <ul>
+            <li><strong>Documentación:</strong> Este plan de gestión, junto con el esquema de base de datos y el código fuente, se mantienen versionados en un repositorio Git.</li>
+            <li><strong>Transferencia de conocimiento:</strong> En caso de cambio del administrador, se realizará una capacitación documentada y se transferirán las credenciales de acceso mediante un gestor de contraseñas.</li>
+            <li><strong>Exportación estándar:</strong> Los datos pueden exportarse en formatos abiertos (CSV, SQL, archivos originales) en cualquier momento, garantizando la portabilidad del archivo completo.</li>
+          </ul>
+          <p class="text-white/40 text-xs mt-4">Última actualización: Julio 2026 · Versión 1.0</p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
+        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
+        <span>|</span>
+        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
+      </nav>
+      <div style="margin-top:8px;"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:rgba(255,255,255,0.4);font-size:11px;text-decoration:none;">CC BY-NC-SA 4.0 — Contenido bajo licencia Creative Commons</a></div>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="64" fill="#000"/>
+  <text x="256" y="230" font-family="Arial,Helvetica,sans-serif" font-size="128" font-weight="900" fill="#E50914" text-anchor="middle" dominant-baseline="central">EL</text>
+  <text x="256" y="360" font-family="Arial,Helvetica,sans-serif" font-size="128" font-weight="900" fill="#E50914" text-anchor="middle" dominant-baseline="central">ARCA</text>
+  <rect x="96" y="380" width="320" height="8" rx="4" fill="#E50914"/>
+</svg>

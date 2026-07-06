@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Videos — Memoria de El Arca</title>
+  <meta property="og:title" content="EL ARCA — Videos">
+  <meta property="og:description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <meta property="og:image" content="https://elarca.cl/images/og-image.jpg">
+  <meta property="og:url" content="https://elarca.cl/videos.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta name="description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <link rel="canonical" href="https://elarca.cl/videos.html">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎥</text></svg>">
+  <script src="/config.js"></script>
+  <script src="/supabase.js" defer></script>
+  <style>
+    :root { --color-mir: #E50914; --color-noche: #111111; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000000 !important; color: #ffffff !important; }
+    h1, h2, h3, h4, h5, h6, footer, p { text-align: center !important; }
+    .card-mir p, article p { text-align: justify !important; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+    .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
+    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: white !important; text-transform: uppercase; letter-spacing: 0.05em; }
+    .text-mir { color: var(--color-mir) !important; }
+    .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
+    .border-mir\/40 { border-color: rgba(229,9,20,0.4) !important; }
+    .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
+    .bg-mir { background-color: var(--color-mir) !important; }
+    .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
+    .bg-noche { background-color: var(--color-noche) !important; }
+    .hover\:text-mir:hover { color: var(--color-mir) !important; }
+    .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
+    .text-mir\/40 { color: rgba(229,9,20,0.4) !important; }
+    .text-white\/40 { color: rgba(255,255,255,0.4) !important; }
+    .text-white\/50 { color: rgba(255,255,255,0.5) !important; }
+    .hover\:bg-resistencia-700:hover { background-color: #b91c1c !important; }
+    .text-red-600 { color: #dc2626 !important; }
+    .border-red-600 { border-color: #dc2626 !important; }
+    .media-card { transition: all 0.3s ease; }
+    .media-card:hover { transform: translateY(-4px); border-color: var(--color-mir) !important; box-shadow: 0 8px 32px rgba(229,9,20,0.1); }
+    .embed-container { position: relative; width: 100%; padding-bottom: 56.25%; overflow: hidden; border-radius: 8px; background: #000; }
+    .embed-container iframe, .embed-container video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+    .audio-player { width: 100%; border-radius: 8px; background: #1a1a1a; }
+    .loading-skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  </style>
+  <script src="/audio-player.js" defer></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0M3Q8DQ3QF');
+  </script>
+</head>
+<body class="bg-black text-white antialiased">
+
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div id="nav-player" class="flex items-center gap-1 md:gap-2 mx-1 md:mx-3"></div>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Mapa</a>
+        <a href="/videos.html" class="text-mir border-b-2 border-mir pb-1">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+      </div>
+      <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-mir/30 px-4 py-4">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition">Mapa</a>
+        <a href="/videos.html" class="text-mir">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition">Archivo</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content">
+    <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
+      <div class="max-w-5xl mx-auto px-4 animate-fade-in-up">
+        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Multimedia</span>
+        <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Videos y Audios</h1>
+        <div class="divider-mir mx-auto"></div>
+        <p class="text-white/60 text-lg max-w-2xl mx-auto">Material audiovisual de El Arca, la Radio Libre y la comunicación popular en La Goya.</p>
+      </div>
+    </header>
+
+    <section class="py-16 bg-noche">
+      <div class="max-w-5xl mx-auto px-4">
+        <div id="videos-container">
+          <!-- Loading skeleton -->
+          <div id="videos-loading" style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;">
+            <div class="loading-skeleton" style="height:280px;"></div>
+            <div class="loading-skeleton" style="height:280px;"></div>
+            <div class="loading-skeleton" style="height:280px;"></div>
+            <div class="loading-skeleton" style="height:280px;"></div>
+          </div>
+          <div id="videos-grid" style="display:none;grid-template-columns:repeat(2,1fr);gap:24px;"></div>
+          <div id="videos-empty" style="display:none;text-align:center;padding:60px 20px;">
+            <div style="font-size:64px;opacity:0.2;margin-bottom:16px;">🎥</div>
+            <p class="text-white/40 text-lg">No hay contenido audiovisual disponible aún.</p>
+            <p class="text-white/30 text-sm mt-2">Los videos y audios aprobados aparecerán aquí automáticamente.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
+        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
+        <span>|</span>
+        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
+      </nav>
+      <div style="margin-top:8px;"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:rgba(255,255,255,0.4);font-size:11px;text-decoration:none;">CC BY-NC-SA 4.0 — Contenido bajo licencia Creative Commons</a></div>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+  </footer>
+
+  <script>
+    function $(id) { return document.getElementById(id); }
+
+    function waitForSupabase(maxWait) {
+      maxWait = maxWait || 8000;
+      return new Promise(function (resolve) {
+        var waited = 0, step = 200;
+        function check() {
+          if (window.miSupabase) return resolve(window.miSupabase);
+          waited += step;
+          if (waited >= maxWait) return resolve(null);
+          setTimeout(check, step);
+        }
+        check();
+      });
+    }
+
+    function embedHTML(url, tipo) {
+      if (!url) return '<div class="text-white/30 text-sm p-4">Sin contenido disponible</div>';
+      var l = url.toLowerCase();
+
+      // YouTube
+      if (tipo === 'video/youtube' || l.indexOf('youtube.com/watch') !== -1 || l.indexOf('youtu.be/') !== -1) {
+        var vid = '';
+        var ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+        if (ytMatch) vid = ytMatch[1];
+        if (vid) return '<div class="embed-container"><iframe src="https://www.youtube.com/embed/' + vid + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>';
+      }
+
+      // Facebook
+      if (tipo === 'video/facebook' || l.indexOf('facebook.com') !== -1) {
+        return '<div class="embed-container"><iframe src="https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(url) + '&show_text=0" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>';
+      }
+
+      // Audio directo
+      if (tipo && tipo.indexOf('audio') === 0) {
+        return '<audio class="audio-player" controls preload="metadata"><source src="' + url.replace(/"/g, '&quot;') + '" type="audio/mpeg">Tu navegador no soporta audio HTML5.</audio>';
+      }
+
+      // Video directo (mp4, webm, etc)
+      if (tipo && tipo.indexOf('video') === 0) {
+        return '<div class="embed-container"><video controls preload="metadata"><source src="' + url.replace(/"/g, '&quot;') + '">Tu navegador no soporta video HTML5.</video></div>';
+      }
+
+      // Audio from storage (Supabase)
+      if (tipo && tipo.indexOf('audio') === 0) {
+        return '<audio class="audio-player" controls preload="metadata"><source src="' + url.replace(/"/g, '&quot;') + '">Tu navegador no soporta audio HTML5.</audio>';
+      }
+
+      // Image
+      if (tipo && tipo.indexOf('image') === 0) {
+        return '<img src="' + url.replace(/"/g, '&quot;') + '" alt="Contenido multimedia" style="width:100%;border-radius:8px;" loading="lazy">';
+      }
+
+      // Fallback: direct link
+      return '<div style="padding:20px;text-align:center;"><a href="' + url.replace(/"/g, '&quot;') + '" target="_blank" class="text-mir hover:underline" style="font-size:14px;">Abrir contenido externo →</a></div>';
+    }
+
+    async function cargarVideos() {
+      var grid = $('videos-grid');
+      var loading = $('videos-loading');
+      var empty = $('videos-empty');
+      var client = await waitForSupabase();
+      if (!client) { loading.style.display = 'none'; empty.style.display = 'block'; empty.innerHTML = '<p class="text-white/40">No se pudo conectar a la base de datos.</p>'; return; }
+
+      try {
+        var { data, error } = await client
+          .from('recuerdos')
+          .select('id, titulo_relato, mensaje, url_archivo, tipo_archivo, nombre, created_at, nombre_serie')
+          .eq('seccion', 'Videos y Audios')
+          .eq('aprobado', true)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        loading.style.display = 'none';
+        var items = data || [];
+
+        if (items.length === 0) {
+          empty.style.display = 'block';
+          return;
+        }
+
+        var html = '';
+        items.forEach(function(item) {
+          var titulo = item.titulo_relato || item.nombre || 'Sin título';
+          var desc = item.mensaje || '';
+          var embed = embedHTML(item.url_archivo, item.tipo_archivo);
+          var fecha = item.created_at ? new Date(item.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) : '';
+          var serie = item.nombre_serie ? '<span style="display:inline-block;background:rgba(229,9,20,0.1);color:var(--color-mir);padding:2px 10px;border-radius:20px;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;font-weight:700;">' + item.nombre_serie + '</span>' : '';
+          var tipoLabel = '';
+          if (item.tipo_archivo) {
+            var t = item.tipo_archivo;
+            if (t.indexOf('youtube') !== -1) tipoLabel = '<span style="font-size:18px;" title="YouTube">▶️</span>';
+            else if (t.indexOf('facebook') !== -1) tipoLabel = '<span style="font-size:18px;" title="Facebook">📘</span>';
+            else if (t.indexOf('audio') === 0) tipoLabel = '<span style="font-size:18px;" title="Audio">🎵</span>';
+            else if (t.indexOf('video') === 0) tipoLabel = '<span style="font-size:18px;" title="Video">🎬</span>';
+            else if (t.indexOf('image') === 0) tipoLabel = '<span style="font-size:18px;" title="Imagen">📷</span>';
+            else tipoLabel = '<span style="font-size:18px;" title="Link">🔗</span>';
+          }
+
+          html += '<div class="card-mir media-card" data-rec-id="' + item.id + '" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">';
+          html += '<div style="padding:16px 20px 12px;border-bottom:1px solid rgba(229,9,20,0.08);display:flex;align-items:center;gap:10px;">';
+          html += tipoLabel;
+          html += '<div style="flex:1;min-width:0;"><h3 style="font-family:Arial,Helvetica,sans-serif;color:white;text-transform:uppercase;letter-spacing:0.03em;font-size:14px;margin:0;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + titulo.replace(/</g, '&lt;') + '</h3></div>';
+          if (serie) html += serie;
+          html += '</div>';
+          html += '<div style="padding:12px 20px;">' + embed + '</div>';
+          if (desc) {
+            html += '<div style="padding:0 20px 8px;"><p style="font-size:12px;color:#999;margin:0;text-align:left;line-height:1.4;">' + desc.substring(0, 200).replace(/</g, '&lt;') + (desc.length > 200 ? '...' : '') + '</p></div>';
+          }
+          if (fecha) {
+            html += '<div style="padding:8px 20px 12px;border-top:1px solid rgba(229,9,20,0.06);font-size:11px;color:#666;text-align:left;">' + fecha + '</div>';
+          }
+          html += '</div>';
+        });
+
+        grid.innerHTML = html;
+        grid.style.display = 'grid';
+      } catch (err) {
+        console.error('[Videos] Error:', err);
+        loading.style.display = 'none';
+        empty.style.display = 'block';
+        empty.innerHTML = '<p class="text-white/40">Error al cargar contenido multimedia.</p>';
+      }
+    }
+
+    function navegarHash() {
+      var h = window.location.hash;
+      if (h && h.indexOf('rec-') === 1) {
+        var id = h.substring(5);
+        var card = document.querySelector('.media-card[data-rec-id="' + id + '"]');
+        if (card) {
+          setTimeout(function () {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            card.style.boxShadow = '0 0 0 3px var(--color-mir)';
+            setTimeout(function () { card.style.boxShadow = ''; }, 3000);
+          }, 500);
+        }
+      }
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', function() {
+      cargarVideos().then(function () { navegarHash(); });
+    });
+
+    // Mobile menu
+    var menuToggle = document.getElementById('menu-toggle');
+    if (menuToggle) {
+      menuToggle.addEventListener('click', function() {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+      });
+    }
+    document.querySelectorAll('#mobile-menu a').forEach(function(l) {
+      l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
+    });
+  </script>
+  <script src="/app.js"></script>
+</body>
+</html>

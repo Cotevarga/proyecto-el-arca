@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subir recuerdo — El Arca</title>
+  <meta property="og:title" content="EL ARCA — Comparte tu Recuerdo">
+  <meta property="og:description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <meta property="og:image" content="https://elarca.cl/images/og-image.jpg">
+  <meta property="og:url" content="https://elarca.cl/subir.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta name="description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <link rel="canonical" href="https://elarca.cl/subir.html">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📤</text></svg>">
+  <style>
+    :root { --color-mir: #E50914; --color-noche: #111111; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000 !important; color: #fff !important; }
+    h1, h2, h3, h4, h5, h6, footer, p { text-align: center !important; }
+    .card-mir p, article p { text-align: justify !important; }
+    .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
+    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; }
+    .text-mir { color: var(--color-mir) !important; }
+    .border-mir { border-color: var(--color-mir) !important; }
+    .bg-mir { background-color: var(--color-mir) !important; }
+    .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
+    .btn-mir { background-color: var(--color-mir) !important; color: white !important; font-weight: bold; padding: 0.75rem 2rem; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem; border: 2px solid var(--color-mir); }
+    .btn-mir:hover { background-color: #000 !important; color: var(--color-mir) !important; }
+    .hover\:text-mir:hover { color: var(--color-mir) !important; }
+    .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
+    .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
+    .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+  </style>
+  <script src="/config.js"></script>
+  <script src="/supabase.js" defer></script>
+  <script src="/audio-player.js" defer></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0M3Q8DQ3QF');
+  </script>
+</head>
+<body class="bg-black text-white antialiased">
+
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div id="nav-player" class="flex items-center gap-1 md:gap-2 mx-1 md:mx-3"></div>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+      </div>
+      <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-mir/30 px-4 py-4">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition">Archivo</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content">
+    <header class="pt-32 pb-16 bg-black text-center border-b border-mir/20">
+      <div class="max-w-3xl mx-auto px-4 animate-fade-in-up">
+        <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Participa</span>
+        <h1 class="heading-mir text-5xl md:text-7xl mt-4 mb-4">Comparte tu recuerdo</h1>
+        <div style="width:4rem;height:0.25rem;background-color:var(--color-mir);margin:1.5rem auto;"></div>
+        <p class="text-white/60 text-lg max-w-2xl mx-auto">Tu historia es parte de nuestra memoria colectiva. Sube fotos, audios o videos y contribuye al archivo comunitario de El Arca.</p>
+      </div>
+    </header>
+
+    <section class="py-16" style="background-color:#111111">
+      <div class="max-w-3xl mx-auto px-4">
+        <form id="form-archivo" class="space-y-6 card-mir">
+          <div style="position:absolute;left:-9999px" aria-hidden="true">
+            <label for="website">No llenar</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
+          <div>
+            <label for="nombre" class="block text-sm font-bold text-white/80 mb-1 uppercase">Nombre o Pseudónimo</label>
+            <input type="text" id="nombre" name="nombre" required maxlength="200" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
+          </div>
+          <div>
+            <label for="anio" class="block text-sm font-bold text-white/80 mb-1 uppercase">Año estimado del material</label>
+            <input type="number" id="anio" name="anio" min="1990" max="2026" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
+          </div>
+          <div id="archivo-group">
+            <label for="archivo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Foto, Audio o Video</label>
+            <input type="file" id="archivo" name="archivo" accept=".jpg,.jpeg,.png,.mp3,.wav,.mp4" class="block w-full text-sm text-white/50 border border-white/20 p-2 bg-black">
+            <div id="file-error" class="text-mir text-sm mt-1 hidden"></div>
+            <div id="file-info" class="text-white/50 text-sm mt-1 hidden"></div>
+            <p class="text-white/40 text-xs mt-2">Formatos: JPG, PNG, MP3, WAV, MP4 &middot; Máx 50 MB &middot; Opcional si solo es texto.</p>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);">
+              <label for="link-externo" class="block text-sm font-bold text-white/80 mb-1 uppercase">O pega un link externo</label>
+              <input type="url" id="link-externo" name="link_externo" placeholder="https://www.youtube.com/watch?v=... o https://facebook.com/... o https://ejemplo.com/audio.mp3" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
+              <p class="text-white/40 text-xs mt-1">Si no puedes subir el archivo, pega un enlace a YouTube, Facebook o un audio/video público.</p>
+            </div>
+          </div>
+          <div>
+            <label for="relato" class="block text-sm font-bold text-white/80 mb-1 uppercase">Relato</label>
+            <textarea id="relato" name="relato" rows="15" maxlength="20000" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-y" placeholder="Escribe aquí tu relato, entrevista o descripción completa..."></textarea>
+          </div>
+          <div>
+            <label for="transcripcion" class="block text-sm font-bold text-white/80 mb-1 uppercase">Transcripción (si el archivo es audio o video)</label>
+            <textarea id="transcripcion" name="transcripcion" rows="6" maxlength="50000" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-y" placeholder="Pega aquí la transcripción del audio o video para hacerlo accesible y buscable..."></textarea>
+            <p class="text-white/40 text-xs mt-1">Opcional. Mejora la accesibilidad y permite buscar dentro del contenido.</p>
+          </div>
+          <div id="metadata-fields" style="padding:12px 16px;background:rgba(229,9,20,0.04);border:1px solid rgba(229,9,20,0.1);border-radius:8px;">
+            <p style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:12px;">Metadatos adicionales (opcionales)</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <label for="pais" style="font-size:10px;text-transform:uppercase;color:#888;display:block;margin-bottom:4px;">País</label>
+                <select id="pais" name="pais" style="width:100%;padding:8px 12px;background:black;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:white;font-size:12px;outline:none;">
+                  <option value="">Seleccionar</option>
+                  <option value="Chile">Chile</option>
+                  <option value="Argentina">Argentina</option>
+                  <option value="Bolivia">Bolivia</option>
+                  <option value="Colombia">Colombia</option>
+                  <option value="Costa Rica">Costa Rica</option>
+                  <option value="Ecuador">Ecuador</option>
+                  <option value="España">España</option>
+                  <option value="Guatemala">Guatemala</option>
+                  <option value="Honduras">Honduras</option>
+                  <option value="México">México</option>
+                  <option value="Nicaragua">Nicaragua</option>
+                  <option value="Panamá">Panamá</option>
+                  <option value="Paraguay">Paraguay</option>
+                  <option value="Perú">Perú</option>
+                  <option value="Puerto Rico">Puerto Rico</option>
+                  <option value="República Dominicana">República Dominicana</option>
+                  <option value="Uruguay">Uruguay</option>
+                  <option value="Venezuela">Venezuela</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+              <div>
+                <label for="region" style="font-size:10px;text-transform:uppercase;color:#888;display:block;margin-bottom:4px;">Región / Departamento</label>
+                <input type="text" id="region" name="region" placeholder="Ej: Metropolitana" style="width:100%;padding:8px 12px;background:black;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:white;font-size:12px;outline:none;">
+              </div>
+              <div>
+                <label for="geolocalizacion" style="font-size:10px;text-transform:uppercase;color:#888;display:block;margin-bottom:4px;">Ubicación</label>
+                <input type="text" id="geolocalizacion" name="geolocalizacion" placeholder="Ej: La Pintana, Santiago" style="width:100%;padding:8px 12px;background:black;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:white;font-size:12px;outline:none;">
+              </div>
+              <div>
+                <label for="fecha-creacion-archivo" style="font-size:10px;text-transform:uppercase;color:#888;display:block;margin-bottom:4px;">Fecha del original</label>
+                <input type="date" id="fecha-creacion-archivo" name="fecha-creacion-archivo" style="width:100%;padding:8px 12px;background:black;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:white;font-size:12px;outline:none;color-scheme:dark;">
+              </div>
+            </div>
+            <div style="margin-top:8px;">
+              <label for="tags" style="font-size:10px;text-transform:uppercase;color:#888;display:block;margin-bottom:4px;">Etiquetas (separadas por coma)</label>
+              <input type="text" id="tags" name="tags" placeholder="Ej: marcha, pobladores, años 90" style="width:100%;padding:8px 12px;background:black;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:white;font-size:12px;outline:none;">
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;background:rgba(229,9,20,0.04);border:1px solid rgba(229,9,20,0.15);border-radius:8px;">
+            <input type="checkbox" id="autorizacion" name="autorizacion" required style="margin-top:3px;accent-color:var(--color-mir);width:18px;height:18px;flex-shrink:0;">
+            <label for="autorizacion" style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5;cursor:pointer;">
+              Autorizo a 'El Arca' a resguardar, digitalizar y publicar mi aporte con fines de memoria colectiva y archivo comunitario, aceptando los <a href="/terminos.html" target="_blank" style="color:var(--color-mir);text-decoration:underline;">Términos y Condiciones</a>.
+            </label>
+          </div>
+          <button type="submit" id="btn-enviar" class="btn-mir w-full" aria-label="Enviar recuerdo al Archivo Comunitario">Subir y compartir recuerdo</button>
+          <div id="form-messages" class="text-center text-sm font-medium hidden"></div>
+          <script>
+    (function () {
+      'use strict';
+      var fnUrl = window.EDGE_FUNCTIONS_URL;
+      if (!fnUrl) {
+        document.getElementById('form-messages').textContent = 'Error de configuración. Recarga la página.';
+        document.getElementById('form-messages').className = 'text-center text-sm font-medium text-mir';
+        document.getElementById('form-messages').classList.remove('hidden');
+        return;
+      }
+
+      var formArchivo = document.getElementById('form-archivo');
+      var fileInput = document.getElementById('archivo');
+      var fileError = document.getElementById('file-error');
+      var fileInfo = document.getElementById('file-info');
+      var menuToggle = document.getElementById('menu-toggle');
+      var mobileMenu = document.getElementById('mobile-menu');
+      var UPLOAD_URL = fnUrl + '/upload';
+
+      if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', function () { mobileMenu.classList.toggle('hidden'); });
+        mobileMenu.querySelectorAll('a').forEach(function (l) { l.addEventListener('click', function () { mobileMenu.classList.add('hidden'); }); });
+      }
+
+      if (fileInput) {
+        fileInput.addEventListener('change', function () {
+          var file = fileInput.files ? fileInput.files[0] : null;
+          if (!file) { fileError.classList.add('hidden'); fileInfo.classList.add('hidden'); return; }
+          var valids = ['image/jpeg', 'image/png', 'audio/mpeg', 'audio/wav', 'video/mp4'];
+          if (valids.indexOf(file.type) === -1) {
+            fileError.textContent = 'Formato no v\u00e1lido. Sube JPG, PNG, MP3, WAV o MP4.';
+            fileError.classList.remove('hidden'); fileInfo.classList.add('hidden'); fileInput.value = ''; return;
+          }
+          fileError.classList.add('hidden');
+          if (file.size > 50 * 1024 * 1024) {
+            fileError.textContent = 'El archivo supera los 50 MB.';
+            fileError.classList.remove('hidden'); fileInfo.classList.add('hidden'); fileInput.value = ''; return;
+          }
+          fileError.classList.add('hidden');
+          fileInfo.textContent = 'Archivo: ' + file.name + ' (' + (file.size / 1024 / 1024).toFixed(1) + ' MB)';
+          fileInfo.classList.remove('hidden');
+        });
+      }
+
+      if (formArchivo) {
+        formArchivo.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var btn = document.getElementById('btn-enviar');
+          var messages = document.getElementById('form-messages');
+          messages.classList.add('hidden');
+
+          var nombre = document.getElementById('nombre').value.trim();
+          var anio = document.getElementById('anio').value.trim();
+          var relato = document.getElementById('relato').value.trim();
+          var file = fileInput && fileInput.files ? fileInput.files[0] : null;
+          var linkUrl = document.getElementById('link-externo') ? document.getElementById('link-externo').value.trim() : '';
+
+          if (!file && !linkUrl && !relato) {
+            messages.textContent = 'Agrega un archivo, un link o escribe un relato.';
+            messages.className = 'text-center text-sm font-medium text-mir';
+            messages.classList.remove('hidden');
+            return;
+          }
+
+          var autorizacion = document.getElementById('autorizacion');
+          if (!autorizacion || !autorizacion.checked) {
+            messages.textContent = 'Debes autorizar el resguardo y publicaci\u00f3n de tu aporte.';
+            messages.className = 'text-center text-sm font-medium text-mir';
+            messages.classList.remove('hidden');
+            return;
+          }
+
+          btn.textContent = 'Enviando\u2026';
+          btn.disabled = true;
+
+          try {
+            var formData = new FormData();
+            if (file && file.size > 0) formData.append('archivo', file);
+            formData.append('nombre', nombre);
+            if (anio) formData.append('anio', anio);
+            if (relato) formData.append('mensaje_largo', relato);
+            formData.append('seccion', 'general');
+            if (linkUrl) formData.append('link_externo', linkUrl);
+            var geo = document.getElementById('geolocalizacion');
+            if (geo && geo.value.trim()) formData.append('geolocalizacion', geo.value.trim());
+            var fechaArch = document.getElementById('fecha-creacion-archivo');
+            if (fechaArch && fechaArch.value) formData.append('fecha_creacion_archivo', fechaArch.value);
+            var tagsEl = document.getElementById('tags');
+            if (tagsEl && tagsEl.value.trim()) formData.append('tags', tagsEl.value.trim());
+            var paisEl = document.getElementById('pais');
+            if (paisEl && paisEl.value) formData.append('pais', paisEl.value);
+            var regionEl = document.getElementById('region');
+            if (regionEl && regionEl.value.trim()) formData.append('region', regionEl.value.trim());
+            var transcEl = document.getElementById('transcripcion');
+            if (transcEl && transcEl.value.trim()) formData.append('transcripcion', transcEl.value.trim());
+            var categoria = 'texto';
+            if (file) categoria = file.type.startsWith('audio') ? 'audio' : file.type.startsWith('video') ? 'video' : 'foto';
+            else if (linkUrl) { var l = linkUrl.toLowerCase(); if (l.indexOf('youtube') !== -1 || l.indexOf('youtu.be') !== -1) categoria = 'video'; else if (l.indexOf('facebook') !== -1) categoria = 'video'; else if (l.match(/\.(mp3|wav|ogg)(\?|$)/)) categoria = 'audio'; else if (l.match(/\.(mp4|webm|mov)(\?|$)/)) categoria = 'video'; else categoria = 'link'; }
+            formData.append('categoria', categoria);
+            formData.append('texto', relato || '');
+
+            var resp = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
+            var result = await resp.json();
+
+            if (!resp.ok || !result.success) {
+              throw new Error(result.error || 'Error del servidor');
+            }
+
+            messages.textContent = '\u00a1Gracias por compartir tu recuerdo! Ser\u00e1 revisado pronto.';
+            messages.className = 'text-center text-sm font-medium text-green-400';
+            messages.classList.remove('hidden');
+            formArchivo.reset();
+            if (fileInfo) fileInfo.classList.add('hidden');
+          } catch (err) {
+            console.error('[Subir] Error:', err);
+            messages.textContent = 'Hubo un error al enviar. Intenta de nuevo o escribe a contacto@elarca.cl';
+            messages.className = 'text-center text-sm font-medium text-mir';
+            messages.classList.remove('hidden');
+          } finally {
+            btn.textContent = 'Subir y compartir recuerdo';
+            btn.disabled = false;
+          }
+        });
+      }
+    })();
+  </script>
+        </form>
+      </div>
+    </section>
+  </main>
+
+<footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
+        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
+        <span>|</span>
+        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
+      </nav>
+      <div style="margin-top:8px;"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:rgba(255,255,255,0.4);font-size:11px;text-decoration:none;">CC BY-NC-SA 4.0 — Contenido bajo licencia Creative Commons</a></div>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+</footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
