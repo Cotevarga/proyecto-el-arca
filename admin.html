@@ -678,9 +678,17 @@
     <div class="main-area">
       <div class="main-header">
         <h2 id="section-title">Dashboard</h2>
-        <div class="user-badge">
+        <div class="user-badge" id="user-badge" style="position:relative;cursor:pointer;">
           <span id="user-name-display">Admin</span>
           <div class="user-avatar" id="user-avatar">A</div>
+          <div id="user-dropdown" style="display:none;position:absolute;top:100%;right:0;margin-top:8px;background:var(--color-acero);border:1px solid rgba(229,9,20,0.2);border-radius:10px;padding:6px;min-width:200px;z-index:1000;box-shadow:0 12px 40px rgba(0,0,0,0.5);">
+            <div onclick="document.getElementById('password-modal').style.display='flex'" style="padding:10px 14px;font-size:13px;color:#ccc;border-radius:6px;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+              <span style="font-size:16px;">🔑</span> Cambiar Contraseña
+            </div>
+            <div class="btn-logout-dropdown" style="padding:10px 14px;font-size:13px;color:var(--color-mir);border-radius:6px;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='rgba(229,9,20,0.1)'" onmouseout="this.style.background='transparent'">
+              <span style="font-size:16px;">🚪</span> Cerrar Sesión
+            </div>
+          </div>
         </div>
       </div>
       <div id="security-banner" onclick="document.querySelector('[data-section=&quot;security&quot;]').click()">
@@ -992,8 +1000,6 @@
                 <ol style="margin:0;padding-left:18px;">
                   <li style="margin-bottom:6px;">Cambia la contraseña del panel admin inmediatamente.</li>
                   <li style="margin-bottom:6px;">Revisa los eventos de seguridad para identificar el origen (IP, email, fecha).</li>
-                  <li style="margin-bottom:6px;">Verifica que no haya contenido malicioso en los recuerdos aprobados recientemente.</li>
-                  <li style="margin-bottom:6px;">Si hay archivos sospechosos, elimínalos desde el panel.</li>
                   <li style="margin-bottom:6px;">Contacta a soporte si el incidente persiste.</li>
                 </ol>
               </div>
@@ -1148,6 +1154,31 @@
     </div>
   </div>
 
+  <!-- ─── Password Change Modal ─── -->
+  <div id="password-modal" style="display:none;position:fixed;z-index:99998;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
+    <div style="background:#121212;border:1px solid rgba(229,9,20,0.2);border-radius:16px;padding:32px;max-width:440px;width:90%;">
+      <h3 style="font-size:18px;font-weight:700;color:white;margin:0 0 4px 0;">🔑 Cambiar Contraseña</h3>
+      <p style="font-size:12px;color:#888;margin:0 0 20px 0;">Ingresa tu contraseña actual y la nueva.</p>
+      <div class="form-group">
+        <label>Contraseña actual</label>
+        <input type="password" id="pw-current" placeholder="••••••••" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" autocomplete="current-password">
+      </div>
+      <div class="form-group">
+        <label>Nueva contraseña</label>
+        <input type="password" id="pw-new" placeholder="••••••••" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label>Confirmar nueva contraseña</label>
+        <input type="password" id="pw-confirm" placeholder="••••••••" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;" autocomplete="new-password">
+      </div>
+      <div id="pw-error" style="font-size:12px;color:var(--color-mir);margin-bottom:12px;display:none;"></div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
+        <button class="btn-secondary" id="btn-pw-cancel" aria-label="Cancelar cambio de contraseña">Cancelar</button>
+        <button class="btn-primary" id="btn-pw-save" style="min-width:140px;" aria-label="Cambiar contraseña">✓ CAMBIAR</button>
+      </div>
+    </div>
+  </div>
+
   <script>
   (function() {
     'use strict';
@@ -1215,19 +1246,33 @@
 
     // ─── Seguridad: registrar intento de login ───
     async function logLoginAttempt(email, success, errorMsg) {
+      var entry = {
+        accion: success ? 'login_success' : 'login_failed',
+        entidad: 'admin_user',
+        usuario_email: email,
+        metadata: {
+          error: errorMsg || null,
+          user_agent: navigator.userAgent,
+          timestamp: new Date().toISOString(),
+        },
+      };
+      // Try edge function (works after login)
       try {
-        var s = await waitForSupabase(3000);
-        if (!s) return;
-        await s.from('audit_log').insert({
-          accion: success ? 'login_success' : 'login_failed',
-          entidad: 'admin_user',
-          usuario_email: email,
-          metadata: {
-            error: errorMsg || null,
-            user_agent: navigator.userAgent,
-            timestamp: new Date().toISOString(),
-          },
-        });
+        var fnUrl = window.EDGE_FUNCTIONS_URL;
+        if (token && fnUrl) {
+          await fetch(fnUrl + '/auditoria', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify(entry),
+          });
+        }
+      } catch (_) {}
+      // Fallback: localStorage audit trail
+      try {
+        var localLog = JSON.parse(localStorage.getItem('_audit_local') || '[]');
+        localLog.push({ ts: Date.now(), email: email, success: success, error: errorMsg });
+        if (localLog.length > 200) localLog = localLog.slice(-200);
+        localStorage.setItem('_audit_local', JSON.stringify(localLog));
       } catch (_) {}
     }
 
@@ -1301,6 +1346,92 @@
       dashboardScreen.style.display = 'none';
       showToast('Sesión cerrada', 'info');
     });
+
+    // Also wire dropdown logout
+    document.querySelector('.btn-logout-dropdown')?.addEventListener('click', function() {
+      btnLogout.click();
+    });
+
+    // ─── User dropdown toggle ───
+    var userBadge = document.getElementById('user-badge');
+    var userDropdown = document.getElementById('user-dropdown');
+    if (userBadge && userDropdown) {
+      userBadge.addEventListener('click', function(e) {
+        e.stopPropagation();
+        userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+      });
+      document.addEventListener('click', function() { userDropdown.style.display = 'none'; });
+      userDropdown.addEventListener('click', function(e) { e.stopPropagation(); });
+    }
+
+    // ─── Password change ───
+    var pwModal = document.getElementById('password-modal');
+    var pwCurrent = document.getElementById('pw-current');
+    var pwNew = document.getElementById('pw-new');
+    var pwConfirm = document.getElementById('pw-confirm');
+    var pwError = document.getElementById('pw-error');
+    var btnPwCancel = document.getElementById('btn-pw-cancel');
+    var btnPwSave = document.getElementById('btn-pw-save');
+
+    function closePwModal() {
+      if (pwModal) pwModal.style.display = 'none';
+      if (pwError) pwError.style.display = 'none';
+      if (pwCurrent) pwCurrent.value = '';
+      if (pwNew) pwNew.value = '';
+      if (pwConfirm) pwConfirm.value = '';
+    }
+
+    if (pwModal) {
+      pwModal.addEventListener('click', function(e) { if (e.target === pwModal) closePwModal(); });
+    }
+    if (btnPwCancel) btnPwCancel.addEventListener('click', closePwModal);
+
+    function showPwError(msg) {
+      if (pwError) { pwError.textContent = msg; pwError.style.display = 'block'; }
+    }
+
+    if (btnPwSave) {
+      btnPwSave.addEventListener('click', async function() {
+        var current = pwCurrent ? pwCurrent.value.trim() : '';
+        var newPw = pwNew ? pwNew.value.trim() : '';
+        var confirmPw = pwConfirm ? pwConfirm.value.trim() : '';
+
+        if (!current) { showPwError('Ingresa tu contraseña actual.'); return; }
+        if (!newPw) { showPwError('Ingresa la nueva contraseña.'); return; }
+        if (newPw.length < 8) { showPwError('La nueva contraseña debe tener al menos 8 caracteres.'); return; }
+        if (newPw !== confirmPw) { showPwError('Las contraseñas nuevas no coinciden.'); return; }
+        if (newPw === current) { showPwError('La nueva contraseña debe ser diferente a la actual.'); return; }
+
+        btnPwSave.textContent = 'Cambiando...';
+        btnPwSave.disabled = true;
+        if (pwError) pwError.style.display = 'none';
+
+        try {
+          // Re-authenticate with current password first (required by Supabase)
+          var s = await waitForSupabase();
+          if (!s) throw new Error('Cliente Supabase no disponible');
+
+          var { error: signInError } = await s.auth.signInWithPassword({
+            email: userData.email,
+            password: current
+          });
+          if (signInError) throw new Error('Contraseña actual incorrecta');
+
+          // Update password
+          var { error: updateError } = await s.auth.updateUser({ password: newPw });
+          if (updateError) throw new Error(updateError.message);
+
+          showToast('Contraseña cambiada exitosamente', 'success');
+          registrarAuditoria('password_change', 'admin_user', userData.id, {});
+          closePwModal();
+        } catch (err) {
+          showPwError(err.message || 'Error al cambiar contraseña');
+        } finally {
+          btnPwSave.textContent = '✓ CAMBIAR';
+          btnPwSave.disabled = false;
+        }
+      });
+    }
 
     // ─── Supabase helpers ───
     function sb() { return window._supabase; }
@@ -3047,6 +3178,26 @@
           else if (e.accion === 'security_file_rejected') countRejected++;
         });
 
+        // Merge localStorage events (failed logins captured when table/edge unavailable)
+        try {
+          var localLog = JSON.parse(localStorage.getItem('_audit_local') || '[]');
+          localLog.forEach(function(e) {
+            if (e.success) countOk++;
+            else countFail++;
+          });
+          // Also show recent local events in the events list
+          if (localLog.length > 0 && events.length < 50) {
+            localLog.slice(-10).reverse().forEach(function(e) {
+              events.push({
+                created_at: new Date(e.ts).toISOString(),
+                accion: e.success ? 'login_success' : 'login_failed',
+                usuario_email: e.email,
+                metadata: { error: e.error || null, local: true }
+              });
+            });
+          }
+        } catch (_) {}
+
         // Update badge in sidebar
         var alertBadge = document.getElementById('security-alert-badge');
         var totalAlerts = countFail + countRejected;
@@ -3094,7 +3245,7 @@
 
         var html = '<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Email / Detalle</th><th>Info adicional</th></tr></thead><tbody>';
         events.forEach(function(e) {
-          var fecha = e.created_at ? new Date(e.created_at).toLocaleString('es-CL') : '—';
+          var fecha = e.created_at ? new Date(e.created_at).toLocaleString('es-CL') : new Date(e.ts || Date.now()).toLocaleString('es-CL');
           var email = e.usuario_email || '—';
           var meta = e.metadata || {};
 
@@ -3135,7 +3286,15 @@
         list.innerHTML = html;
       } catch (err) {
         console.error('[Security] Error:', err);
-        if (err.message !== 'Sesión expirada') showToast('Error al cargar eventos de seguridad', 'error');
+        if (err.message !== 'Sesión expirada') {
+          var list = document.getElementById('security-events-list');
+          if (list && err.code === 'PGRST116') {
+            // 404 — table doesn't exist yet
+            list.innerHTML = '<div class="empty-state" style="border:1px dashed rgba(229,9,20,0.3);border-radius:12px;padding:32px;"><div class="icon">🗄️</div><div class="text" style="font-size:14px;color:#bbb;max-width:480px;margin:0 auto;line-height:1.6;">La tabla <code style="background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:4px;font-size:12px;">audit_log</code> no existe en la base de datos.<br><br>Para crearla, abre el <strong>SQL Editor</strong> de Supabase y ejecuta el script de migración desde <code style="background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:4px;font-size:12px;">supabase/migrations/011_audit_log.sql</code>.<br><br>Mientras tanto, los eventos de seguridad no podrán registrarse.</div></div>';
+          } else {
+            showToast('Error al cargar eventos de seguridad', 'error');
+          }
+        }
       }
     }
 

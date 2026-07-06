@@ -10,6 +10,7 @@
   var timeout = null;
 
   function render(items) {
+    resultsEl.style.display = 'block';
     if (!items || items.length === 0) {
       resultsEl.innerHTML = '<div class="text-white/40 text-sm py-4">Sin resultados</div>';
       return;
@@ -17,8 +18,8 @@
     var html = '';
     items.forEach(function (d) {
       var icono = d.tipo_archivo ? (d.tipo_archivo.startsWith('audio') ? '🎵' : d.tipo_archivo.startsWith('video') ? '🎬' : d.tipo_archivo.startsWith('image') ? '📷' : '📄') : '📄';
-      var origen = d.pais || '';
-      if (d.region) origen += (origen ? ', ' : '') + d.region;
+      var origen = (d.pais || d.pais_origen || '').trim();
+      if (d.region || d.region_origen) origen += (origen ? ', ' : '') + (d.region || d.region_origen || '');
       html += '<a href="' + (d.url_archivo || '#') + '" target="_blank" class="block px-4 py-3 hover:bg-white/5 border-b border-white/5 transition text-sm" style="text-decoration:none;">' +
         '<span class="flex items-center gap-2">' +
           '<span>' + icono + '</span>' +
@@ -47,7 +48,7 @@
   searchEl.addEventListener('input', function () {
     clearTimeout(timeout);
     var v = searchEl.value.trim();
-    if (v.length === 0) { resultsEl.innerHTML = ''; if (clearEl) clearEl.classList.add('hidden'); return; }
+    if (v.length === 0) { resultsEl.innerHTML = ''; resultsEl.style.display = 'none'; if (clearEl) clearEl.classList.add('hidden'); return; }
     if (clearEl) clearEl.classList.remove('hidden');
     timeout = setTimeout(function () { buscar(v); }, 300);
   });

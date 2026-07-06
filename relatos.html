@@ -350,6 +350,118 @@
       });
     }
 
+    /* ─── Toast ─── */
+    function showToast(msg, type) {
+      var c = document.getElementById('toast-container-relatos');
+      if (!c) {
+        c = document.createElement('div');
+        c.id = 'toast-container-relatos';
+        c.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:8px;pointer-events:none;';
+        document.body.appendChild(c);
+      }
+      var t = document.createElement('div');
+      t.style.cssText = 'padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;color:white;pointer-events:auto;animation:fadeSlideUp 0.3s ease-out;box-shadow:0 8px 32px rgba(0,0,0,0.4);';
+      var colors = { error: 'rgba(229,9,20,0.95)', success: 'rgba(46,125,50,0.95)', info: 'rgba(30,30,30,0.95)', warning: 'rgba(255,152,0,0.95)' };
+      t.style.background = colors[type] || colors.info;
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(function() { t.style.opacity = '0'; t.style.transform = 'translateX(40px)'; t.style.transition = '0.3s'; setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 300); }, 4000);
+    }
+
+    /* ─── waitForSupabase ─── */
+    function waitForSupabase(maxWait) {
+      maxWait = maxWait || 8000;
+      return new Promise(function (resolve) {
+        var waited = 0, step = 200;
+        function check() {
+          if (window.miSupabase) return resolve(window.miSupabase);
+          waited += step;
+          if (waited >= maxWait) return resolve(null);
+          setTimeout(check, step);
+        }
+        check();
+      });
+    }
+
+    /* ─── Auto-refresh: re-fetch DB relatos cada 30s ─── */
+    var _refreshTimer = null;
+
+    function iniciarAutoRefresh() {
+      detenerAutoRefresh();
+      _refreshTimer = setInterval(async function() {
+        var sec = estadoRelatos.seccion;
+        if (!sec) return;
+        var client = await waitForSupabase(3000);
+        if (!client) return;
+        try {
+          var resp = await client
+            .from('recuerdos')
+            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, nombre_serie, url_archivo, tipo_archivo')
+            .eq('seccion', sec)
+            .eq('aprobado', true)
+            .not('titulo_relato', 'is', null)
+            .neq('titulo_relato', '')
+            .order('created_at', { ascending: false });
+          if (resp.error || !resp.data) return;
+
+          // Merge: keep hardcoded, replace DB items
+          var hard = RELATOS_HARDCODEADOS[sec] || [];
+          var nuevos = [];
+          hard.forEach(function(a) {
+            nuevos.push({ id: a.id, titulo: a.titulo, subtitulo: a.subtitulo, html: a.html, fuente: 'hardcodeado' });
+          });
+          resp.data.forEach(function(r) {
+            // Avoid duplicates by ID
+            var dup = nuevos.some(function(n) { return n.id === r.id; });
+            if (!dup) {
+              nuevos.push({
+                id: r.id,
+                titulo: r.titulo_relato || 'Sin título',
+                subtitulo: (r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) : '') + (r.nombre_serie ? ' · Serie: ' + r.nombre_serie : '') + ' · por ' + (r.nombre || 'Anónimo'),
+                html: (function() {
+                  var imgHtml = '';
+                  if (r.url_archivo && r.tipo_archivo && r.tipo_archivo.indexOf('image') === 0) {
+                    imgHtml = '<div class="relato-img"><img src="' + r.url_archivo.replace(/"/g, '&quot;') + '" alt="' + escaparHTML(r.titulo_relato || '') + '" loading="lazy"></div>';
+                  }
+                  var metaHtml = (r.created_at ? '<span>' + new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) + '</span>' : '') + '<span>por ' + escaparHTML(r.nombre || 'Anónimo') + '</span>' + (r.nombre_serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escaparHTML(r.nombre_serie) + '</span>' : '');
+                  return '<div class="relato-detalle"><h2>' + escaparHTML(r.titulo_relato || 'Sin título') + '</h2><div class="meta">' + metaHtml + '</div><div class="relato-body">' + imgHtml + '<div class="contenido">' + sanitizarHTML(r.mensaje_largo || r.mensaje || '') + '</div></div></div>';
+                })(),
+                fuente: 'supabase'
+              });
+            }
+          });
+
+          var oldLen = estadoRelatos.items.length;
+          estadoRelatos.items = nuevos;
+
+          // Re-render sidebar preserving active item
+          var activeId = null;
+          var lista = document.getElementById('lista-titulos');
+          if (lista) {
+            var activeLi = lista.querySelector('li.active');
+            if (activeLi) {
+              var match = activeLi.getAttribute('onclick');
+              if (match) { var m = match.match(/'([^']+)'/); if (m) activeId = m[1]; }
+            }
+            lista.innerHTML = nuevos.map(function(r) {
+              var cls = r.id === activeId ? ' class="active"' : '';
+              return '<li' + cls + ' onclick="mostrarRelato(\'' + r.id + '\')">' + escaparHTML(r.titulo) + '</li>';
+            }).join('');
+          }
+
+          // If new items appeared and we're on index, show first new item
+          if (nuevos.length > oldLen && estadoRelatos.modo === 'index') {
+            mostrarRelato(nuevos[0].id);
+            showToast('Nuevo relato disponible', 'info');
+          }
+        } catch (_) {}
+      }, 30000);
+    }
+
+    function detenerAutoRefresh() {
+      if (_refreshTimer) { clearInterval(_refreshTimer); _refreshTimer = null; }
+    }
+
     /* ─── Inicialización ─── */
     (function() {
       var menuToggle = document.getElementById('menu-toggle');
@@ -366,10 +478,9 @@
       var urlParams = new URLSearchParams(window.location.search);
       var idRelato = urlParams.get('id');
       var seccionRelato = urlParams.get('seccion');
-      if (idRelato || seccionRelato) {
-        var sec = seccionRelato || 'Relatos: El Arca';
-        navegarASubseccion(sec);
-      }
+      var sec = seccionRelato || 'Relatos: El Arca';
+      navegarASubseccion(sec);
+      iniciarAutoRefresh();
     })();
   </script>
   </main>

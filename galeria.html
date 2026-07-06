@@ -472,8 +472,24 @@
       var images = [];
       var idx = 0;
 
+      /* ─────────────── waitForSupabase ─────────────── */
+      function waitForSupabase(maxWait) {
+        maxWait = maxWait || 8000;
+        return new Promise(function (resolve) {
+          var waited = 0;
+          var step = 200;
+          function check() {
+            if (window.miSupabase) return resolve(window.miSupabase);
+            waited += step;
+            if (waited >= maxWait) return resolve(null);
+            setTimeout(check, step);
+          }
+          check();
+        });
+      }
+
       /* ─────────────── fetch ─────────────── */
-      function cargar() {
+      async function cargar() {
         var elThumbs = $('gal-thumbs');
         var elImg    = $('gal-img');
         var elEmpty  = $('gal-empty');
@@ -487,7 +503,7 @@
         if (elEmpty) elEmpty.style.display = '';
         if (elCnt) elCnt.textContent = '';
 
-        var client = window.miSupabase;
+        var client = await waitForSupabase();
         if (!client) { usarFallback(); return; }
 
         var galeriaPromise = client.from('galeria')
@@ -496,7 +512,7 @@
           .order('orden', { ascending: true });
 
         var recuerdosPromise = client.from('recuerdos')
-          .select('url_archivo, nombre, mensaje_largo, pais, region')
+          .select('url_archivo, nombre, mensaje_largo')
           .eq('aprobado', true)
           .in('tipo_archivo', ['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
           .order('created_at', { ascending: false });
@@ -513,9 +529,7 @@
 
             if (!rData.error && rData.data && rData.data.length > 0) {
               rData.data.forEach(function (d) {
-                var sub = d.pais || '';
-                if (d.region) sub += (sub ? ', ' : '') + d.region;
-                all.push({ url: d.url_archivo, titulo: d.nombre || '', subtitulo: sub });
+                all.push({ url: d.url_archivo, titulo: d.nombre || '', subtitulo: '' });
               });
             }
 
