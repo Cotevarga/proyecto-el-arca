@@ -21,9 +21,8 @@ jobs:
           version: latest
 
       - name: Link project
-        run: >
-          supabase link
-          --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}"
+        run: |
+          supabase link --project-ref ukpoprkdgezgxlkjjuve
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
@@ -33,9 +32,13 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Deploy functions
-        run: supabase functions deploy --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}"
+        run: supabase functions deploy --project-ref ukpoprkdgezgxlkjjuve
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Notify deploy status
+        if: always()
+        run: echo "Edge Functions deploy status: ${{ job.status }}"
 
   deploy-vercel:
     name: Deploy Frontend (Vercel)
@@ -47,9 +50,9 @@ jobs:
         run: npm install -g vercel
 
       - name: Deploy to Vercel
-        run: >
-          vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"
-          --scope="${{ secrets.VERCEL_ORG_ID }}"
+        run: |
+          vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}" `
+            --scope="team_kiyDYH05TcOgl7saOwBi2N4H"
         env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: team_kiyDYH05TcOgl7saOwBi2N4H
+          VERCEL_PROJECT_ID: prj_2RB5iSSwApAbiZBBtiT3pCIfd41A
