@@ -161,18 +161,56 @@ Un recuerdo es aprobado si cumple **todos** estos criterios:
 
 ---
 
+## f) Alineación con Convocatorias Internacionales (UNESCO, Europa Creativa)
+
+### Marco de referencia
+
+El Arca se alinea con los siguientes estándares y programas internacionales:
+
+| Programa | Ejes de alineación |
+|----------|-------------------|
+| **UNESCO Memory of the World** | Autenticidad documental (hash SHA-256), significancia territorial, contexto histórico de resistencia, integridad del archivo |
+| **UNESCO Education for Sustainable Development (ESD) 2030** | ODS 4.7 (educación para ciudadanía global), pedagogía crítica, trabajo con infancias |
+| **Europa Creativa — Patrimonio Cultural** | Digitalización participativa, código abierto, licencia CC BY-NC-SA 4.0 |
+| **Fondart Regional / FNDR 8% Cultura** | Fortalcimiento de identidad local, participación comunitaria, memoria territorial |
+| **National Endowment for the Humanities (NEH)** | Preservación digital de patrimonio inmaterial, historia oral comunitaria |
+
+### Plan de cierre de brechas para postulación UNESCO
+
+| Brecha detectada | Acción concreta | Responsable | Plazo |
+|-----------------|-----------------|-------------|-------|
+| Sin respaldo institucional formal | Solicitar carta de patrocinio a: (1) Municipalidad de La Pintana, (2) Liceo Municipal, (3) Junta de Vecinos Población Francisco de Goya | Enlace comunitario | 3 meses |
+| Sin publicaciones académicas | Preparar artículo para revista "Patrimonio Inmaterial" o "Revista de Educación Popular" | Administradora | 6 meses |
+| Convenios escolares sin formalizar | Firmar convenio marco con Liceo Municipal y Escuela Básica G-520 | Facilitador/a pedagógico | 2 meses |
+| Sin métricas de impacto validadas externamente | Solicitar evaluación a estudiantes de última año de trabajo social o antropología de universidad local (convenio práctico) | Administradora | 4 meses |
+| Sin comité asesor externo | Convocar a 3 personas externas (académico, dirigente vecinal, gestor cultural) como consejo consultivo ad-honorem | Enlace comunitario | 6 meses |
+
+### Hoja de ruta para reconocimiento internacional
+
+```
+Mes 1-3:   Obtener cartas de respaldo institucional + firmar convenios escolares
+Mes 4-6:   Publicar artículo académico + implementar dashboard de KPIs públicos
+Mes 7-9:   Conformar consejo consultivo externo + solicitar evaluación universitaria
+Mes 10-12: Postular a Fondart Regional y UNESCO Memory of the World (registro nacional)
+Año 2:     Postular a Europa Creativa y NEH (fase de escalabilidad)
+Año 3-5:   Postular a UNESCO Memory of the World (registro internacional)
+```
+
+---
+
 ## Ficha del proyecto
 
 | Campo | Valor |
 |-------|-------|
 | **Nombre** | Archivo Comunitario "El Arca" |
 | **Territorio** | Población Francisco de Goya, La Pintana, Región Metropolitana, Chile |
-| **Misión** | Salvaguardar, digitalizar y poner en valor la memoria colectiva del territorio |
-| **Visión** | 10.000+ registros digitales para 2046, accesibles globalmente |
+| **Misión** | Salvaguardar, digitalizar y activar pedagógicamente la memoria colectiva del territorio para formar adultos críticos, conscientes y solidarios desde el trabajo de masas con las infancias |
+| **Visión** | 10.000+ registros digitales para 2046, accesibles globalmente, con réplicas en 5+ territorios |
 | **Público** | Vecinos, investigadores, estudiantes, organizaciones culturales |
 | **Tecnología** | Supabase (PostgreSQL + Storage + Realtime) + Frontend HTML/CSS/JS |
 | **Licencia** | MIT (software) / CC BY-NC-SA 4.0 (contenido) |
 | **Postulación a** | Fondart Regional, FNDR 8% Cultura, UNESCO Memory of the World, National Endowment for the Humanities, Europa Creativa |
+| **Seguridad** | RLS + CORS restringido + rate limiting + validación MIME + honeypot antispam |
 
 ---
 

@@ -4,27 +4,68 @@ import { getSupabaseAdmin } from "../_shared/supabase.ts";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
 const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") ?? "mariajosevarga@gmail.com";
 
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const RATE_LIMIT_MAX = 5; // max submissions per window
+const MAX_STRING_LENGTH = 5000;
+const MAX_NOMBRE_LENGTH = 200;
+
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    "&": "&amp;", "<": "&lt;", ">": "&gt;",
+    '"': "&quot;", "'": "&#039;",
+  };
+  return String(text).replace(/[&<>"']/g, (c) => map[c] ?? c);
+}
+
 Deno.serve(async (req: Request) => {
   const cors = handleCors(req);
   if (cors) return cors;
+  const ch = corsHeaders(req);
 
   const supabase = getSupabaseAdmin();
+  const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+    || req.headers.get("cf-connecting-ip")
+    || "unknown";
 
   try {
+    // ─── Rate limiting ───
+    const { count, error: countError } = await supabase
+      .from("rate_limits")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_address", clientIp)
+      .gte("created_at", new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString());
+
+    if (!countError && count !== null && count >= RATE_LIMIT_MAX) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Demasiadas solicitudes. Intenta en 15 minutos." }),
+        { status: 429, headers: { ...ch, "Content-Type": "application/json" } },
+      );
+    }
+
     const formData = await req.formData();
+
+    // ─── Honeypot check ───
+    const honeypot = formData.get("website") as string;
+    if (honeypot) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Solicitud rechazada." }),
+        { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
+      );
+    }
+
     const file = formData.get("archivo") as File | null;
-    const nombre = (formData.get("nombre") as string)?.trim() || "Anónimo";
-    const anio = formData.get("anio") as string ?? null;
-    const mensaje = formData.get("mensaje") as string ?? null;
-    const mensaje_largo = formData.get("mensaje_largo") as string ?? null;
-    const categoria = formData.get("categoria") as string || "galeria";
-    const seccion = (formData.get("seccion") as string) || "general";
-    const texto = formData.get("texto") as string ?? null;
+    const nombre = ((formData.get("nombre") as string)?.trim() || "Anónimo").slice(0, MAX_NOMBRE_LENGTH);
+    const anio = (formData.get("anio") as string)?.slice(0, 10) ?? null;
+    const mensaje = (formData.get("mensaje") as string)?.slice(0, MAX_STRING_LENGTH) ?? null;
+    const mensaje_largo = (formData.get("mensaje_largo") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
+    const categoria = (formData.get("categoria") as string || "galeria").slice(0, 100);
+    const seccion = (formData.get("seccion") as string || "general").slice(0, 100);
+    const texto = (formData.get("texto") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
 
     if ((!file || file.size === 0) && !mensaje_largo && !texto) {
       return new Response(
         JSON.stringify({ success: false, error: "Archivo o texto requerido" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
       );
     }
 
@@ -38,14 +79,14 @@ Deno.serve(async (req: Request) => {
       if (!validTypes.includes(file.type)) {
         return new Response(
           JSON.stringify({ success: false, error: "Tipo de archivo no válido." }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
         );
       }
 
       if (file.size > 50 * 1024 * 1024) {
         return new Response(
           JSON.stringify({ success: false, error: "El archivo supera los 50 MB." }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
         );
       }
     }
@@ -103,6 +144,12 @@ Deno.serve(async (req: Request) => {
 
     if (insertError) throw insertError;
 
+    // ─── Register rate limit ───
+    await supabase.from("rate_limits").insert({
+      ip_address: clientIp,
+      action: "upload_recuerdo",
+    }).catch(() => {});
+
     // ─── Send email notification via Resend ───
     if (RESEND_API_KEY) {
       try {
@@ -138,20 +185,12 @@ Deno.serve(async (req: Request) => {
 
     return new Response(
       JSON.stringify({ success: true, data: inserted }),
-      { status: 201, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { status: 201, headers: { ...ch, "Content-Type": "application/json" } },
     );
   } catch (err) {
     return new Response(
       JSON.stringify({ success: false, error: "Error interno del servidor" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { status: 500, headers: { ...ch, "Content-Type": "application/json" } },
     );
   }
 });
-
-function escapeHtml(text: string): string {
-  const map: Record<string, string> = {
-    "&": "&amp;", "<": "&lt;", ">": "&gt;",
-    '"': "&quot;", "'": "&#039;",
-  };
-  return String(text).replace(/[&<>"']/g, (c) => map[c] ?? c);
-}

@@ -1,7 +1,17 @@
 # El Arca — Archivo Comunitario
 
-Memorial de Pedro "Cabezón Jano" González.  
-**Arquitectura BaaS:** Supabase (Edge Functions + PostgreSQL + Storage) + Frontend estático en Vercel.
+**Memorial de Pedro "Cabezón Jano" González**  
+*Población Francisco de Goya, La Pintana — Santiago de Chile*
+
+---
+
+## Propósito
+
+El Arca no es solo un archivo digital. Es una **herramienta política-pedagógica** para retomar el trabajo de masas con las infancias de los territorios, formando adultos críticos, conscientes y solidarios.
+
+La memoria colectiva de nuestro barrio —sus luchas, sus organizaciones, sus referentes— es el combustible para que las nuevas generaciones entiendan que **no están destinadas al sometimiento**, sino a ser sujetos conscientes de su propia historia. Preservar y activar esa memoria es un acto de soberanía.
+
+> *"No queremos que los niños sean solo consumidores de archivo. Queremos que sean sus creadores, sus curadores y sus herederos."*
 
 ---
 
@@ -24,8 +34,7 @@ Memorial de Pedro "Cabezón Jano" González.
 ```
 /
 ├── supabase/
-│   ├── migrations/           # SQL schema + RLS policies
-│   │   └── 001_schema.sql
+│   ├── migrations/           # SQL schema + RLS policies (001–007)
 │   ├── functions/
 │   │   ├── _shared/          # CORS, Supabase client helpers
 │   │   ├── auth/             # POST /auth — login + JWT
@@ -35,16 +44,35 @@ Memorial de Pedro "Cabezón Jano" González.
 │   │   └── upload/           # POST /upload — subida + email (Resend)
 │   ├── config.toml
 │   └── deno.json
-├── src/main/resources/static/    # Frontend estático
-│   ├── index.html, galeria.html, videos.html, ...
-│   ├── admin.html
-│   ├── supabase.js           # Cliente Supabase compartido
-│   ├── app.js                # SPA router
-│   └── images/               # Fotos históricas (Che, Víctor Jara, Jano)
-├── src/main/java/...         # Legacy Spring Boot (no usado en producción)
+├── *.html                    # Frontend estático en raíz
+│   ├── index.html            # Portada del archivo
+│   ├── relatos.html          # Relatos organizados por sección
+│   ├── galeria.html          # Galería de imágenes
+│   ├── videos.html           # Videos y material audiovisual
+│   ├── admin.html            # Panel de administración y curaduría
+│   ├── subir.html            # Formulario público de contribución
+│   └── ...
+├── images/                   # Fotos históricas del territorio
+├── supabase.js               # Cliente Supabase compartido
+├── app.js                    # SPA router
 ├── .env.template
+├── vercel.json
 └── README.md
 ```
+
+---
+
+## Documentación complementaria
+
+| Archivo | Contenido |
+|---------|-----------|
+| `informe-proyecto.md` | Problema, solución, KPIs, gobernanza, presupuesto y plan UNESCO |
+| `MAPA-RUTA-PEDAGOGICO.md` | Ruta pedagógica: talleres con NNA, validación comunitaria e integración curricular |
+| `protocolo-curaduria.md` | Criterios de ingreso, política de rechazo y principios éticos del archivo |
+| `PLAN-SOSTENIBILIDAD.md` | Sostenibilidad técnica, financiera, preservación de datos y continuidad humana |
+| `CONTRIBUTING.md` | Guía para contribuir, replicar y adaptar el proyecto en otros territorios |
+| `template-carta-respaldo.md` | Modelo de carta para solicitar patrocinio institucional |
+| `template-convenio-escolar.md` | Modelo de convenio para formalizar colaboración con escuelas |
 
 ---
 
@@ -62,26 +90,21 @@ Memorial de Pedro "Cabezón Jano" González.
 ### 1. Supabase — Base de datos y RLS
 
 1. Crear proyecto en [supabase.com](https://supabase.com)
-2. Ir a **SQL Editor** → pegar el contenido de `supabase/migrations/001_schema.sql` → Ejecutar
+2. Ir a **SQL Editor** → ejecutar las migraciones en orden desde `supabase/migrations/`
 3. Ir a **Authentication** → Settings → habilitar email/password auth
 4. Ir a **Storage** → crear bucket público `elarca-uploads`
-5. Crear usuario admin en **Authentication** → Users → Add User (email: `mariajosevarga@gmail.com`, password: la que elijas)
+5. Crear usuario admin en **Authentication** → Users → Add User (email: `mariajosevarga@gmail.com`)
 
-> ⚠️ La migración SQL ya incluye el seed del admin y todas las políticas RLS.
+> ⚠️ Las migraciones SQL ya incluyen el seed del admin y todas las políticas RLS.
 
 ### 2. Edge Functions (Backend)
 
 ```bash
-# Instalar Supabase CLI
 npm install -g supabase
 
-# Iniciar sesión
 supabase login
-
-# Vincular con tu proyecto
 supabase link --project-ref <tu-project-id>
 
-# Desplegar todas las Edge Functions
 supabase functions deploy auth
 supabase functions deploy galeria
 supabase functions deploy musica
@@ -89,21 +112,21 @@ supabase functions deploy recuerdos
 supabase functions deploy upload
 ```
 
-Setear variables de entorno para las funciones:
+Setear variables de entorno:
 
 ```bash
 supabase secrets set RESEND_API_KEY=re_your-api-key
 supabase secrets set ADMIN_EMAIL=mariajosevarga@gmail.com
+supabase secrets set CORS_ALLOWED_ORIGINS=https://elarca.cl,https://www.elarca.cl
+supabase secrets set DOMAIN=elarca.cl
 ```
 
 ### 3. Vercel — Frontend
 
 1. Ir a [vercel.com](https://vercel.com) → Importar repositorio
-2. **Root Directory:** `src/main/resources/static`
-3. **Build Command:** nada (solo estáticos)
-4. **Output:** nada
-
-**O bien**, copiar el contenido de `src/main/resources/static/` a un repositorio separado y desplegar.
+2. **Root Directory:** `/` (la raíz del proyecto)
+3. **Build Command:** ninguno (solo estáticos)
+4. **Output:** ninguno
 
 **Importante:** Setear estas variables de entorno en Vercel:
 
@@ -113,7 +136,7 @@ supabase secrets set ADMIN_EMAIL=mariajosevarga@gmail.com
 | `SUPABASE_URL` | `https://tu-project.supabase.co` |
 | `SUPABASE_ANON_KEY` | tu anon key (pública) |
 
-Luego reemplazar `${SUPABASE_PROJECT_ID}` y `${SUPABASE_ANON_KEY}` en los HTMLs con los valores reales, o inyectarlos via Vercel Environment Variables + build script.
+Luego reemplazar `${SUPABASE_PROJECT_ID}` y `${SUPABASE_ANON_KEY}` en los HTMLs con los valores reales, o inyectarlos vía Vercel Environment Variables.
 
 ---
 
@@ -133,7 +156,7 @@ Ver `.env.template` para referencia completa.
 
 ### Frontend (inyectadas en HTML)
 
-Estos placeholders deben ser reemplazados por valores reales:
+Placeholders a reemplazar por valores reales:
 - `${SUPABASE_PROJECT_ID}` → tu project ID
 - `${SUPABASE_ANON_KEY}` → tu anon key pública
 
@@ -183,18 +206,9 @@ Todas las tablas tienen RLS habilitado:
 
 ---
 
-## Legacy (Spring Boot)
-
-El proyecto conserva el backend Java Spring Boot 3.4 para referencia y desarrollo local.  
-No se usa en producción — toda la lógica corre en Supabase Edge Functions.
-
-Para desarrollo local del backend legacy:
-```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
----
-
 ## Licencia
+
+**Software:** MIT  
+**Contenido del archivo:** CC BY-NC-SA 4.0  
 
 Memoria Popular El Arca — La Pintana, Santiago de Chile.

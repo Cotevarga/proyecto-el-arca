@@ -4,13 +4,14 @@ import { getSupabase, getSupabaseAdmin } from "../_shared/supabase.ts";
 Deno.serve(async (req: Request) => {
   const cors = handleCors(req);
   if (cors) return cors;
+  const ch = corsHeaders(req);
 
   try {
     const { email, password } = await req.json();
     if (!email || !password) {
       return new Response(
         JSON.stringify({ success: false, message: "Email y contraseña requeridos" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
       );
     }
 
@@ -23,7 +24,7 @@ Deno.serve(async (req: Request) => {
     if (authError || !authData.session) {
       return new Response(
         JSON.stringify({ success: false, message: "Credenciales inválidas" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 401, headers: { ...ch, "Content-Type": "application/json" } },
       );
     }
 
@@ -37,7 +38,7 @@ Deno.serve(async (req: Request) => {
     if (userError || !userData) {
       return new Response(
         JSON.stringify({ success: false, message: "Usuario no encontrado" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 403, headers: { ...ch, "Content-Type": "application/json" } },
       );
     }
 
@@ -51,12 +52,12 @@ Deno.serve(async (req: Request) => {
           nombre: userData.nombre ?? "Admin",
         },
       }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { status: 200, headers: { ...ch, "Content-Type": "application/json" } },
     );
   } catch (err) {
     return new Response(
       JSON.stringify({ success: false, message: "Error interno del servidor" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { status: 500, headers: { ...ch, "Content-Type": "application/json" } },
     );
   }
 });

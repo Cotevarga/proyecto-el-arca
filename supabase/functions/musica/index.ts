@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "../_shared/supabase.ts";
 Deno.serve(async (req: Request) => {
   const cors = handleCors(req);
   if (cors) return cors;
+  const ch = corsHeaders(req);
 
   const supabase = getSupabaseAdmin();
 
@@ -23,7 +24,7 @@ Deno.serve(async (req: Request) => {
 
       return new Response(JSON.stringify(data ?? []), {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...ch, "Content-Type": "application/json" },
       });
     }
 
@@ -37,21 +38,21 @@ Deno.serve(async (req: Request) => {
       if (!file) {
         return new Response(
           JSON.stringify({ success: false, error: "Archivo MP3 requerido" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
         );
       }
 
       if (file.type !== "audio/mpeg" && !file.name.toLowerCase().endsWith(".mp3")) {
         return new Response(
           JSON.stringify({ success: false, error: "Formato no válido. Solo MP3." }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
         );
       }
 
       if (file.size > 50 * 1024 * 1024) {
         return new Response(
           JSON.stringify({ success: false, error: "El archivo supera los 50 MB." }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
         );
       }
 
@@ -93,7 +94,7 @@ Deno.serve(async (req: Request) => {
 
       return new Response(JSON.stringify({ success: true, data }), {
         status: 201,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...ch, "Content-Type": "application/json" },
       });
     }
 
@@ -113,7 +114,7 @@ Deno.serve(async (req: Request) => {
 
       return new Response(JSON.stringify({ success: true, data }), {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...ch, "Content-Type": "application/json" },
       });
     }
 
@@ -140,15 +141,15 @@ Deno.serve(async (req: Request) => {
 
       return new Response(JSON.stringify({ success: true }), {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...ch, "Content-Type": "application/json" },
       });
     }
 
-    return new Response("Method not allowed", { status: 405, headers: corsHeaders });
+    return new Response("Method not allowed", { status: 405, headers: { ...ch, "Content-Type": "text/plain" } });
   } catch (err) {
     return new Response(
       JSON.stringify({ success: false, error: "Error interno del servidor" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { status: 500, headers: { ...ch, "Content-Type": "application/json" } },
     );
   }
 });

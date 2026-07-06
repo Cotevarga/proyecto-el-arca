@@ -29,6 +29,8 @@
     .cat-card { transition: all 0.4s ease; cursor: pointer; }
     .cat-card:hover { transform: translateY(-8px); border-color: var(--color-mir) !important; box-shadow: 0 10px 40px rgba(229,9,20,0.2); }
   </style>
+  <script src="/config.js"></script>
+  <script src="/supabase.js" defer></script>
   <script src="/audio-player.js" defer></script>
     <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
@@ -134,15 +136,6 @@
         <a href="/subir.html" class="inline-block bg-mir hover:bg-resistencia-700 text-white font-bold py-3 px-10 transition-all duration-300 tracking-wider uppercase text-sm border-2 border-mir hover:bg-black hover:text-mir">Comparte tu recuerdo</a>
       </div>
     </section>
-
-  <script>
-    if (!window.miSupabase && typeof supabase !== 'undefined') {
-      window.miSupabase = supabase.createClient(
-        'https://ukpoprkdgezgxlkjjuve.supabase.co',
-        'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi'
-      );
-    }
-  </script>
 
   <script>
     /* ─── Relatos hardcodeados (por artículo individual) ─── */

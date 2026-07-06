@@ -27,15 +27,8 @@
     @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
     .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
-  <script>
-    window.miSupabase = supabase.createClient(
-      'https://ukpoprkdgezgxlkjjuve.supabase.co',
-      'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi'
-    );
-    window.SUPABASE_URL = 'https://ukpoprkdgezgxlkjjuve.supabase.co';
-    window.SUPABASE_ANON_KEY = 'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi';
-  </script>
+  <script src="/config.js"></script>
+  <script src="/supabase.js" defer></script>
   <script src="/audio-player.js" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
   <script>
@@ -88,9 +81,13 @@
     <section class="py-16" style="background-color:#111111">
       <div class="max-w-3xl mx-auto px-4">
         <form id="form-archivo" class="space-y-6 card-mir">
+          <div style="position:absolute;left:-9999px" aria-hidden="true">
+            <label for="website">No llenar</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
           <div>
             <label for="nombre" class="block text-sm font-bold text-white/80 mb-1 uppercase">Nombre o Pseudónimo</label>
-            <input type="text" id="nombre" name="nombre" required class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
+            <input type="text" id="nombre" name="nombre" required maxlength="200" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
           </div>
           <div>
             <label for="anio" class="block text-sm font-bold text-white/80 mb-1 uppercase">Año estimado del material</label>
@@ -105,7 +102,7 @@
           </div>
           <div>
             <label for="relato" class="block text-sm font-bold text-white/80 mb-1 uppercase">Relato</label>
-            <textarea id="relato" name="relato" rows="15" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-y" placeholder="Escribe aquí tu relato, entrevista o descripción completa..."></textarea>
+            <textarea id="relato" name="relato" rows="15" maxlength="20000" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-y" placeholder="Escribe aquí tu relato, entrevista o descripción completa..."></textarea>
           </div>
           <div id="metadata-fields" style="padding:12px 16px;background:rgba(229,9,20,0.04);border:1px solid rgba(229,9,20,0.1);border-radius:8px;">
             <p style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:12px;">Metadatos adicionales (opcionales)</p>
@@ -135,9 +132,9 @@
           <script>
     (function () {
       'use strict';
-      var supabaseClient = window.miSupabase;
-      if (!supabaseClient) {
-        document.getElementById('form-messages').textContent = 'Error de conexión. Recarga la página.';
+      var fnUrl = window.EDGE_FUNCTIONS_URL;
+      if (!fnUrl) {
+        document.getElementById('form-messages').textContent = 'Error de configuración. Recarga la página.';
         document.getElementById('form-messages').className = 'text-center text-sm font-medium text-mir';
         document.getElementById('form-messages').classList.remove('hidden');
         return;
@@ -149,6 +146,7 @@
       var fileInfo = document.getElementById('file-info');
       var menuToggle = document.getElementById('menu-toggle');
       var mobileMenu = document.getElementById('mobile-menu');
+      var UPLOAD_URL = fnUrl + '/upload';
 
       if (menuToggle && mobileMenu) {
         menuToggle.addEventListener('click', function () { mobileMenu.classList.toggle('hidden'); });
@@ -173,54 +171,6 @@
           fileInfo.textContent = 'Archivo: ' + file.name + ' (' + (file.size / 1024 / 1024).toFixed(1) + ' MB)';
           fileInfo.classList.remove('hidden');
         });
-      }
-
-      function leerMetadatosForm() {
-        var meta = {};
-        var geo = document.getElementById('geolocalizacion');
-        if (geo && geo.value.trim()) meta.geolocalizacion = geo.value.trim();
-        var fechaArch = document.getElementById('fecha-creacion-archivo');
-        if (fechaArch && fechaArch.value) meta.fecha_creacion_archivo = fechaArch.value;
-        var tagsEl = document.getElementById('tags');
-        if (tagsEl && tagsEl.value.trim()) {
-          meta.tags = tagsEl.value.trim().split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t.length > 0; });
-        }
-        return meta;
-      }
-
-      async function manejarSubida(file, metadata) {
-        var meta = leerMetadatosForm();
-        var fileName = Date.now() + '_' + file.name;
-        var { error: uploadError } = await supabaseClient
-          .storage
-          .from('elarca-uploads')
-          .upload('recuerdos/' + fileName, file);
-        if (uploadError) throw uploadError;
-
-        var { data: { publicUrl } } = supabaseClient
-          .storage
-          .from('elarca-uploads')
-          .getPublicUrl('recuerdos/' + fileName);
-
-        var { error: dbError } = await supabaseClient
-          .from('recuerdos')
-          .insert({
-            nombre: metadata.nombre,
-            anio: metadata.anio || null,
-            url_archivo: publicUrl,
-            storage_path: 'recuerdos/' + fileName,
-            tipo_archivo: file.type,
-            nombre_original: file.name,
-            tamanio_bytes: file.size,
-            mensaje_largo: metadata.relato || null,
-            aprobado: false,
-            seccion: null,
-            consentimiento: true,
-            geolocalizacion: meta.geolocalizacion || null,
-            tags: meta.tags || null,
-            fecha_creacion_archivo: meta.fecha_creacion_archivo || null
-          });
-        if (dbError) throw dbError;
       }
 
       if (formArchivo) {
@@ -254,24 +204,26 @@
           btn.disabled = true;
 
           try {
-            if (file && file.size > 0) {
-              await manejarSubida(file, { nombre: nombre, anio: anio, relato: relato });
-            } else {
-              var meta = leerMetadatosForm();
-              var { error: dbError } = await supabaseClient
-                .from('recuerdos')
-                .insert({
-                  nombre: nombre,
-                  anio: anio || null,
-                  mensaje_largo: relato || null,
-                  aprobado: false,
-                  seccion: null,
-                  consentimiento: true,
-                  geolocalizacion: meta.geolocalizacion || null,
-                  tags: meta.tags || null,
-                  fecha_creacion_archivo: meta.fecha_creacion_archivo || null
-                });
-              if (dbError) throw dbError;
+            var formData = new FormData();
+            if (file && file.size > 0) formData.append('archivo', file);
+            formData.append('nombre', nombre);
+            if (anio) formData.append('anio', anio);
+            if (relato) formData.append('mensaje_largo', relato);
+            formData.append('seccion', 'general');
+            var geo = document.getElementById('geolocalizacion');
+            if (geo && geo.value.trim()) formData.append('geolocalizacion', geo.value.trim());
+            var fechaArch = document.getElementById('fecha-creacion-archivo');
+            if (fechaArch && fechaArch.value) formData.append('fecha_creacion_archivo', fechaArch.value);
+            var tagsEl = document.getElementById('tags');
+            if (tagsEl && tagsEl.value.trim()) formData.append('tags', tagsEl.value.trim());
+            formData.append('categoria', file ? (file.type.startsWith('audio') ? 'audio' : file.type.startsWith('video') ? 'video' : 'foto') : 'texto');
+            formData.append('texto', relato || '');
+
+            var resp = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
+            var result = await resp.json();
+
+            if (!resp.ok || !result.success) {
+              throw new Error(result.error || 'Error del servidor');
             }
 
             messages.textContent = '\u00a1Gracias por compartir tu recuerdo! Ser\u00e1 revisado pronto.';

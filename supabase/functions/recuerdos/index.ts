@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "../_shared/supabase.ts";
 Deno.serve(async (req: Request) => {
   const cors = handleCors(req);
   if (cors) return cors;
+  const ch = corsHeaders(req);
 
   const supabase = getSupabaseAdmin();
 
@@ -24,7 +25,7 @@ Deno.serve(async (req: Request) => {
 
       return new Response(JSON.stringify(data ?? []), {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...ch, "Content-Type": "application/json" },
       });
     }
 
@@ -41,7 +42,7 @@ Deno.serve(async (req: Request) => {
       if (!nombre) {
         return new Response(
           JSON.stringify({ success: false, error: "Nombre requerido" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
         );
       }
 
@@ -60,14 +61,14 @@ Deno.serve(async (req: Request) => {
         if (!validTypes.includes(file.type)) {
           return new Response(
             JSON.stringify({ success: false, error: "Tipo de archivo no válido." }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+            { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
           );
         }
 
         if (file.size > 50 * 1024 * 1024) {
           return new Response(
             JSON.stringify({ success: false, error: "El archivo supera los 50 MB." }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+            { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
           );
         }
 
@@ -112,7 +113,7 @@ Deno.serve(async (req: Request) => {
 
       return new Response(JSON.stringify({ success: true, data }), {
         status: 201,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...ch, "Content-Type": "application/json" },
       });
     }
 
@@ -135,7 +136,7 @@ Deno.serve(async (req: Request) => {
 
       return new Response(JSON.stringify({ success: true, data }), {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...ch, "Content-Type": "application/json" },
       });
     }
 
@@ -158,15 +159,15 @@ Deno.serve(async (req: Request) => {
 
       return new Response(JSON.stringify({ success: true }), {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...ch, "Content-Type": "application/json" },
       });
     }
 
-    return new Response("Not found", { status: 404, headers: corsHeaders });
+    return new Response("Not found", { status: 404, headers: { ...ch, "Content-Type": "text/plain" } });
   } catch (err) {
     return new Response(
       JSON.stringify({ success: false, error: "Error interno del servidor" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { status: 500, headers: { ...ch, "Content-Type": "application/json" } },
     );
   }
 });

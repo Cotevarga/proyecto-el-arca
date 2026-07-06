@@ -102,15 +102,19 @@ ON CONFLICT (email) DO NOTHING;
 ALTER TABLE public.admin_users ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "admin_users_select_policy" ON public.admin_users;
 CREATE POLICY "admin_users_select_policy" ON public.admin_users
-    FOR SELECT USING (true);
+    FOR SELECT USING (auth.role() = 'authenticated');
 
 DROP POLICY IF EXISTS "admin_users_insert_policy" ON public.admin_users;
 CREATE POLICY "admin_users_insert_policy" ON public.admin_users
-    FOR INSERT WITH CHECK (true);
+    FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
 DROP POLICY IF EXISTS "admin_users_update_policy" ON public.admin_users;
 CREATE POLICY "admin_users_update_policy" ON public.admin_users
-    FOR UPDATE USING (true);
+    FOR UPDATE USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "admin_users_delete_policy" ON public.admin_users;
+CREATE POLICY "admin_users_delete_policy" ON public.admin_users
+    FOR DELETE USING (auth.role() = 'authenticated');
 
 -- ─── recuerdos ───
 ALTER TABLE public.recuerdos ENABLE ROW LEVEL SECURITY;

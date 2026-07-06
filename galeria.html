@@ -271,11 +271,7 @@
       .gal-lb-prev, .gal-lb-next { font-size: 28px; padding: 14px 10px; }
     }
   </style>
-  <script>
-    window.SUPABASE_URL = 'https://ukpoprkdgezgxlkjjuve.supabase.co';
-    window.SUPABASE_ANON_KEY = 'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi';
-    window.EDGE_FUNCTIONS_URL = 'https://ukpoprkdgezgxlkjjuve.supabase.co/functions/v1';
-  </script>
+  <script src="/config.js"></script>
   <script src="/supabase.js" defer></script>
   <script src="/audio-player.js" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
@@ -421,18 +417,6 @@
     </script>
 
     <!-- ════════════════════════════════════════════════════════════ -->
-    <!-- SCRIPT: Asegurar Supabase (el CDN ya está en <head> vía supabase.js) -->
-    <!-- ════════════════════════════════════════════════════════════ -->
-    <script>
-    if (!window.miSupabase && typeof supabase !== 'undefined') {
-      window.miSupabase = supabase.createClient(
-        'https://ukpoprkdgezgxlkjjuve.supabase.co',
-        'sb_publishable_4fc-Vh3qJQkTTAbMWA4I8A_N7jUbEMi'
-      );
-    }
-    </script>
-
-    <!-- ════════════════════════════════════════════════════════════ -->
     <!-- SCRIPT: Motor de Galería (se re-ejecuta en cada SPA)       -->
     <!-- ════════════════════════════════════════════════════════════ -->
     <script>
@@ -481,13 +465,33 @@
         var client = window.miSupabase;
         if (!client) { usarFallback(); return; }
 
-        client.from('galeria')
+        var galeriaPromise = client.from('galeria')
           .select('url_imagen, titulo')
           .eq('activo', true)
-          .order('orden', { ascending: true })
-          .then(function (r) {
-            if (!r.error && r.data && r.data.length > 0) {
-              images = r.data.map(function (d) { return { url: d.url_imagen, titulo: d.titulo || '' }; });
+          .order('orden', { ascending: true });
+
+        var recuerdosPromise = client.from('recuerdos')
+          .select('url_archivo, nombre, mensaje_largo')
+          .eq('aprobado', true)
+          .in('tipo_archivo', ['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+          .order('created_at', { ascending: false });
+
+        Promise.all([galeriaPromise, recuerdosPromise])
+          .then(function (results) {
+            var gData = results[0];
+            var rData = results[1];
+            var all = [];
+
+            if (!gData.error && gData.data && gData.data.length > 0) {
+              gData.data.forEach(function (d) { all.push({ url: d.url_imagen, titulo: d.titulo || '' }); });
+            }
+
+            if (!rData.error && rData.data && rData.data.length > 0) {
+              rData.data.forEach(function (d) { all.push({ url: d.url_archivo, titulo: d.nombre || '' }); });
+            }
+
+            if (all.length > 0) {
+              images = all;
             } else { usarFallback(); }
             render();
           })
