@@ -50,9 +50,7 @@ jobs:
         run: npm install -g vercel
 
       - name: Deploy to Vercel
-        run: |
-          vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}" `
-            --scope="team_kiyDYH05TcOgl7saOwBi2N4H"
+        run: vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}" --scope="team_kiyDYH05TcOgl7saOwBi2N4H"
         env:
           VERCEL_ORG_ID: team_kiyDYH05TcOgl7saOwBi2N4H
           VERCEL_PROJECT_ID: prj_2RB5iSSwApAbiZBBtiT3pCIfd41A
