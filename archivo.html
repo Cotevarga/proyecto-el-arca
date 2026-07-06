@@ -146,6 +146,26 @@
         </div>
       </div>
     </section>
+    <!-- ─── VISOR INDIVIDUAL ─── -->
+    <section id="visor-rec" class="py-16" style="background-color:#111111;display:none;">
+      <div class="max-w-4xl mx-auto px-4">
+        <button onclick="cerrarVisor()" style="background:transparent;border:1px solid rgba(229,9,20,0.3);color:white;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:13px;margin-bottom:20px;">← Volver al archivo</button>
+        <div id="visor-content" class="card-mir">
+          <div style="text-align:center;padding:40px 0;">
+            <div style="width:40px;height:40px;border:3px solid rgba(229,9,20,0.3);border-top-color:var(--color-mir);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto;"></div>
+            <p class="text-white/40 text-sm mt-4">Cargando...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <style>
+      @keyframes spin { to { transform:rotate(360deg); } }
+      #visor-content img { max-width:100%; height:auto; border-radius:8px; margin:16px 0; }
+      #visor-content video, #visor-content audio { width:100%; border-radius:8px; margin:16px 0; }
+      #visor-content .embed-container { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; margin:16px 0; border-radius:8px; }
+      #visor-content .embed-container iframe { position:absolute; top:0; left:0; width:100%; height:100%; }
+    </style>
   </main>
 
 <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
@@ -176,24 +196,97 @@
       l.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
     });
 
-    /* hash navigation */
-    var h = window.location.hash;
-    if (h && h.indexOf('rec-') === 1) {
-      var target = document.getElementById('buscador-input');
-      if (target) {
-        target.value = 'Cargando...';
-        setTimeout(function() {
-          target.value = 'Resultado en el archivo';
-          target.style.borderColor = '#E50914';
-          var msg = document.createElement('div');
-          msg.style.cssText = 'margin-top:8px;padding:12px 16px;background:rgba(229,9,20,0.08);border:1px solid rgba(229,9,20,0.2);border-radius:8px;font-size:13px;color:#ccc;';
-          msg.textContent = 'Elemento no encontrado en esta página. Prueba buscando en "Todo el sitio" desde cualquier página.';
-          var parent = target.parentElement;
-          if (parent && !document.getElementById('rec-notice')) {
-            msg.id = 'rec-notice';
-            parent.appendChild(msg);
+    function embedHTML(url, tipo) {
+      if (!url) return '';
+      var l = url.toLowerCase();
+      if (tipo === 'video/youtube' || l.indexOf('youtube.com/watch') !== -1 || l.indexOf('youtu.be/') !== -1) {
+        var vid = ''; var ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+        if (ytMatch) vid = ytMatch[1];
+        if (vid) return '<div class="embed-container"><iframe src="https://www.youtube.com/embed/' + vid + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>';
+      }
+      if (tipo === 'video/facebook' || l.indexOf('facebook.com') !== -1) {
+        return '<div class="embed-container"><iframe src="https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(url) + '&show_text=0" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>';
+      }
+      if (tipo && tipo.indexOf('audio') === 0) return '<audio controls preload="metadata" style="width:100%;border-radius:8px;"><source src="' + url.replace(/"/g, '&quot;') + '"></audio>';
+      if (tipo && tipo.indexOf('video') === 0) return '<div class="embed-container"><video controls preload="metadata"><source src="' + url.replace(/"/g, '&quot;') + '"></video></div>';
+      if (tipo && tipo.indexOf('image') === 0) return '<img src="' + url.replace(/"/g, '&quot;') + '" alt="Recuerdo" loading="lazy">';
+      return '<div style="padding:12px 0;"><a href="' + url.replace(/"/g, '&quot;') + '" target="_blank" class="text-mir hover:underline" style="font-size:14px;">Abrir contenido externo →</a></div>';
+    }
+
+    function ocultarSecciones() {
+      var secciones = document.querySelectorAll('section');
+      secciones.forEach(function(s) {
+        if (s.id !== 'visor-rec') s.style.display = 'none';
+      });
+    }
+
+    function mostrarSecciones() {
+      var secciones = document.querySelectorAll('section');
+      secciones.forEach(function(s) { s.style.display = ''; });
+      document.getElementById('visor-rec').style.display = 'none';
+    }
+
+    function cargarVisor(id) {
+      ocultarSecciones();
+      var visor = document.getElementById('visor-rec');
+      var content = document.getElementById('visor-content');
+      if (!visor || !content) return;
+      visor.style.display = 'block';
+      content.innerHTML = '<div style="text-align:center;padding:40px 0;"><div style="width:40px;height:40px;border:3px solid rgba(229,9,20,0.3);border-top-color:var(--color-mir);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto;"></div><p class="text-white/40 text-sm mt-4">Cargando...</p></div>';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      function waitForSupabase(maxWait) {
+        maxWait = maxWait || 8000;
+        return new Promise(function (resolve) {
+          var waited = 0, step = 200;
+          function check() {
+            if (window.miSupabase) return resolve(window.miSupabase);
+            if (window._supabase) { window.miSupabase = window._supabase; return resolve(window._supabase); }
+            waited += step;
+            if (waited >= maxWait) return resolve(null);
+            setTimeout(check, step);
           }
-        }, 100);
+          check();
+        });
+      }
+
+      waitForSupabase().then(function(client) {
+        if (!client) { content.innerHTML = '<div style="text-align:center;padding:40px 0;"><p class="text-mir">Error de conexión</p></div>'; return; }
+        client.from('recuerdos').select('*').eq('id', id).single().then(function(res) {
+          if (res.error || !res.data) { content.innerHTML = '<div style="text-align:center;padding:40px 0;"><p class="text-mir">Recuerdo no encontrado</p></div>'; return; }
+          var d = res.data;
+          var html = '';
+          if (d.nombre) html += '<h1 class="heading-mir text-3xl md:text-4xl mb-2">' + d.nombre.replace(/</g, '&lt;') + '</h1>';
+          if (d.titulo_relato) html += '<p class="text-mir font-title text-lg mb-4">' + d.titulo_relato.replace(/</g, '&lt;') + '</p>';
+          var origen = (d.pais || d.pais_origen || '').trim();
+          if (d.region || d.region_origen) origen += (origen ? ', ' : '') + (d.region || d.region_origen || '');
+          if (d.geolocalizacion) origen += (origen ? ' — ' : '') + d.geolocalizacion;
+          if (origen) html += '<p style="font-size:13px;color:#888;margin-bottom:4px;">📍 ' + origen.replace(/</g, '&lt;') + '</p>';
+          if (d.fecha_creacion_archivo) html += '<p style="font-size:12px;color:#666;margin-bottom:16px;">📅 ' + d.fecha_creacion_archivo + '</p>';
+          if (d.url_archivo) html += embedHTML(d.url_archivo, d.tipo_archivo);
+          if (d.mensaje_largo) html += '<div style="margin-top:20px;border-top:1px solid rgba(229,9,20,0.1);padding-top:20px;"><p style="font-size:14px;color:#ccc;line-height:1.7;white-space:pre-wrap;">' + d.mensaje_largo.replace(/</g, '&lt;') + '</p></div>';
+          if (d.transcripcion) html += '<div style="margin-top:16px;background:rgba(0,0,0,0.3);padding:16px;border-radius:8px;border-left:3px solid rgba(229,9,20,0.3);"><p style="font-size:11px;text-transform:uppercase;color:#888;margin-bottom:8px;">Transcripción</p><p style="font-size:13px;color:#aaa;line-height:1.6;white-space:pre-wrap;">' + d.transcripcion.replace(/</g, '&lt;') + '</p></div>';
+          if (d.tags) html += '<div style="margin-top:16px;display:flex;gap:6px;flex-wrap:wrap;">' + d.tags.split(',').map(function(t) { return '<span style="background:rgba(229,9,20,0.1);color:var(--color-mir);padding:2px 12px;border-radius:20px;font-size:11px;">' + t.trim().replace(/</g, '&lt;') + '</span>'; }).join('') + '</div>';
+          if (d.created_at) html += '<p style="font-size:11px;color:#555;margin-top:20px;border-top:1px solid rgba(255,255,255,0.05);padding-top:12px;">Aportado el ' + new Date(d.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) + '</p>';
+          content.innerHTML = html;
+        });
+      });
+    }
+
+    function cerrarVisor() {
+      mostrarSecciones();
+      history.replaceState(null, '', '/archivo.html');
+    }
+
+    /* query param + hash navigation */
+    var params = new URLSearchParams(window.location.search);
+    var viewId = params.get('view');
+    if (viewId && viewId.indexOf('rec-') === 0) {
+      cargarVisor(viewId.substring(4));
+    } else {
+      var h = window.location.hash;
+      if (h && h.indexOf('rec-') === 1) {
+        cargarVisor(h.substring(5));
       }
     }
   </script>

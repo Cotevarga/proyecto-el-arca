@@ -11,11 +11,8 @@
   var timeout = null;
 
   function getTargetUrl(d) {
-    var tipo = (d.tipo_archivo || '').toLowerCase();
     var id = d.id;
-    if (tipo.startsWith('image/')) return '/galeria.html#rec-' + id;
-    if (tipo.startsWith('video/') || tipo.startsWith('audio/') || tipo === 'link') return '/videos.html#rec-' + id;
-    return '/archivo.html#rec-' + id;
+    return '/archivo.html?view=rec-' + id;
   }
 
   function render(items) {
