@@ -63,6 +63,7 @@ Deno.serve(async (req: Request) => {
     const texto = (formData.get("texto") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
     const pais = (formData.get("pais") as string)?.slice(0, 100) ?? null;
     const region = (formData.get("region") as string)?.slice(0, 100) ?? null;
+    const transcripcion = (formData.get("transcripcion") as string)?.slice(0, 50000) ?? null;
 
     if ((!file || file.size === 0) && !mensaje_largo && !texto) {
       return new Response(
@@ -141,6 +142,7 @@ Deno.serve(async (req: Request) => {
         seccion,
         pais,
         region,
+        transcripcion,
         aprobado: false,
       })
       .select()

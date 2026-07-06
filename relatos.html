@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Relatos — Memoria de El Arca</title>
+  <meta property="og:title" content="EL ARCA — Relatos">
+  <meta property="og:description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <meta property="og:image" content="https://elarca.cl/images/og-image.jpg">
+  <meta property="og:url" content="https://elarca.cl/relatos.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta name="description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <link rel="canonical" href="https://elarca.cl/relatos.html">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
   <style>
@@ -51,6 +59,7 @@
       <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
         <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
         <a href="/galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Mapa</a>
         <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
         <a href="/relatos.html" class="text-mir border-b-2 border-mir pb-1">Relatos</a>
         <a href="/legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
@@ -64,6 +73,7 @@
       <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
         <a href="/index.html" class="hover:text-mir transition">Inicio</a>
         <a href="/galeria.html" class="hover:text-mir transition">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition">Mapa</a>
         <a href="/videos.html" class="hover:text-mir transition">Videos</a>
         <a href="/relatos.html" class="text-mir">Relatos</a>
         <a href="/legado.html" class="hover:text-mir transition">El Legado</a>
@@ -84,6 +94,13 @@
 
     <!-- ─── Sub-secciones (card landing) ─── -->
     <section id="navegacion-subsecciones" class="py-16" style="background-color:#111111">
+      <div class="max-w-3xl mx-auto px-4 mb-12">
+        <div style="position:relative;">
+          <input type="search" id="buscador-input" placeholder="Buscar en relatos y recuerdos…" style="width:100%;padding:14px 20px;background:#0a0a0a;border:1px solid rgba(229,9,20,0.25);border-radius:8px;color:white;font-size:15px;outline:none;transition:border-color 0.3s;" onfocus="this.style.borderColor='#E50914'" onblur="this.style.borderColor='rgba(229,9,20,0.25)'">
+          <button id="buscador-clear" class="hidden" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:#888;cursor:pointer;font-size:18px;" aria-label="Limpiar búsqueda">&times;</button>
+        </div>
+        <div id="buscador-results" class="mt-4" style="max-height:400px;overflow-y:auto;border:1px solid rgba(229,9,20,0.15);border-radius:8px;background:#0a0a0a;display:none;"></div>
+      </div>
       <div class="max-w-5xl mx-auto px-4">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
           <button class="cat-card card-mir flex flex-col items-center text-center min-h-[280px] justify-center hover:border-mir transition-all" onclick="navegarASubseccion('Relatos: El Jano')">
@@ -357,6 +374,8 @@
   </script>
   </main>
 
+  <script src="/search.js"></script>
+
 <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
     <div class="max-w-5xl mx-auto px-4 text-center">
       <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
@@ -366,6 +385,7 @@
         <span>|</span>
         <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
       </nav>
+      <div style="margin-top:8px;"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:rgba(255,255,255,0.4);font-size:11px;text-decoration:none;">CC BY-NC-SA 4.0 — Contenido bajo licencia Creative Commons</a></div>
       <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
     </div>
 </footer>

@@ -14,3 +14,12 @@ verify_jwt = false
 
 [functions.upload]
 verify_jwt = false
+
+[functions.search]
+verify_jwt = false
+
+[functions.stats]
+verify_jwt = false
+
+[functions.export]
+verify_jwt = false

@@ -8,6 +8,9 @@
     "musica": "deno serve --watch functions/musica/index.ts",
     "recuerdos": "deno serve --watch functions/recuerdos/index.ts",
     "upload": "deno serve --watch functions/upload/index.ts",
+    "search": "deno serve --watch functions/search/index.ts",
+    "stats": "deno serve --watch functions/stats/index.ts",
+    "export": "deno serve --watch functions/export/index.ts",
     "test": "deno test --allow-env --allow-net"
   }
 }

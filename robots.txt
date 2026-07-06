@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://elarca.cl/sitemap.xml

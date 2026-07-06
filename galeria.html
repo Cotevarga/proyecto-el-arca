@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Galería — Memoria de El Arca</title>
+  <meta property="og:title" content="EL ARCA — Galería">
+  <meta property="og:description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <meta property="og:image" content="https://elarca.cl/images/og-image.jpg">
+  <meta property="og:url" content="https://elarca.cl/galeria.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta name="description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <link rel="canonical" href="https://elarca.cl/galeria.html">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
   <style>
@@ -291,6 +299,7 @@
       <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
         <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
         <a href="/galeria.html" class="text-mir border-b-2 border-mir pb-1">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Mapa</a>
         <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
         <a href="/relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
         <a href="/legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
@@ -304,6 +313,7 @@
       <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
         <a href="/index.html" class="hover:text-mir transition">Inicio</a>
         <a href="/galeria.html" class="text-mir">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition">Mapa</a>
         <a href="/videos.html" class="hover:text-mir transition">Videos</a>
         <a href="/relatos.html" class="hover:text-mir transition">Relatos</a>
         <a href="/legado.html" class="hover:text-mir transition">El Legado</a>
@@ -389,6 +399,15 @@
       </div>
     </section>
 
+    <!-- ─── Modal de citación ─── -->
+    <div id="gal-citar-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000;background:rgba(0,0,0,0.85);justify-content:center;align-items:center;" onclick="if(event.target===this)document.getElementById('gal-citar-modal').style.display='none'">
+      <div style="background:#111;border:1px solid rgba(229,9,20,0.3);border-radius:12px;padding:32px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;">
+        <h3 style="color:var(--color-mir);text-transform:uppercase;letter-spacing:0.05em;font-size:14px;margin:0 0 16px 0;">Citar este ítem</h3>
+        <div id="gal-citar-content"></div>
+        <button onclick="document.getElementById('gal-citar-modal').style.display='none'" style="margin-top:16px;background:var(--color-mir);color:white;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:12px;text-transform:uppercase;">Cerrar</button>
+      </div>
+    </div>
+
     <!-- ─── Lightbox ─── -->
     <div id="gal-lb" class="gal-lb">
       <button class="gal-lb-close" id="gal-lb-close">&times;</button>
@@ -400,6 +419,7 @@
       </div>
       <span class="gal-lb-counter" id="gal-lb-counter"></span>
       <div class="gal-lb-caption" id="gal-lb-caption" style="position:absolute;bottom:64px;left:50%;transform:translateX(-50%);font-size:14px;color:rgba(255,255,255,0.85);text-align:center;max-width:80%;padding:8px 16px;background:rgba(0,0,0,0.7);border-radius:8px;pointer-events:none;display:none;"></div>
+      <button id="gal-lb-citar" style="position:absolute;bottom:24px;right:24px;background:rgba(229,9,20,0.8);color:white;border:none;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:0.05em;z-index:10;" title="Generar cita académica">Citar</button>
     </div>
 
     <!-- ════════════════════════════════════════════════════════════ -->
@@ -655,6 +675,27 @@
         if (lbP) lbP.addEventListener('click', function (e) { e.stopPropagation(); lbPrev(); });
         if (lbN) lbN.addEventListener('click', function (e) { e.stopPropagation(); lbNext(); });
 
+        /* ─── citar ─── */
+        var citarBtn = $('gal-lb-citar');
+        if (citarBtn) {
+          citarBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var im = images[idx];
+            if (!im) return;
+            var titulo = im.titulo || 'Fotografía de El Arca';
+            var url = im.url || '';
+            var year = new Date().getFullYear();
+            var apa = titulo + '. (' + year + '). El Arca — Archivo Comunitario. ' + url;
+            var mla = '&ldquo;' + titulo + '.&rdquo; El Arca — Archivo Comunitario, ' + year + ', ' + url + '.';
+            var chicago = titulo + '. ' + year + '. El Arca — Archivo Comunitario. ' + url + '.';
+            var html = '<div style="margin-bottom:16px;"><strong style="color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">APA</strong><p style="background:#0a0a0a;padding:12px;border-radius:6px;font-size:12px;color:#ccc;word-break:break-all;margin:6px 0 0 0;">' + apa + '</p></div>' +
+              '<div style="margin-bottom:16px;"><strong style="color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">MLA</strong><p style="background:#0a0a0a;padding:12px;border-radius:6px;font-size:12px;color:#ccc;word-break:break-all;margin:6px 0 0 0;">' + mla + '</p></div>' +
+              '<div style="margin-bottom:16px;"><strong style="color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">Chicago</strong><p style="background:#0a0a0a;padding:12px;border-radius:6px;font-size:12px;color:#ccc;word-break:break-all;margin:6px 0 0 0;">' + chicago + '</p></div>';
+            $('gal-citar-content').innerHTML = html;
+            $('gal-citar-modal').style.display = 'flex';
+          });
+        }
+
         /* ─── touch swipe ─── */
         var viewer = qs('.gal-viewer');
         var tx = 0, ty = 0;
@@ -714,6 +755,7 @@
         <span>|</span>
         <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
       </nav>
+      <div style="margin-top:8px;"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:rgba(255,255,255,0.4);font-size:11px;text-decoration:none;">CC BY-NC-SA 4.0 — Contenido bajo licencia Creative Commons</a></div>
       <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
     </div>
   </footer>
