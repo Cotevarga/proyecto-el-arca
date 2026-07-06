@@ -1,55 +1,12 @@
-name: CD - Deploy
+name: Deploy
 
 on:
   push:
     branches: [main]
 
 jobs:
-  deploy-edge-functions:
-    name: Deploy Edge Functions (Supabase)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: supabase
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Link project
-        run: supabase link --project-ref ukpoprkdgezgxlkjjuve
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Run migrations
-        run: supabase db push
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Deploy functions
-        run: supabase functions deploy --project-ref ukpoprkdgezgxlkjjuve
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Notify deploy status
-        if: always()
-        run: echo "Edge Functions deploy status: ${{ job.status }}"
-
   deploy-vercel:
-    name: Deploy Frontend (Vercel)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install Vercel CLI
-        run: npm install -g vercel
-
-      - name: Deploy to Vercel
-        run: vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}" --scope="team_kiyDYH05TcOgl7saOwBi2N4H"
-        env:
-          VERCEL_ORG_ID: team_kiyDYH05TcOgl7saOwBi2N4H
-          VERCEL_PROJECT_ID: prj_2RB5iSSwApAbiZBBtiT3pCIfd41A
+      - run: echo "hello"
