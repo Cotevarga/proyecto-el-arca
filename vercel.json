@@ -1,4 +1,6 @@
 {
+  "outputDirectory": "dist",
+  "buildCommand": "npm run build",
   "rewrites": [
     { "source": "/impacto", "destination": "/impacto.html" },
     { "source": "/status", "destination": "/status.html" },
