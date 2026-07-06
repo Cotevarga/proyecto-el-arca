@@ -61,6 +61,8 @@ Deno.serve(async (req: Request) => {
     const categoria = (formData.get("categoria") as string || "galeria").slice(0, 100);
     const seccion = (formData.get("seccion") as string || "general").slice(0, 100);
     const texto = (formData.get("texto") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
+    const pais = (formData.get("pais") as string)?.slice(0, 100) ?? null;
+    const region = (formData.get("region") as string)?.slice(0, 100) ?? null;
 
     if ((!file || file.size === 0) && !mensaje_largo && !texto) {
       return new Response(
@@ -137,6 +139,8 @@ Deno.serve(async (req: Request) => {
         tamanio_bytes: tamanioBytes,
         texto,
         seccion,
+        pais,
+        region,
         aprobado: false,
       })
       .select()

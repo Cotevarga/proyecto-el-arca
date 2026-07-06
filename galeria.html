@@ -379,6 +379,7 @@
             <div class="gal-stage">
               <img id="gal-img" class="gal-img" src="" alt="Galería El Arca" style="opacity:0;">
               <p id="gal-empty" class="gal-empty">Cargando galería…</p>
+              <div id="gal-caption" style="padding:6px 12px;font-size:12px;color:rgba(255,255,255,0.6);text-align:center;display:none;"></div>
             </div>
             <button class="gal-btn gal-btn-prev" id="gal-prev" title="Anterior">&#10094;</button>
             <button class="gal-btn gal-btn-next" id="gal-next" title="Siguiente">&#10095;</button>
@@ -398,6 +399,7 @@
         <img class="gal-lb-img" id="gal-lb-img" src="" alt="">
       </div>
       <span class="gal-lb-counter" id="gal-lb-counter"></span>
+      <div class="gal-lb-caption" id="gal-lb-caption" style="position:absolute;bottom:64px;left:50%;transform:translateX(-50%);font-size:14px;color:rgba(255,255,255,0.85);text-align:center;max-width:80%;padding:8px 16px;background:rgba(0,0,0,0.7);border-radius:8px;pointer-events:none;display:none;"></div>
     </div>
 
     <!-- ════════════════════════════════════════════════════════════ -->
@@ -472,7 +474,7 @@
           .order('orden', { ascending: true });
 
         var recuerdosPromise = client.from('recuerdos')
-          .select('url_archivo, nombre, mensaje_largo')
+          .select('url_archivo, nombre, mensaje_largo, pais, region')
           .eq('aprobado', true)
           .in('tipo_archivo', ['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
           .order('created_at', { ascending: false });
@@ -484,11 +486,15 @@
             var all = [];
 
             if (!gData.error && gData.data && gData.data.length > 0) {
-              gData.data.forEach(function (d) { all.push({ url: d.url_imagen, titulo: d.titulo || '' }); });
+              gData.data.forEach(function (d) { all.push({ url: d.url_imagen, titulo: d.titulo || '', subtitulo: '' }); });
             }
 
             if (!rData.error && rData.data && rData.data.length > 0) {
-              rData.data.forEach(function (d) { all.push({ url: d.url_archivo, titulo: d.nombre || '' }); });
+              rData.data.forEach(function (d) {
+                var sub = d.pais || '';
+                if (d.region) sub += (sub ? ', ' : '') + d.region;
+                all.push({ url: d.url_archivo, titulo: d.nombre || '', subtitulo: sub });
+              });
             }
 
             FALLBACK.forEach(function (f) { all.push({ url: f.url, titulo: '' }); });
@@ -520,7 +526,9 @@
         }
 
         elThumbs.innerHTML = images.map(function (im, i) {
-          return '<img src="' + im.url.replace(/"/g, '&quot;') + '" class="gal-thumb' + (i === 0 ? ' active' : '') + '" data-idx="' + i + '" alt="' + (im.titulo || '') + '" loading="lazy">';
+          var label = im.titulo || '';
+          if (im.subtitulo) label += (label ? ' — ' : '') + im.subtitulo;
+          return '<img src="' + im.url.replace(/"/g, '&quot;') + '" class="gal-thumb' + (i === 0 ? ' active' : '') + '" data-idx="' + i + '" alt="' + label.replace(/"/g, '&quot;') + '" title="' + label.replace(/"/g, '&quot;') + '" loading="lazy">';
         }).join('');
 
         mostrar(0);
@@ -532,12 +540,20 @@
         var elEmpty = $('gal-empty');
         var elCnt   = $('gal-counter');
         var elLdr   = $('gal-loader');
+        var elCap   = $('gal-caption');
         if (!elImg || !images[n]) return;
 
         idx = n;
         if (elEmpty) elEmpty.style.display = 'none';
         if (elLdr) elLdr.style.display = 'block';
         elImg.style.opacity = '0';
+
+        if (elCap) {
+          var txt = images[n].titulo || '';
+          if (images[n].subtitulo) txt += (txt ? ' — ' : '') + images[n].subtitulo;
+          if (txt) { elCap.textContent = txt; elCap.style.display = ''; }
+          else { elCap.style.display = 'none'; }
+        }
 
         var tmp = new Image();
         tmp.onload = function () { done(elImg, tmp.src); };
@@ -557,6 +573,15 @@
       function next() { if (images.length) mostrar((idx + 1) % images.length); }
 
       /* ─────────────── lightbox ─────────────── */
+      function actCaption() {
+        var cap = $('gal-lb-caption');
+        if (!cap || !images[idx]) { return; }
+        var txt = images[idx].titulo || '';
+        if (images[idx].subtitulo) txt += (txt ? ' — ' : '') + images[idx].subtitulo;
+        if (txt) { cap.textContent = txt; cap.style.display = ''; }
+        else { cap.style.display = 'none'; }
+      }
+
       function abrirLB() {
         var lb = $('gal-lb');
         var lbImg = $('gal-lb-img');
@@ -577,6 +602,7 @@
           vv.style.opacity = '1';
           if (lbLdr) lbLdr.style.display = 'none';
           if (lbCnt && images.length) lbCnt.textContent = (idx + 1) + ' / ' + images.length;
+          actCaption();
         }
         lb.classList.add('open');
         document.body.style.overflow = 'hidden';
@@ -600,8 +626,8 @@
         if (lbLdr) lbLdr.style.display = 'block';
         lbImg.style.opacity = '0';
         var tmp = new Image();
-        tmp.onload = function () { lbImg.src = tmp.src; lbImg.style.opacity = '1'; if (lbLdr) lbLdr.style.display = 'none'; };
-        tmp.onerror = function () { lbImg.src = tmp.src; lbImg.style.opacity = '1'; if (lbLdr) lbLdr.style.display = 'none'; };
+        tmp.onload = function () { lbImg.src = tmp.src; lbImg.style.opacity = '1'; if (lbLdr) lbLdr.style.display = 'none'; actCaption(); };
+        tmp.onerror = function () { lbImg.src = tmp.src; lbImg.style.opacity = '1'; if (lbLdr) lbLdr.style.display = 'none'; actCaption(); };
         tmp.src = images[idx].url;
         if (lbCnt && images.length) lbCnt.textContent = (idx + 1) + ' / ' + images.length;
       }

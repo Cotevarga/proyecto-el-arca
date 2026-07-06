@@ -1,0 +1,33 @@
+name: CI — Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/**'
+      - 'supabase/deno.json'
+  pull_request:
+    paths:
+      - 'supabase/functions/**'
+      - 'supabase/deno.json'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: supabase
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Cache dependencies
+        run: deno cache functions/_shared/cors.ts functions/_shared/supabase.ts
+
+      - name: Run tests
+        run: deno test --allow-env --allow-net

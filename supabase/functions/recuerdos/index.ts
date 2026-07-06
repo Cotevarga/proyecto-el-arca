@@ -37,6 +37,8 @@ Deno.serve(async (req: Request) => {
       const mensaje = formData.get("mensaje") as string ?? null;
       const mensaje_largo = formData.get("mensaje_largo") as string ?? null;
       const categoria = formData.get("tipo_contenido") as string || "foto";
+      const pais = (formData.get("pais") as string)?.slice(0, 100) ?? null;
+      const region = (formData.get("region") as string)?.slice(0, 100) ?? null;
       const file = formData.get("archivo") as File | null;
 
       if (!nombre) {
@@ -104,6 +106,8 @@ Deno.serve(async (req: Request) => {
           tipo_archivo: tipoArchivo,
           nombre_original: nombreOriginal,
           tamanio_bytes: tamanioBytes,
+          pais,
+          region,
           aprobado: false,
         })
         .select()
