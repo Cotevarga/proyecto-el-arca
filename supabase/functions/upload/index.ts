@@ -204,10 +204,9 @@ Deno.serve(async (req: Request) => {
         tamanio_bytes: tamanioBytes,
         texto,
         seccion,
+        pais,
+        region,
         geolocalizacion: geolocalizacionFinal,
-        fecha_creacion_archivo,
-        tags: tagsFinal,
-        consentimiento: consentimiento === "true" || consentimiento === "on",
         transcripcion,
         aprobado: false,
       })
