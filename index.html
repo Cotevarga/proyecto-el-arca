@@ -698,12 +698,14 @@
 
           try {
             var meta = {};
+            var partesUbicacion = [];
             var paisEl = document.getElementById('pais');
-            if (paisEl && paisEl.value) meta.pais = paisEl.value;
+            if (paisEl && paisEl.value) partesUbicacion.push(paisEl.value);
             var regionEl = document.getElementById('region');
-            if (regionEl && regionEl.value.trim()) meta.region = regionEl.value.trim();
+            if (regionEl && regionEl.value.trim()) partesUbicacion.push(regionEl.value.trim());
             var geo = document.getElementById('geolocalizacion');
-            if (geo && geo.value.trim()) meta.geolocalizacion = geo.value.trim();
+            if (geo && geo.value.trim()) partesUbicacion.push(geo.value.trim());
+            meta.geolocalizacion = partesUbicacion.length > 0 ? partesUbicacion.join(', ') : null;
             var fechaArch = document.getElementById('fecha-creacion-archivo');
             if (fechaArch && fechaArch.value) meta.fecha_creacion_archivo = fechaArch.value;
             var tagsEl = document.getElementById('tags');
@@ -736,8 +738,6 @@
                   aprobado: false,
                   seccion: null,
                   consentimiento: true,
-                  pais: meta.pais || null,
-                  region: meta.region || null,
                   geolocalizacion: meta.geolocalizacion || null,
                   tags: meta.tags || null,
                   fecha_creacion_archivo: meta.fecha_creacion_archivo || null
@@ -753,8 +753,6 @@
                   aprobado: false,
                   seccion: null,
                   consentimiento: true,
-                  pais: meta.pais || null,
-                  region: meta.region || null,
                   geolocalizacion: meta.geolocalizacion || null,
                   tags: meta.tags || null,
                   fecha_creacion_archivo: meta.fecha_creacion_archivo || null
