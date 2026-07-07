@@ -81,14 +81,20 @@ Deno.serve(async (req: Request) => {
     }
 
     const file = formData.get("archivo") as File | null;
+    const tipo = (formData.get("tipo") as string)?.trim() || "general";
+    const seccionRaw = (formData.get("seccion") as string)?.slice(0, 100) ?? null;
+    const isMusica = tipo === "musica" || seccionRaw === "Musica";
+
     const nombre = ((formData.get("nombre") as string)?.trim() || "Anónimo").slice(0, MAX_NOMBRE_LENGTH);
+    const tituloRelato = (formData.get("titulo_relato") as string)?.trim()?.slice(0, MAX_NOMBRE_LENGTH) ?? null;
+    const nombreSerie = (formData.get("nombre_serie") as string)?.trim()?.slice(0, MAX_NOMBRE_LENGTH) ?? null;
     const mensaje_largo = (formData.get("mensaje_largo") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
     const texto = (formData.get("texto") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
     const categoria = (formData.get("categoria") as string || "galeria").slice(0, 100);
-    const seccionRaw = (formData.get("seccion") as string)?.slice(0, 100) ?? null;
-    const seccion = (seccionRaw === "general" || seccionRaw === "General") ? null : seccionRaw;
+    const seccion = isMusica ? "Musica" : ((seccionRaw === "general" || seccionRaw === "General") ? null : seccionRaw);
     const pais = (formData.get("pais") as string)?.slice(0, 100) ?? null;
     const linkExterno = (formData.get("link_externo") as string)?.trim() ?? null;
+    const consentimiento = (formData.get("consentimiento") as string) ?? null;
 
     if ((!file || file.size === 0) && !linkExterno && !mensaje_largo && !texto) {
       return new Response(
@@ -157,7 +163,7 @@ Deno.serve(async (req: Request) => {
       tamanioBytes = file.size;
       tipoArchivo = file.type;
       const sanitized = sanitizeName(file.name);
-      storagePath = `recuerdos/${Date.now()}_${sanitized}`;
+      storagePath = isMusica ? `canciones/${Date.now()}_${sanitized}` : `recuerdos/${Date.now()}_${sanitized}`;
 
       console.log(`[Upload] Subiendo archivo a storage: ${storagePath} (${file.type}, ${file.size} bytes)`);
       const { error: uploadError } = await supabase.storage
@@ -186,21 +192,35 @@ Deno.serve(async (req: Request) => {
     if (geolocalizacionRaw) geoParts.push(geolocalizacionRaw);
     const geolocalizacionFinal = geoParts.length > 0 ? geoParts.join(", ") : null;
 
-    const insertPayload = {
-      nombre,
-      mensaje_largo,
-      contenido: texto || mensaje_largo,
-      categoria,
-      url_archivo: urlArchivo,
-      storage_path: storagePath,
-      tipo_archivo: tipoArchivo,
-      nombre_original: nombreOriginal,
-      tamanio_bytes: tamanioBytes,
-      seccion,
-      pais,
-      geolocalizacion: geolocalizacionFinal,
-      aprobado: false,
-    };
+    const insertPayload = isMusica
+      ? {
+          titulo_relato: tituloRelato || nombre,
+          nombre_serie: nombreSerie || null,
+          url_archivo: urlArchivo,
+          storage_path: storagePath,
+          tipo_archivo: tipoArchivo || "audio/mpeg",
+          nombre_original: nombreOriginal,
+          tamanio_bytes: tamanioBytes,
+          seccion: "Musica",
+          aprobado: false,
+          consentimiento: true,
+        }
+      : {
+          nombre,
+          mensaje_largo,
+          contenido: texto || mensaje_largo,
+          categoria,
+          url_archivo: urlArchivo,
+          storage_path: storagePath,
+          tipo_archivo: tipoArchivo,
+          nombre_original: nombreOriginal,
+          tamanio_bytes: tamanioBytes,
+          seccion,
+          pais,
+          geolocalizacion: geolocalizacionFinal,
+          aprobado: false,
+          consentimiento: consentimiento === "true" || consentimiento === "on",
+        };
 
     console.log(`[Upload] Insertando en recuerdos:`, JSON.stringify(insertPayload));
     const { data: inserted, error: insertError } = await supabase

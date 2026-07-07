@@ -336,7 +336,7 @@
         }
       }
 
-      // ─── Canción form (via Supabase client) ───
+      // ─── Canción form (via Edge Function) ───
       var formCancion = document.getElementById('form-cancion');
       if (formCancion) {
         formCancion.addEventListener('submit', async function (e) {
@@ -352,35 +352,23 @@
           if (!titulo) { msgs.textContent = 'Escribe el t\u00edtulo de la canci\u00f3n.'; msgs.className = 'text-center text-sm font-medium text-mir'; msgs.classList.remove('hidden'); return; }
           if (!file) { msgs.textContent = 'Selecciona un archivo de audio.'; msgs.className = 'text-center text-sm font-medium text-mir'; msgs.classList.remove('hidden'); return; }
 
-          var supabaseClient = window.miSupabase;
-          if (!supabaseClient) { msgs.textContent = 'Error de conexi\u00f3n. Recarga la p\u00e1gina.'; msgs.className = 'text-center text-sm font-medium text-mir'; msgs.classList.remove('hidden'); return; }
+          if (!UPLOAD_URL) { msgs.textContent = 'Error de configuraci\u00f3n. Recarga la p\u00e1gina.'; msgs.className = 'text-center text-sm font-medium text-mir'; msgs.classList.remove('hidden'); return; }
 
           btn.textContent = 'Enviando\u2026'; btn.disabled = true;
 
           try {
-            var fileName = 'cancion_' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-            var { error: uploadError } = await supabaseClient.storage
-              .from('elarca-uploads')
-              .upload('canciones/' + fileName, file);
-            if (uploadError) throw uploadError;
+            var formData = new FormData();
+            formData.append('archivo', file);
+            formData.append('titulo_relato', titulo);
+            formData.append('nombre_serie', artista || 'El Arca');
+            formData.append('tipo', 'musica');
 
-            var { data: { publicUrl } } = supabaseClient.storage
-              .from('elarca-uploads')
-              .getPublicUrl('canciones/' + fileName);
+            var resp = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
+            var result = await resp.json();
 
-            var { error: dbError } = await supabaseClient
-              .from('recuerdos')
-              .insert({
-                titulo_relato: titulo,
-                nombre_serie: artista || 'El Arca',
-                url_archivo: publicUrl,
-                storage_path: 'canciones/' + fileName,
-                tipo_archivo: 'audio/mpeg',
-                seccion: 'Musica',
-                aprobado: false,
-                consentimiento: true
-              });
-            if (dbError) throw dbError;
+            if (!resp.ok || !result.success) {
+              throw new Error(result.error || 'Error del servidor');
+            }
 
             msgs.textContent = '\u00a1Gracias por compartir tu m\u00fasica!';
             msgs.className = 'text-center text-sm font-medium text-green-400';
