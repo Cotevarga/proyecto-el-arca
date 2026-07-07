@@ -478,9 +478,10 @@
       var urlParams = new URLSearchParams(window.location.search);
       var idRelato = urlParams.get('id');
       var seccionRelato = urlParams.get('seccion');
-      var sec = seccionRelato || 'Relatos: El Arca';
-      navegarASubseccion(sec);
-      iniciarAutoRefresh();
+      if (seccionRelato) {
+        navegarASubseccion(seccionRelato);
+        iniciarAutoRefresh();
+      }
     })();
   </script>
   <script src="/search.js"></script>

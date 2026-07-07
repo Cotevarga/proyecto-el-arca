@@ -102,6 +102,20 @@
 
     <section class="py-16 bg-noche">
       <div class="max-w-5xl mx-auto px-4">
+        <!-- Video destacado: Radio Libre -->
+        <div class="mb-12">
+          <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase block text-center mb-4">📻 Video Destacado</span>
+          <div class="card-mir" style="padding:0;overflow:hidden;">
+            <div class="embed-container" style="position:relative;width:100%;padding-bottom:56.25%;overflow:hidden;border-radius:8px;background:#000;">
+              <iframe src="https://www.youtube.com/embed/tNz15U2EZcw" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            </div>
+            <div style="padding:16px 20px;">
+              <h3 style="font-family:Arial,Helvetica,sans-serif;color:var(--color-mir);text-transform:uppercase;letter-spacing:0.05em;font-size:14px;margin:0 0 4px 0;">Radio Libre 90.1 FM</h3>
+              <p style="font-size:12px;color:#999;margin:0;text-align:left;">Programas y registros de la radio comunitaria de El Arca.</p>
+            </div>
+          </div>
+        </div>
+
         <div id="videos-container">
           <!-- Loading skeleton -->
           <div id="videos-loading" style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;">
@@ -115,6 +129,24 @@
             <div style="font-size:64px;opacity:0.2;margin-bottom:16px;">🎥</div>
             <p class="text-white/40 text-lg">No hay contenido audiovisual disponible aún.</p>
             <p class="text-white/30 text-sm mt-2">Los videos y audios aprobados aparecerán aquí automáticamente.</p>
+          </div>
+          <!-- Próximamente -->
+          <div id="videos-proximamente" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:32px;">
+            <div class="card-mir" style="text-align:center;padding:40px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;">
+              <div style="font-size:48px;opacity:0.3;margin-bottom:16px;">🎬</div>
+              <h4 style="color:var(--color-mir);font-size:14px;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0;">Archivo Histórico</h4>
+              <p style="font-size:12px;color:#888;margin:0;">Próximamente — Documentales y registros históricos de El Arca.</p>
+            </div>
+            <div class="card-mir" style="text-align:center;padding:40px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;">
+              <div style="font-size:48px;opacity:0.3;margin-bottom:16px;">🎤</div>
+              <h4 style="color:var(--color-mir);font-size:14px;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0;">Entrevistas</h4>
+              <p style="font-size:12px;color:#888;margin:0;">Próximamente — Testimonios grabados de vecinos y exintegrantes.</p>
+            </div>
+            <div class="card-mir" style="text-align:center;padding:40px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;">
+              <div style="font-size:48px;opacity:0.3;margin-bottom:16px;">📻</div>
+              <h4 style="color:var(--color-mir);font-size:14px;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0;">Radio Libre</h4>
+              <p style="font-size:12px;color:#888;margin:0;">Próximamente — Grabaciones originales de la Radio Libre 90.1 FM.</p>
+            </div>
           </div>
         </div>
       </div>
