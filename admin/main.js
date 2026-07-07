@@ -4,6 +4,7 @@
 
   A.init = function() {
     A.s.ready();
+    if (A.dom.loginForm) A.dom.loginForm.addEventListener('submit', A.loginFormSubmit);
     var savedToken = localStorage.getItem('admin_token');
     var savedUser = localStorage.getItem('admin_user');
     if (savedToken && savedUser) {
@@ -45,8 +46,7 @@
     }
   });
 
-  // ─── Login form ───
-  if (A.dom.loginForm) A.dom.loginForm.addEventListener('submit', A.loginFormSubmit);
+  // ─── Login form (registrado en A.init tras A.s.ready) ───
 
   // ─── Reset failure counter on saved session ───
   if (localStorage.getItem('admin_token')) { localStorage.removeItem('login_failures'); }
