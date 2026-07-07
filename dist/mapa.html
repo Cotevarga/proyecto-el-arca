@@ -40,6 +40,7 @@
     @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
     .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
   </style>
+  <script src="/audio-player.js" defer></script>
   <script src="/config.js"></script>
   <script src="/supabase.js" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
@@ -50,6 +51,7 @@
   <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div id="nav-player" class="flex items-center gap-1 md:gap-2 mx-1 md:mx-3"></div>
       <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
         <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
         <a href="/galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>

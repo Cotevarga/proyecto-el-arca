@@ -18,19 +18,41 @@
   var btnPlay, btnPrev, btnNext, trackInfo;
   var audioElementId = 'arca-hidden-audio';
 
+  // ─── Esperar a que Supabase esté listo ───
+  function waitForSupabase(maxRetries) {
+    if (maxRetries === undefined) maxRetries = 50;
+    return new Promise(function (resolve) {
+      var retries = 0;
+      function check() {
+        var s = window.miSupabase || window._supabase;
+        if (s) { resolve(s); return; }
+        retries++;
+        if (retries >= maxRetries) { resolve(null); return; }
+        setTimeout(check, 200);
+      }
+      check();
+    });
+  }
+
   // ─── Consulta dinámica desde Supabase ───
   async function cargarPlaylistDesdeBD() {
-    var s = window.miSupabase || window._supabase;
-    if (!s) return [];
+    var s = await waitForSupabase();
+    if (!s) { console.warn('[Player] Supabase no disponible'); return []; }
     var { data, error } = await s
       .from('musica_reproductor')
       .select('*')
-      .eq('activo', true);
+      .eq('activo', true)
+      .order('orden', { ascending: true });
     if (error) {
       console.warn('[Player] Error al cargar playlist:', error.message);
+      setTimeout(function () { cargarPlaylistDesdeBD(); }, 5000);
       return [];
     }
+    var prevLen = canciones.length;
     canciones = data || [];
+    if (canciones.length > 0 && prevLen === 0 && isPlaying === false && savedPlaying === false) {
+      playRandom();
+    }
     return canciones;
   }
 
@@ -62,8 +84,8 @@
 
   // ─── Inicialización: carga desde BD, luego restaura o arranca ───
   async function inicializar() {
+    initPlayer();
     await cargarPlaylistDesdeBD();
-    if (!playerInited) initPlayer();
     if (savedPlaying && canciones.length > 0) {
       var idx = savedTrack >= 0 && savedTrack < canciones.length ? savedTrack : -1;
       if (idx >= 0) {
@@ -104,9 +126,9 @@
     if (!navPlayer) return;
 
     var html =
-      '<button id="arca-btn-prev" class="text-white/50 hover:text-mir transition text-sm md:text-base p-1 cursor-pointer" title="Canción anterior">⏮</button>' +
+      '<button id="arca-btn-prev" class="text-white/50 hover:text-mir transition text-sm md:text-base p-1 cursor-pointer" title="Anterior">⏮</button>' +
       '<button id="arca-btn-play" class="text-white hover:text-mir transition text-base md:text-lg p-1 cursor-pointer" title="Reproducir / Pausar">▶</button>' +
-      '<button id="arca-btn-next" class="text-white/50 hover:text-mir transition text-sm md:text-base p-1 cursor-pointer" title="Siguiente canción">⏭</button>' +
+      '<button id="arca-btn-next" class="text-white/50 hover:text-mir transition text-sm md:text-base p-1 cursor-pointer" title="Siguiente">⏭</button>' +
       '<span id="arca-track-info" class="text-white/30 text-[9px] md:text-[10px] truncate max-w-[100px] md:max-w-[140px] hidden md:inline arca-heartbeat">Mejora tu Experiencia — PLAY</span>';
     navPlayer.innerHTML = html;
 
@@ -157,7 +179,10 @@
   }
 
   function togglePlay() {
-    if (canciones.length === 0) return;
+    if (canciones.length === 0) {
+      cargarPlaylistDesdeBD();
+      return;
+    }
     var audio = getAudio();
     if (!audio.src || audio.src === window.location.href || audio.ended) {
       playRandom();
@@ -181,12 +206,18 @@
   }
 
   function nextTrack() {
-    if (canciones.length === 0) return;
+    if (canciones.length === 0) {
+      cargarPlaylistDesdeBD();
+      return;
+    }
     playRandom();
   }
 
   function prevTrack() {
-    if (canciones.length === 0) return;
+    if (canciones.length === 0) {
+      cargarPlaylistDesdeBD();
+      return;
+    }
     currentTrackIndex = (currentTrackIndex - 1 + canciones.length) % canciones.length;
     playCancion(canciones[currentTrackIndex]);
   }
