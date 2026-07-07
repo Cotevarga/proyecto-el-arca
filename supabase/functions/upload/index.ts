@@ -12,21 +12,21 @@ const MAX_NOMBRE_LENGTH = 200;
 const MAGIC_BYTES: Record<string, Uint8Array[]> = {
   "image/jpeg": [new Uint8Array([0xFF, 0xD8, 0xFF])],
   "image/png": [new Uint8Array([0x89, 0x50, 0x4E, 0x47])],
-  "image/webp": [new Uint8Array([0x52, 0x49, 0x46, 0x46])], // RIFF....WEBP
+  "image/webp": [new Uint8Array([0x52, 0x49, 0x46, 0x46])],
   "audio/mpeg": [
-    new Uint8Array([0x49, 0x44, 0x33]), // ID3 tag
-    new Uint8Array([0xFF, 0xFB]),        // MPEG-1 Layer 3
+    new Uint8Array([0x49, 0x44, 0x33]),
+    new Uint8Array([0xFF, 0xFB]),
     new Uint8Array([0xFF, 0xF3]),
     new Uint8Array([0xFF, 0xF2]),
   ],
-  "audio/wav": [new Uint8Array([0x52, 0x49, 0x46, 0x46])], // RIFF....WAVE
-  "video/mp4": [new Uint8Array([0x00, 0x00, 0x00])], // ....ftyp
+  "audio/wav": [new Uint8Array([0x52, 0x49, 0x46, 0x46])],
+  "video/mp4": [new Uint8Array([0x00, 0x00, 0x00])],
   "application/pdf": [new Uint8Array([0x25, 0x50, 0x44, 0x46])],
 };
 
 function matchesMagicByte(fileBytes: Uint8Array, mimeType: string): boolean {
   const signatures = MAGIC_BYTES[mimeType];
-  if (!signatures) return true; // unknown type, skip check
+  if (!signatures) return true;
   return signatures.some(sig => {
     if (fileBytes.length < sig.length) return false;
     for (let i = 0; i < sig.length; i++) {
@@ -49,10 +49,17 @@ Deno.serve(async (req: Request) => {
   if (cors) return cors;
   const ch = corsHeaders(req);
 
-  const supabase = getSupabaseAdmin();
   const clientIp = getClientIp(req);
 
   try {
+    // ─── Verify env vars ───
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!supabaseUrl) throw new Error("SUPABASE_URL no configurada");
+    if (!supabaseServiceKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY no configurada");
+
+    const supabase = getSupabaseAdmin();
+
     // ─── Rate limiting ───
     const rl = await checkRateLimit(clientIp, "upload");
     if (!rl.allowed) {
@@ -75,32 +82,13 @@ Deno.serve(async (req: Request) => {
 
     const file = formData.get("archivo") as File | null;
     const nombre = ((formData.get("nombre") as string)?.trim() || "Anónimo").slice(0, MAX_NOMBRE_LENGTH);
-    const anio = (formData.get("anio") as string)?.slice(0, 10) ?? null;
-    const mensaje = (formData.get("mensaje") as string)?.slice(0, MAX_STRING_LENGTH) ?? null;
     const mensaje_largo = (formData.get("mensaje_largo") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
     const categoria = (formData.get("categoria") as string || "galeria").slice(0, 100);
     const seccion = (formData.get("seccion") as string || "general").slice(0, 100);
     const texto = (formData.get("texto") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
-    const geolocalizacionRaw = (formData.get("geolocalizacion") as string)?.trim() ?? null;
     const pais = (formData.get("pais") as string)?.slice(0, 100) ?? null;
     const region = (formData.get("region") as string)?.slice(0, 100) ?? null;
-    const fecha_creacion_archivo = (formData.get("fecha_creacion_archivo") as string)?.slice(0, 20) ?? null;
-    const tagsRaw = (formData.get("tags") as string)?.trim() ?? null;
-    const consentimiento = (formData.get("consentimiento") as string) ?? null;
-    const transcripcion = (formData.get("transcripcion") as string)?.slice(0, 50000) ?? null;
     const linkExterno = (formData.get("link_externo") as string)?.trim() ?? null;
-
-    // Build geolocalizacion from pais + region + explicit input
-    const geoParts: string[] = [];
-    if (pais) geoParts.push(pais);
-    if (region) geoParts.push(region);
-    if (geolocalizacionRaw) geoParts.push(geolocalizacionRaw);
-    const geolocalizacionFinal = geoParts.length > 0 ? geoParts.join(", ") : null;
-
-    // Parse tags
-    const tagsFinal = tagsRaw
-      ? tagsRaw.split(",").map((t: string) => t.trim()).filter((t: string) => t.length > 0)
-      : null;
 
     if ((!file || file.size === 0) && !linkExterno && !mensaje_largo && !texto) {
       return new Response(
@@ -118,7 +106,7 @@ Deno.serve(async (req: Request) => {
       ];
       if (!validTypes.includes(file.type)) {
         return new Response(
-          JSON.stringify({ success: false, error: "Tipo de archivo no válido." }),
+          JSON.stringify({ success: false, error: "Tipo de archivo no v\u00e1lido." }),
           { status: 400, headers: { ...ch, "Content-Type": "application/json" } },
         );
       }
@@ -130,11 +118,10 @@ Deno.serve(async (req: Request) => {
         );
       }
 
-      // ─── Magic byte validation (server-side) ───
+      // ─── Magic byte validation ───
       const headerBytes = new Uint8Array(await file.slice(0, 12).arrayBuffer());
       if (!matchesMagicByte(headerBytes, file.type)) {
         console.warn(`[Upload] Magic byte mismatch: declared=${file.type}, firstBytes=${Array.from(headerBytes.slice(0, 4)).map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
-        // Log security event
         try {
           await supabase.from("audit_log").insert({
             accion: "security_file_rejected",
@@ -172,48 +159,61 @@ Deno.serve(async (req: Request) => {
       const sanitized = sanitizeName(file.name);
       storagePath = `recuerdos/${Date.now()}_${sanitized}`;
 
+      console.log(`[Upload] Subiendo archivo a storage: ${storagePath} (${file.type}, ${file.size} bytes)`);
       const { error: uploadError } = await supabase.storage
         .from("elarca-uploads")
         .upload(storagePath, file, { contentType: file.type });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error(`[Upload] Error en storage.upload:`, JSON.stringify(uploadError));
+        throw new Error(`Error al subir archivo al bucket: ${uploadError.message}`);
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from("elarca-uploads")
         .getPublicUrl(storagePath);
 
       urlArchivo = publicUrl;
+      console.log(`[Upload] Archivo subido exitosamente: ${publicUrl}`);
     } else if (linkExterno) {
       urlArchivo = linkExterno;
       tipoArchivo = "link";
     }
 
-    // ─── Insert into recuerdos ───
+    // ─── Build geolocalizacion from pais + region ───
+    const geoParts: string[] = [];
+    if (pais) geoParts.push(pais);
+    if (region) geoParts.push(region);
+    const geolocalizacionFinal = geoParts.length > 0 ? geoParts.join(", ") : null;
+
+    const insertPayload = {
+      nombre,
+      mensaje_largo,
+      categoria,
+      url_archivo: urlArchivo,
+      storage_path: storagePath,
+      tipo_archivo: tipoArchivo,
+      nombre_original: nombreOriginal,
+      tamanio_bytes: tamanioBytes,
+      texto,
+      seccion,
+      pais,
+      region,
+      geolocalizacion: geolocalizacionFinal,
+      aprobado: false,
+    };
+
+    console.log(`[Upload] Insertando en recuerdos:`, JSON.stringify(insertPayload));
     const { data: inserted, error: insertError } = await supabase
       .from("recuerdos")
-      .insert({
-        nombre,
-        anio: anio ?? null,
-        mensaje,
-        mensaje_largo,
-        categoria,
-        url_archivo: urlArchivo,
-        storage_path: storagePath,
-        tipo_archivo: tipoArchivo,
-        nombre_original: nombreOriginal,
-        tamanio_bytes: tamanioBytes,
-        texto,
-        seccion,
-        pais,
-        region,
-        geolocalizacion: geolocalizacionFinal,
-        transcripcion,
-        aprobado: false,
-      })
+      .insert(insertPayload)
       .select()
       .single();
 
-    if (insertError) throw insertError;
+    if (insertError) {
+      console.error(`[Upload] Error en insert:`, JSON.stringify(insertError));
+      throw new Error(`Error al insertar en recuerdos: ${insertError.message}${insertError.details ? " — " + insertError.details : ""}`);
+    }
 
     // ─── Register rate limit ───
     await recordRateLimit(clientIp, "upload_recuerdo");
@@ -224,8 +224,6 @@ Deno.serve(async (req: Request) => {
         const emailHtml = `
           <h2>Nuevo recuerdo recibido en El Arca</h2>
           <p><strong>Nombre:</strong> ${escapeHtml(nombre)}</p>
-          ${anio ? `<p><strong>Año:</strong> ${escapeHtml(anio)}</p>` : ""}
-          ${mensaje ? `<p><strong>Mensaje:</strong> ${escapeHtml(mensaje)}</p>` : ""}
           ${texto ? `<p><strong>Texto:</strong> ${escapeHtml(texto)}</p>` : ""}
           ${nombreOriginal ? `<p><strong>Archivo:</strong> ${escapeHtml(nombreOriginal)} (${(tamanioBytes! / 1024 / 1024).toFixed(1)} MB)</p>` : ""}
           <p><strong>Sección:</strong> ${escapeHtml(seccion)}</p>
@@ -247,7 +245,7 @@ Deno.serve(async (req: Request) => {
           }),
         });
       } catch (emailErr) {
-        console.error("Error al enviar email:", emailErr);
+        console.error("[Upload] Error al enviar email:", emailErr);
       }
     }
 
@@ -256,6 +254,9 @@ Deno.serve(async (req: Request) => {
       { status: 201, headers: { ...ch, "Content-Type": "application/json", ...rateLimitHeaders(rl.remaining, 5) } },
     );
   } catch (err) {
+    console.error("[Upload] Error general:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    console.error("[Upload] Error message:", err instanceof Error ? err.message : String(err));
+    console.error("[Upload] Error stack:", err instanceof Error ? err.stack : "N/A");
     return new Response(
       JSON.stringify({ success: false, error: "Error interno del servidor" }),
       { status: 500, headers: { ...ch, "Content-Type": "application/json" } },
