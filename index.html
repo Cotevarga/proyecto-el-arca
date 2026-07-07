@@ -547,6 +547,35 @@
               <p style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:12px;">Metadatos adicionales (opcionales)</p>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div>
+                  <label for="pais" style="font-size:10px;text-transform:uppercase;color:#888;display:block;margin-bottom:4px;">País</label>
+                  <select id="pais" name="pais" style="width:100%;padding:8px 12px;background:black;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:white;font-size:12px;outline:none;">
+                    <option value="">Seleccionar</option>
+                    <option value="Chile">Chile</option>
+                    <option value="Argentina">Argentina</option>
+                    <option value="Bolivia">Bolivia</option>
+                    <option value="Colombia">Colombia</option>
+                    <option value="Costa Rica">Costa Rica</option>
+                    <option value="Ecuador">Ecuador</option>
+                    <option value="España">España</option>
+                    <option value="Guatemala">Guatemala</option>
+                    <option value="Honduras">Honduras</option>
+                    <option value="México">México</option>
+                    <option value="Nicaragua">Nicaragua</option>
+                    <option value="Panamá">Panamá</option>
+                    <option value="Paraguay">Paraguay</option>
+                    <option value="Perú">Perú</option>
+                    <option value="Puerto Rico">Puerto Rico</option>
+                    <option value="República Dominicana">República Dominicana</option>
+                    <option value="Uruguay">Uruguay</option>
+                    <option value="Venezuela">Venezuela</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="region" style="font-size:10px;text-transform:uppercase;color:#888;display:block;margin-bottom:4px;">Región / Departamento</label>
+                  <input type="text" id="region" name="region" placeholder="Ej: Metropolitana" style="width:100%;padding:8px 12px;background:black;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:white;font-size:12px;outline:none;">
+                </div>
+                <div>
                   <label for="geolocalizacion" style="font-size:10px;text-transform:uppercase;color:#888;display:block;margin-bottom:4px;">Ubicación</label>
                   <input type="text" id="geolocalizacion" name="geolocalizacion" placeholder="Ej: La Pintana, Santiago" style="width:100%;padding:8px 12px;background:black;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:white;font-size:12px;outline:none;">
                 </div>
@@ -669,6 +698,10 @@
 
           try {
             var meta = {};
+            var paisEl = document.getElementById('pais');
+            if (paisEl && paisEl.value) meta.pais = paisEl.value;
+            var regionEl = document.getElementById('region');
+            if (regionEl && regionEl.value.trim()) meta.region = regionEl.value.trim();
             var geo = document.getElementById('geolocalizacion');
             if (geo && geo.value.trim()) meta.geolocalizacion = geo.value.trim();
             var fechaArch = document.getElementById('fecha-creacion-archivo');
@@ -703,6 +736,8 @@
                   aprobado: false,
                   seccion: null,
                   consentimiento: true,
+                  pais: meta.pais || null,
+                  region: meta.region || null,
                   geolocalizacion: meta.geolocalizacion || null,
                   tags: meta.tags || null,
                   fecha_creacion_archivo: meta.fecha_creacion_archivo || null
@@ -718,6 +753,8 @@
                   aprobado: false,
                   seccion: null,
                   consentimiento: true,
+                  pais: meta.pais || null,
+                  region: meta.region || null,
                   geolocalizacion: meta.geolocalizacion || null,
                   tags: meta.tags || null,
                   fecha_creacion_archivo: meta.fecha_creacion_archivo || null
