@@ -691,10 +691,10 @@
           </div>
         </div>
       </div>
-      <div id="security-banner" onclick="document.querySelector('[data-section=&quot;security&quot;]').click()">
+      <div id="security-banner" style="display:none;">
         <span class="sec-icon">🛡️</span>
         <span class="sec-text" id="security-banner-text">Eventos de seguridad detectados</span>
-        <span class="sec-cta">Revisar</span>
+        <span class="sec-cta" onclick="window.__admin.revisarAlertas()">Revisar</span>
       </div>
       <div class="main-content">
 

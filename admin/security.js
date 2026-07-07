@@ -29,14 +29,17 @@
         }
       } catch (_) {}
 
+      var reviewedAt = parseInt(localStorage.getItem('security_reviewed_at') || '0', 10);
+      var reviewExpired = (Date.now() - reviewedAt) > 5 * 60 * 1000;
+
       if (A.dom.securityAlertBadge) {
         var totalAlerts = countFail + countRejected;
-        if (totalAlerts > 0) { A.dom.securityAlertBadge.style.display = 'inline'; A.dom.securityAlertBadge.textContent = totalAlerts > 99 ? '99+' : String(totalAlerts); }
+        if (totalAlerts > 0 && reviewExpired) { A.dom.securityAlertBadge.style.display = 'inline'; A.dom.securityAlertBadge.textContent = totalAlerts > 99 ? '99+' : String(totalAlerts); }
         else { A.dom.securityAlertBadge.style.display = 'none'; }
       }
 
       if (A.dom.secBanner && A.dom.secBannerText) {
-        if (countFail + countRejected > 0) { A.dom.secBanner.style.display = 'flex'; A.dom.secBannerText.textContent = countFail + ' intentos de login fallidos · ' + countRejected + ' archivos rechazados'; }
+        if (countFail + countRejected > 0 && reviewExpired) { A.dom.secBanner.style.display = 'flex'; A.dom.secBannerText.textContent = countFail + ' intentos de login fallidos · ' + countRejected + ' archivos rechazados'; }
         else { A.dom.secBanner.style.display = 'none'; }
       }
 
@@ -74,5 +77,12 @@
         } else { A.showToast('Error al cargar eventos de seguridad', 'error'); }
       }
     }
+  };
+
+  A.revisarAlertas = function() {
+    localStorage.setItem('security_reviewed_at', Date.now());
+    if (A.dom.securityAlertBadge) { A.dom.securityAlertBadge.style.display = 'none'; }
+    if (A.dom.secBanner) { A.dom.secBanner.style.display = 'none'; }
+    document.querySelector('[data-section="security"]').click();
   };
 })();
