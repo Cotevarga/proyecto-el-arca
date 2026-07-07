@@ -81,10 +81,26 @@ Deno.serve(async (req: Request) => {
     const categoria = (formData.get("categoria") as string || "galeria").slice(0, 100);
     const seccion = (formData.get("seccion") as string || "general").slice(0, 100);
     const texto = (formData.get("texto") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
+    const geolocalizacionRaw = (formData.get("geolocalizacion") as string)?.trim() ?? null;
     const pais = (formData.get("pais") as string)?.slice(0, 100) ?? null;
     const region = (formData.get("region") as string)?.slice(0, 100) ?? null;
+    const fecha_creacion_archivo = (formData.get("fecha_creacion_archivo") as string)?.slice(0, 20) ?? null;
+    const tagsRaw = (formData.get("tags") as string)?.trim() ?? null;
+    const consentimiento = (formData.get("consentimiento") as string) ?? null;
     const transcripcion = (formData.get("transcripcion") as string)?.slice(0, 50000) ?? null;
     const linkExterno = (formData.get("link_externo") as string)?.trim() ?? null;
+
+    // Build geolocalizacion from pais + region + explicit input
+    const geoParts: string[] = [];
+    if (pais) geoParts.push(pais);
+    if (region) geoParts.push(region);
+    if (geolocalizacionRaw) geoParts.push(geolocalizacionRaw);
+    const geolocalizacionFinal = geoParts.length > 0 ? geoParts.join(", ") : null;
+
+    // Parse tags
+    const tagsFinal = tagsRaw
+      ? tagsRaw.split(",").map((t: string) => t.trim()).filter((t: string) => t.length > 0)
+      : null;
 
     if ((!file || file.size === 0) && !linkExterno && !mensaje_largo && !texto) {
       return new Response(
@@ -188,8 +204,10 @@ Deno.serve(async (req: Request) => {
         tamanio_bytes: tamanioBytes,
         texto,
         seccion,
-        pais,
-        region,
+        geolocalizacion: geolocalizacionFinal,
+        fecha_creacion_archivo,
+        tags: tagsFinal,
+        consentimiento: consentimiento === "true" || consentimiento === "on",
         transcripcion,
         aprobado: false,
       })

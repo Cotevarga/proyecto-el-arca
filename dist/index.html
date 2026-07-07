@@ -719,6 +719,7 @@
             else if (linkUrl) { var l = linkUrl.toLowerCase(); if (l.indexOf('youtube') !== -1 || l.indexOf('youtu.be') !== -1) categoria = 'video'; else if (l.indexOf('facebook') !== -1) categoria = 'video'; else if (l.match(/\.(mp3|wav|ogg)(\?|$)/)) categoria = 'audio'; else if (l.match(/\.(mp4|webm|mov)(\?|$)/)) categoria = 'video'; else categoria = 'link'; }
             formData.append('categoria', categoria);
             formData.append('texto', relato || '');
+            formData.append('consentimiento', 'true');
 
             var resp = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
             var result = await resp.json();
