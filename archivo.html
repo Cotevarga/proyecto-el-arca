@@ -241,6 +241,18 @@
       content.innerHTML = '<div style="text-align:center;padding:40px 0;"><div style="width:40px;height:40px;border:3px solid rgba(229,9,20,0.3);border-top-color:var(--color-mir);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto;"></div><p class="text-white/40 text-sm mt-4">Cargando...</p></div>';
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
+      function sanitizarHTML(html) {
+        if (!html) return '';
+        return html
+          .replace(/<script[^>]*>.*?<\/script>/gi, '')
+          .replace(/on\w+=["'][^"']*["']/gi, '')
+          .replace(/<[^>]*>/g, function(m) {
+            var permitidas = ['<b>','</b>','<i>','</i>','<u>','</u>','<br>','<br/>','<br />','<p>','</p>'];
+            if (permitidas.indexOf(m.toLowerCase()) !== -1) return m;
+            return '';
+          });
+      }
+
       function waitForSupabase(maxWait) {
         maxWait = maxWait || 8000;
         return new Promise(function (resolve) {
@@ -268,8 +280,8 @@
           if (origen) html += '<p style="font-size:13px;color:#888;margin-bottom:4px;">📍 ' + origen.replace(/</g, '&lt;') + '</p>';
           if (d.fecha_creacion_archivo) html += '<p style="font-size:12px;color:#666;margin-bottom:16px;">📅 ' + d.fecha_creacion_archivo + '</p>';
           if (d.url_archivo) html += embedHTML(d.url_archivo, d.tipo_archivo);
-          if (d.mensaje_largo) html += '<div style="margin-top:20px;border-top:1px solid rgba(229,9,20,0.1);padding-top:20px;"><p style="font-size:14px;color:#ccc;line-height:1.7;white-space:pre-wrap;">' + d.mensaje_largo.replace(/</g, '&lt;') + '</p></div>';
-          if (d.transcripcion) html += '<div style="margin-top:16px;background:rgba(0,0,0,0.3);padding:16px;border-radius:8px;border-left:3px solid rgba(229,9,20,0.3);"><p style="font-size:11px;text-transform:uppercase;color:#888;margin-bottom:8px;">Transcripción</p><p style="font-size:13px;color:#aaa;line-height:1.6;white-space:pre-wrap;">' + d.transcripcion.replace(/</g, '&lt;') + '</p></div>';
+          if (d.mensaje_largo) html += '<div style="margin-top:20px;border-top:1px solid rgba(229,9,20,0.1);padding-top:20px;"><p style="font-size:14px;color:#ccc;line-height:1.7;white-space:pre-wrap;">' + sanitizarHTML(d.mensaje_largo) + '</p></div>';
+          if (d.transcripcion) html += '<div style="margin-top:16px;background:rgba(0,0,0,0.3);padding:16px;border-radius:8px;border-left:3px solid rgba(229,9,20,0.3);"><p style="font-size:11px;text-transform:uppercase;color:#888;margin-bottom:8px;">Transcripción</p><p style="font-size:13px;color:#aaa;line-height:1.6;white-space:pre-wrap;">' + sanitizarHTML(d.transcripcion) + '</p></div>';
           if (d.tags) { var tagList = Array.isArray(d.tags) ? d.tags : d.tags.split(','); html += '<div style="margin-top:16px;display:flex;gap:6px;flex-wrap:wrap;">' + tagList.map(function(t) { return '<span style="background:rgba(229,9,20,0.1);color:var(--color-mir);padding:2px 12px;border-radius:20px;font-size:11px;">' + t.trim().replace(/</g, '&lt;') + '</span>'; }).join('') + '</div>'; }
           if (d.created_at) html += '<p style="font-size:11px;color:#555;margin-top:20px;border-top:1px solid rgba(255,255,255,0.05);padding-top:12px;">Aportado el ' + new Date(d.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) + '</p>';
           content.innerHTML = html;

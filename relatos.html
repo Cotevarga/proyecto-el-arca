@@ -226,7 +226,7 @@
         try {
           var resp = await supabaseClient
             .from('recuerdos')
-            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, nombre_serie, url_archivo, tipo_archivo')
+            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, nombre_serie, url_archivo, tipo_archivo, geolocalizacion')
             .eq('seccion', nombreSeccion)
             .eq('aprobado', true)
             .not('titulo_relato', 'is', null)
@@ -400,7 +400,7 @@
         try {
           var resp = await client
             .from('recuerdos')
-            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, nombre_serie, url_archivo, tipo_archivo')
+            .select('id, titulo_relato, mensaje_largo, mensaje, nombre, created_at, nombre_serie, url_archivo, tipo_archivo, geolocalizacion')
             .eq('seccion', sec)
             .eq('aprobado', true)
             .not('titulo_relato', 'is', null)
