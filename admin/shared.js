@@ -127,7 +127,7 @@
   };
 
   A.SECCIONES_VALIDAS = [
-    'Galeria', 'Videos y Audios',
+    'Galeria', 'Videos y Audios', 'Musica',
     'Relatos: El Jano', 'Relatos: El Arca', 'Relatos: Otras organizaciones',
     'Relatos: Anecdotas'
   ];
@@ -138,7 +138,8 @@
     'Relatos: El Jano': { label: 'Relatos: El Jano', fields: ['archivo_opcional', 'texto_largo'], requireFile: false, requireTexto: true },
     'Relatos: El Arca': { label: 'Relatos: El Arca', fields: ['archivo_opcional', 'texto_largo'], requireFile: false, requireTexto: true },
     'Relatos: Otras organizaciones': { label: 'Relatos: Otras organizaciones', fields: ['archivo_opcional', 'texto_largo'], requireFile: false, requireTexto: true },
-    'Relatos: Anecdotas': { label: 'Relatos: Anecdotas', fields: ['archivo_opcional', 'texto_largo'], requireFile: false, requireTexto: true }
+    'Relatos: Anecdotas': { label: 'Relatos: Anecdotas', fields: ['archivo_opcional', 'texto_largo'], requireFile: false, requireTexto: true },
+    'Musica': { label: 'Música', fields: ['multimedia'], requireFile: false, requireTexto: false }
   };
 
   A.validarSeccion = function(seccion) {

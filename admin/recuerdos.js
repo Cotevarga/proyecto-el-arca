@@ -287,6 +287,22 @@
       var updateData = { aprobado: true, seccion: seccion, titulo_relato: tituloRelato || null, nombre_serie: nombreSerie || null, mensaje_largo: textoLargo || null, destacado: destacado, es_efimero: destacado, transcripcion: transcripcion || null };
       var { error: updateError } = await s.from('recuerdos').update(updateData).eq('id', id);
       if (updateError) throw updateError;
+
+      if (seccion === 'Musica') {
+        var { data: songRecord, error: songFetchError } = await s.from('recuerdos').select('*').eq('id', id).single();
+        if (!songFetchError && songRecord && songRecord.url_archivo) {
+          var { error: musicaInsertError } = await s.from('musica_reproductor').insert({
+            titulo: songRecord.titulo_relato || tituloRelato || 'Sin título',
+            artista: songRecord.nombre_serie || 'El Arca',
+            url_mp3: songRecord.url_archivo,
+            storage_path: songRecord.storage_path || null,
+            activo: true,
+            orden: 0
+          });
+          if (musicaInsertError) console.error('[Aprobación] Error al insertar en musica_reproductor:', musicaInsertError.message);
+        }
+      }
+
       A.showToast('Recuerdo aprobado y publicado en ' + (A.NOMBRES_SECCION[seccion] || seccion), 'success');
       A.registrarAuditoria('approve', 'recuerdo', id, { seccion: seccion, titulo: tituloRelato });
       A.closeApprovalModal();
