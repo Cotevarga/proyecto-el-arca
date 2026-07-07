@@ -112,8 +112,24 @@
 
     var mapLoaded = false;
 
-    function cargarMapa() {
+    function waitForLeaflet(maxRetries) {
+      if (maxRetries === undefined) maxRetries = 50;
+      return new Promise(function (resolve) {
+        if (typeof L !== 'undefined') { resolve(L); return; }
+        var link = document.createElement('link');
+        link.rel = 'stylesheet'; link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+        var script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.onload = function () { resolve(L); };
+        script.onerror = function () { resolve(null); };
+        document.head.appendChild(script);
+      });
+    }
+
+    async function cargarMapa() {
       if (mapLoaded) return;
+      if (typeof L === 'undefined') { var _L = await waitForLeaflet(); if (!_L) { mapEl.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">Error al cargar mapa</p>'; return; } }
       var client = window.miSupabase;
       if (!client) { mapEl.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">Conectando...</p>'; return; }
       mapLoaded = true;

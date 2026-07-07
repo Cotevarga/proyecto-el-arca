@@ -282,7 +282,7 @@
           html += '<tr><td style="padding:4px 8px;color:#888;">dc:identifier</td><td style="padding:4px 8px;color:#ccc;">rec-' + d.id + '</td></tr>';
           html += '<tr style="background:rgba(255,255,255,0.02);"><td style="padding:4px 8px;color:#888;">dc:language</td><td style="padding:4px 8px;color:#ccc;">es</td></tr>';
           html += '<tr><td style="padding:4px 8px;color:#888;">dc:coverage</td><td style="padding:4px 8px;color:#ccc;">' + (origen || 'Chile').replace(/</g, '&lt;') + '</td></tr>';
-          html += '<tr style="background:rgba(255,255,255,0.02);"><td style="padding:4px 8px;color:#888;">dc:subject</td><td style="padding:4px 8px;color:#ccc;">' + (d.tags || 'memoria popular, comunidad').replace(/</g, '&lt;') + '</td></tr>';
+          var subjectTags = d.tags ? (Array.isArray(d.tags) ? d.tags.join(', ') : d.tags) : 'memoria popular, comunidad'; html += '<tr style="background:rgba(255,255,255,0.02);"><td style="padding:4px 8px;color:#888;">dc:subject</td><td style="padding:4px 8px;color:#ccc;">' + subjectTags.replace(/</g, '&lt;') + '</td></tr>';
           html += '<tr><td style="padding:4px 8px;color:#888;">dc:rights</td><td style="padding:4px 8px;color:#ccc;">CC BY-NC-SA 4.0</td></tr>';
           html += '<tr style="background:rgba(255,255,255,0.02);"><td style="padding:4px 8px;color:#888;">dc:type</td><td style="padding:4px 8px;color:#ccc;">Community Archive — Memory of the World (UNESCO MoW)</td></tr>';
           html += '</table></div>';
