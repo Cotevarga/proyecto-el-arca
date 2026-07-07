@@ -237,14 +237,13 @@
               items.push({
                 id: r.id,
                 titulo: r.titulo_relato || 'Sin título',
-                subtitulo: (r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) : '') + (r.nombre_serie ? ' · Serie: ' + r.nombre_serie : '') + ' · por ' + (r.nombre || 'Anónimo'),
+                subtitulo: r.titulo_relato || 'Sin título',
                 html: (function() {
                   var imgHtml = '';
                   if (r.url_archivo && r.tipo_archivo && r.tipo_archivo.indexOf('image') === 0) {
                     imgHtml = '<div class="relato-img"><img src="' + r.url_archivo.replace(/"/g, '&quot;') + '" alt="' + escaparHTML(r.titulo_relato || '') + '" loading="lazy"></div>';
                   }
-                  var metaHtml = (r.created_at ? '<span>' + new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) + '</span>' : '') + '<span>por ' + escaparHTML(r.nombre || 'Anónimo') + '</span>' + (r.nombre_serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escaparHTML(r.nombre_serie) + '</span>' : '');
-                  return '<div class="relato-detalle"><h2>' + escaparHTML(r.titulo_relato || 'Sin título') + '</h2><div class="meta">' + metaHtml + '</div><div class="relato-body">' + imgHtml + '<div class="contenido">' + sanitizarHTML(r.mensaje_largo || r.mensaje || '') + '</div></div></div>';
+                  return '<div class="relato-detalle"><h2>' + escaparHTML(r.titulo_relato || 'Sin título') + '</h2><div class="relato-body">' + imgHtml + '<div class="contenido">' + sanitizarHTML(r.mensaje_largo || r.mensaje || '') + '</div></div></div>';
                 })(),
                 fuente: 'supabase'
               });
@@ -417,14 +416,13 @@
               nuevos.push({
                 id: r.id,
                 titulo: r.titulo_relato || 'Sin título',
-                subtitulo: (r.created_at ? new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) : '') + (r.nombre_serie ? ' · Serie: ' + r.nombre_serie : '') + ' · por ' + (r.nombre || 'Anónimo'),
+                subtitulo: r.titulo_relato || 'Sin título',
                 html: (function() {
                   var imgHtml = '';
                   if (r.url_archivo && r.tipo_archivo && r.tipo_archivo.indexOf('image') === 0) {
                     imgHtml = '<div class="relato-img"><img src="' + r.url_archivo.replace(/"/g, '&quot;') + '" alt="' + escaparHTML(r.titulo_relato || '') + '" loading="lazy"></div>';
                   }
-                  var metaHtml = (r.created_at ? '<span>' + new Date(r.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) + '</span>' : '') + '<span>por ' + escaparHTML(r.nombre || 'Anónimo') + '</span>' + (r.nombre_serie ? '<span style="text-transform:uppercase;letter-spacing:0.05em;color:var(--color-mir);">Serie: ' + escaparHTML(r.nombre_serie) + '</span>' : '');
-                  return '<div class="relato-detalle"><h2>' + escaparHTML(r.titulo_relato || 'Sin título') + '</h2><div class="meta">' + metaHtml + '</div><div class="relato-body">' + imgHtml + '<div class="contenido">' + sanitizarHTML(r.mensaje_largo || r.mensaje || '') + '</div></div></div>';
+                  return '<div class="relato-detalle"><h2>' + escaparHTML(r.titulo_relato || 'Sin título') + '</h2><div class="relato-body">' + imgHtml + '<div class="contenido">' + sanitizarHTML(r.mensaje_largo || r.mensaje || '') + '</div></div></div>';
                 })(),
                 fuente: 'supabase'
               });
@@ -508,7 +506,7 @@
     /* ─── Relato detalle (SPA) ─── */
     .relato-detalle { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.2) !important; padding: 2rem; margin-bottom: 2rem; border-radius: 0; }
     .relato-detalle h2 { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; text-align: left !important; margin: 0 0 0.75rem 0; }
-    .relato-detalle .meta { display: flex; gap: 12px; font-size: 12px; color: #666; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(229,9,20,0.1); flex-wrap: wrap; text-align: left; }
+
     .relato-detalle .contenido { font-size: 15px; line-height: 1.8; color: #ddd; text-align: justify; white-space: pre-wrap; }
     .relato-detalle .contenido b, .relato-detalle .contenido strong { color: white; }
     .relato-detalle .contenido i, .relato-detalle .contenido em { color: #ddd; }
