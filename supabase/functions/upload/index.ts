@@ -85,7 +85,7 @@ Deno.serve(async (req: Request) => {
     const mensaje_largo = (formData.get("mensaje_largo") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
     const texto = (formData.get("texto") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
     const categoria = (formData.get("categoria") as string || "galeria").slice(0, 100);
-    const seccion = (formData.get("seccion") as string || "general").slice(0, 100);
+    const seccion = (formData.get("seccion") as string)?.slice(0, 100) ?? null;
     const pais = (formData.get("pais") as string)?.slice(0, 100) ?? null;
     const linkExterno = (formData.get("link_externo") as string)?.trim() ?? null;
 
