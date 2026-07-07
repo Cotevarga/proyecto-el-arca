@@ -9,6 +9,96 @@ window.API_BASE = '';
   // ─── 1. Supabase persistente ───
   const getSupabase = () => window.miSupabase;
 
+  // ─── Password Recovery ───
+  (function() {
+    var recoveryResolved = false;
+    var recoveryFormHTML =
+      '<div id="recovery-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;' +
+      'background:rgba(0,0,0,0.7);z-index:99999;display:flex;align-items:center;justify-content:center;' +
+      'font-family:system-ui,sans-serif;">' +
+      '<div style="background:#1a1a2e;padding:32px;border-radius:12px;max-width:400px;width:90%;' +
+      'box-shadow:0 8px 32px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.08);">' +
+      '<h2 style="color:#e50914;margin:0 0 8px 0;font-size:20px;font-weight:700;text-align:center;">Cambiar contrase&ntilde;a</h2>' +
+      '<p style="color:#888;font-size:13px;text-align:center;margin:0 0 20px 0;">Ingresa tu nueva contrase&ntilde;a</p>' +
+      '<input id="recovery-password" type="password" placeholder="Nueva contrase&ntilde;a (m&iacute;n. 6 caracteres)" ' +
+      'style="width:100%;padding:10px 12px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.1);' +
+      'border-radius:6px;background:#16213e;color:#eee;font-size:14px;box-sizing:border-box;outline:none;">' +
+      '<input id="recovery-confirm" type="password" placeholder="Confirmar contrase&ntilde;a" ' +
+      'style="width:100%;padding:10px 12px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.1);' +
+      'border-radius:6px;background:#16213e;color:#eee;font-size:14px;box-sizing:border-box;outline:none;">' +
+      '<button id="recovery-submit" style="width:100%;padding:10px;background:#e50914;color:#fff;' +
+      'border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;">Restablecer contrase&ntilde;a</button>' +
+      '<p id="recovery-error" style="color:#e50914;font-size:13px;text-align:center;margin:10px 0 0 0;display:none;"></p>' +
+      '<p id="recovery-success" style="color:#4ade80;font-size:13px;text-align:center;margin:10px 0 0 0;display:none;">' +
+      'Contrase&ntilde;a cambiada exitosamente. Redirigiendo...</p>' +
+      '</div></div>';
+
+    function waitForSupabaseClient(cb, attempts) {
+      if (!attempts) attempts = 0;
+      if (attempts > 50) return;
+      if (window.miSupabase) { cb(window.miSupabase); return; }
+      setTimeout(function() { waitForSupabaseClient(cb, attempts + 1); }, 200);
+    }
+
+    function showRecoveryForm() {
+      var existing = document.getElementById('recovery-overlay');
+      if (existing) return;
+      var div = document.createElement('div');
+      div.innerHTML = recoveryFormHTML;
+      document.body.appendChild(div.firstElementChild);
+
+      document.getElementById('recovery-submit').addEventListener('click', function() {
+        var pw = document.getElementById('recovery-password').value;
+        var confirm = document.getElementById('recovery-confirm').value;
+        var errEl = document.getElementById('recovery-error');
+        var successEl = document.getElementById('recovery-success');
+        errEl.style.display = 'none';
+
+        if (pw.length < 6) { errEl.textContent = 'Mínimo 6 caracteres'; errEl.style.display = ''; return; }
+        if (pw !== confirm) { errEl.textContent = 'Las contraseñas no coinciden'; errEl.style.display = ''; return; }
+
+        document.getElementById('recovery-submit').disabled = true;
+        document.getElementById('recovery-submit').textContent = 'Actualizando...';
+
+        waitForSupabaseClient(function(supabase) {
+          supabase.auth.updateUser({ password: pw }).then(function(resp) {
+            if (resp.error) {
+              errEl.textContent = resp.error.message;
+              errEl.style.display = '';
+              document.getElementById('recovery-submit').disabled = false;
+              document.getElementById('recovery-submit').textContent = 'Restablecer contraseña';
+              return;
+            }
+            successEl.style.display = '';
+            document.getElementById('recovery-submit').style.display = 'none';
+            document.getElementById('recovery-password').style.display = 'none';
+            document.getElementById('recovery-confirm').style.display = 'none';
+            setTimeout(function() {
+              window.location.href = '/admin.html';
+            }, 2000);
+          });
+        });
+      });
+    }
+
+    function initRecoveryListener() {
+      waitForSupabaseClient(function(supabase) {
+        supabase.auth.onAuthStateChange(function(event) {
+          if (event === 'PASSWORD_RECOVERY' && !recoveryResolved) {
+            recoveryResolved = true;
+            showRecoveryForm();
+          }
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initRecoveryListener);
+    } else {
+      initRecoveryListener();
+    }
+  })();
+
   // ─── Error banner ───
   var errorBanner = document.createElement('div');
   errorBanner.id = 'arca-error-banner';
