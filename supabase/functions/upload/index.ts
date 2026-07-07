@@ -83,11 +83,10 @@ Deno.serve(async (req: Request) => {
     const file = formData.get("archivo") as File | null;
     const nombre = ((formData.get("nombre") as string)?.trim() || "Anónimo").slice(0, MAX_NOMBRE_LENGTH);
     const mensaje_largo = (formData.get("mensaje_largo") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
+    const texto = (formData.get("texto") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
     const categoria = (formData.get("categoria") as string || "galeria").slice(0, 100);
     const seccion = (formData.get("seccion") as string || "general").slice(0, 100);
-    const texto = (formData.get("texto") as string)?.slice(0, MAX_STRING_LENGTH * 4) ?? null;
     const pais = (formData.get("pais") as string)?.slice(0, 100) ?? null;
-    const region = (formData.get("region") as string)?.slice(0, 100) ?? null;
     const linkExterno = (formData.get("link_externo") as string)?.trim() ?? null;
 
     if ((!file || file.size === 0) && !linkExterno && !mensaje_largo && !texto) {
@@ -180,25 +179,24 @@ Deno.serve(async (req: Request) => {
       tipoArchivo = "link";
     }
 
-    // ─── Build geolocalizacion from pais + region ───
+    const geolocalizacionRaw = (formData.get("geolocalizacion") as string)?.trim() ?? null;
     const geoParts: string[] = [];
     if (pais) geoParts.push(pais);
-    if (region) geoParts.push(region);
+    if (geolocalizacionRaw) geoParts.push(geolocalizacionRaw);
     const geolocalizacionFinal = geoParts.length > 0 ? geoParts.join(", ") : null;
 
     const insertPayload = {
       nombre,
       mensaje_largo,
+      contenido: texto || mensaje_largo,
       categoria,
       url_archivo: urlArchivo,
       storage_path: storagePath,
       tipo_archivo: tipoArchivo,
       nombre_original: nombreOriginal,
       tamanio_bytes: tamanioBytes,
-      texto,
       seccion,
       pais,
-      region,
       geolocalizacion: geolocalizacionFinal,
       aprobado: false,
     };
