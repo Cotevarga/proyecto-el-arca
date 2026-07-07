@@ -93,6 +93,23 @@ async function build() {
     }
   }
 
+  // 4. Copy admin scripts
+  const adminSrcDir = join(ROOT, 'admin');
+  const adminDstDir = join(distDir, 'admin');
+  if (existsSync(adminSrcDir)) {
+    if (!existsSync(adminDstDir)) mkdirSync(adminDstDir, { recursive: true });
+    const adminEntries = readdirSync(adminSrcDir);
+    for (const entry of adminEntries) {
+      const srcPath = join(adminSrcDir, entry);
+      if (statSync(srcPath).isFile()) {
+        let content = readFileSync(srcPath, 'utf-8');
+        content = injectEnv(entry, content);
+        writeFileSync(join(adminDstDir, entry), content, 'utf-8');
+      }
+    }
+    console.log(`  📁 admin/ -> dist/admin/`);
+  }
+
   console.log('\n✅ Build complete');
 }
 

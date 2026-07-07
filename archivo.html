@@ -280,9 +280,7 @@
           var html = '';
           if (d.nombre) html += '<h1 class="heading-mir text-3xl md:text-4xl mb-2">' + d.nombre.replace(/</g, '&lt;') + '</h1>';
           if (d.titulo_relato) html += '<p class="text-mir font-title text-lg mb-4">' + d.titulo_relato.replace(/</g, '&lt;') + '</p>';
-          var origen = (d.pais || d.pais_origen || '').trim();
-          if (d.region || d.region_origen) origen += (origen ? ', ' : '') + (d.region || d.region_origen || '');
-          if (d.geolocalizacion) origen += (origen ? ' — ' : '') + d.geolocalizacion;
+          var origen = (d.geolocalizacion || '').trim();
           if (origen) html += '<p style="font-size:13px;color:#888;margin-bottom:4px;">📍 ' + origen.replace(/</g, '&lt;') + '</p>';
           if (d.fecha_creacion_archivo) html += '<p style="font-size:12px;color:#666;margin-bottom:16px;">📅 ' + d.fecha_creacion_archivo + '</p>';
           if (d.url_archivo) html += embedHTML(d.url_archivo, d.tipo_archivo);

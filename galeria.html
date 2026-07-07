@@ -514,7 +514,7 @@
         var recuerdosPromise = client.from('recuerdos')
           .select('id, url_archivo, nombre, mensaje_largo')
           .eq('aprobado', true)
-          .in('tipo_archivo', ['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+          .or('tipo_archivo.in.(image/jpeg,image/png,image/webp,image/gif),tipo_archivo.is.null')
           .order('created_at', { ascending: false });
 
         Promise.all([galeriaPromise, recuerdosPromise])
@@ -528,7 +528,10 @@
             }
 
             if (!rData.error && rData.data && rData.data.length > 0) {
+              var imgExtRe = /\.(jpg|jpeg|png|webp|gif|svg)(\?|$)/i;
               rData.data.forEach(function (d) {
+                if (!d.url_archivo) return;
+                if (!d.tipo_archivo && !imgExtRe.test(d.url_archivo)) return;
                 all.push({ id: d.id, url: d.url_archivo, titulo: d.nombre || '', subtitulo: '' });
               });
             }

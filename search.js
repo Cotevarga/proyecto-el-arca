@@ -25,8 +25,7 @@
     var html = '';
     items.forEach(function (d) {
       var icono = d.tipo_archivo ? (d.tipo_archivo.startsWith('audio') ? '🎵' : d.tipo_archivo.startsWith('video') ? '🎬' : d.tipo_archivo.startsWith('image') ? '📷' : '📄') : '📄';
-      var origen = (d.pais || d.pais_origen || '').trim();
-      if (d.region || d.region_origen) origen += (origen ? ', ' : '') + (d.region || d.region_origen || '');
+      var origen = (d.geolocalizacion || '').trim();
       var targetUrl = getTargetUrl(d);
       html += '<a href="' + targetUrl + '" class="block px-4 py-3 hover:bg-white/5 border-b border-white/5 transition text-sm" style="text-decoration:none;">' +
         '<span class="flex items-center gap-2">' +
@@ -50,9 +49,9 @@
     if (!term) { buscarViaEdge(q); return; }
     client
       .from('recuerdos')
-      .select('id, nombre, mensaje_largo, tipo_archivo, url_archivo, pais, region, created_at')
+      .select('id, nombre, mensaje_largo, tipo_archivo, url_archivo, geolocalizacion, created_at')
       .eq('aprobado', true)
-      .or('nombre.ilike.%' + term + '%,mensaje_largo.ilike.%' + term + '%,pais.ilike.%' + term + '%')
+      .or('nombre.ilike.%' + term + '%,mensaje_largo.ilike.%' + term + '%')
       .order('created_at', { ascending: false })
       .limit(50)
       .then(function (res) {
