@@ -202,6 +202,7 @@
       if (A.dom.editTexto) A.dom.editTexto.value = r.mensaje_largo || r.mensaje || '';
       if (A.dom.editGeo) A.dom.editGeo.value = r.geolocalizacion || '';
       if (A.dom.editTags) A.dom.editTags.value = (r.tags && Array.isArray(r.tags)) ? r.tags.join(', ') : (r.tags || '');
+      if (A.dom.editTranscripcion) A.dom.editTranscripcion.value = r.transcripcion || '';
       if (A.dom.editModal) A.dom.editModal.style.display = 'flex';
     } catch (err) { A.showToast('Error al cargar datos', 'error'); }
   };
@@ -217,13 +218,14 @@
     var geo = A.dom.editGeo ? A.dom.editGeo.value.trim() : '';
     var tagsRaw = A.dom.editTags ? A.dom.editTags.value.trim() : '';
     var tags = tagsRaw ? tagsRaw.split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t.length > 0; }) : null;
+    var transcripcion = A.dom.editTranscripcion ? A.dom.editTranscripcion.value.trim() : '';
 
     A.dom.btnEditSave.textContent = 'Guardando...';
     A.dom.btnEditSave.disabled = true;
     try {
       var s = window.__admin.getSupabaseClient();
       if (!s) throw new Error('Cliente Supabase no disponible');
-      var updateData = { seccion: seccion, nombre: nombre || null, titulo_relato: titulo || null, nombre_serie: serie || null, mensaje_largo: texto || null, geolocalizacion: geo || null, tags: tags };
+      var updateData = { seccion: seccion, nombre: nombre || null, titulo_relato: titulo || null, nombre_serie: serie || null, mensaje_largo: texto || null, geolocalizacion: geo || null, tags: tags, transcripcion: transcripcion || null };
       var { error: updateError } = await s.from('recuerdos').update(updateData).eq('id', id);
       if (updateError) throw updateError;
       A.showToast('Recuerdo actualizado', 'success');
@@ -255,6 +257,7 @@
     if (A.dom.approvalTextoLargoStd) A.dom.approvalTextoLargoStd.value = txt;
     if (A.dom.approvalTitulo) A.dom.approvalTitulo.value = (record && (record.titulo_relato || record.nombre || '')) || '';
     if (A.dom.approvalSerie) A.dom.approvalSerie.value = (record && record.nombre_serie) || '';
+    if (A.dom.approvalTranscripcion) A.dom.approvalTranscripcion.value = (record && record.transcripcion) || '';
     if (A.dom.approvalDestacado) A.dom.approvalDestacado.checked = (record && record.destacado === true);
     if (A.dom.approvalModal) A.dom.approvalModal.style.display = 'flex';
   };
@@ -273,6 +276,7 @@
       textoLargo = A.dom.approvalTextoLargoStd ? A.dom.approvalTextoLargoStd.value.trim() : '';
       tituloRelato = A.dom.approvalTitulo ? A.dom.approvalTitulo.value.trim() : '';
     }
+    var transcripcion = A.dom.approvalTranscripcion ? A.dom.approvalTranscripcion.value.trim() : '';
     var destacado = A.dom.approvalDestacado ? A.dom.approvalDestacado.checked : false;
 
     A.dom.btnApprovalConfirm.textContent = 'Publicando...';
@@ -280,7 +284,7 @@
     try {
       var s = window.__admin.getSupabaseClient();
       if (!s) throw new Error('Cliente Supabase no disponible');
-      var updateData = { aprobado: true, seccion: seccion, titulo_relato: tituloRelato || null, nombre_serie: nombreSerie || null, mensaje_largo: textoLargo || null, destacado: destacado, es_efimero: destacado };
+      var updateData = { aprobado: true, seccion: seccion, titulo_relato: tituloRelato || null, nombre_serie: nombreSerie || null, mensaje_largo: textoLargo || null, destacado: destacado, es_efimero: destacado, transcripcion: transcripcion || null };
       var { error: updateError } = await s.from('recuerdos').update(updateData).eq('id', id);
       if (updateError) throw updateError;
       A.showToast('Recuerdo aprobado y publicado en ' + (A.NOMBRES_SECCION[seccion] || seccion), 'success');

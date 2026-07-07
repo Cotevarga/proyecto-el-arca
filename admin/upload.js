@@ -109,7 +109,8 @@
       destacado: destacado, es_efimero: destacado,
       geolocalizacion: A.dom.adminUploadGeo ? A.dom.adminUploadGeo.value.trim() || null : null,
       fecha_creacion_archivo: A.dom.adminUploadFecha ? A.dom.adminUploadFecha.value || null : null,
-      tags: null
+      tags: null,
+      transcripcion: A.dom.adminUploadTranscripcion ? A.dom.adminUploadTranscripcion.value.trim() || null : null
     };
     if (A.dom.adminUploadTags && A.dom.adminUploadTags.value.trim()) {
       extraData.tags = A.dom.adminUploadTags.value.trim().split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t.length > 0; });

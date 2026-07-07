@@ -940,6 +940,10 @@
                     <label>Etiquetas (separadas por coma)</label>
                     <input type="text" id="admin-upload-tags" placeholder="Ej: marcha, pobladores, años 90">
                   </div>
+                  <div class="form-group" style="margin-bottom:0;margin-top:8px;">
+                    <label>Transcripción (para archivos de audio/video)</label>
+                    <textarea id="admin-upload-transcripcion" rows="4" placeholder="Pega aquí la transcripción del audio o video..." style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;"></textarea>
+                  </div>
                 </div>
 
                 <!-- ─── Vitrina checkbox ─── -->
@@ -1058,6 +1062,10 @@
           <textarea id="approval-textolargo-std" rows="5" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;" placeholder="Descripción opcional..."></textarea>
         </div>
       </div>
+      <div class="form-group">
+        <label>Transcripción (si es audio/video)</label>
+        <textarea id="approval-transcripcion" rows="4" placeholder="Transcripción..." style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;"></textarea>
+      </div>
       <div style="display:flex;align-items:center;gap:10px;padding:10px 0;">
         <input type="checkbox" id="approval-destacado" style="accent-color:var(--color-mir);width:16px;height:16px;">
         <label for="approval-destacado" style="font-size:12px;color:#aaa;cursor:pointer;">Publicar en vitrina (index)</label>
@@ -1146,6 +1154,10 @@
           <label>Tags (separados por coma)</label>
           <input type="text" id="edit-tags" placeholder="marcha, pobladores, años 90" style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;">
         </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0;margin-top:8px;">
+        <label>Transcripción</label>
+        <textarea id="edit-transcripcion" rows="4" placeholder="Transcripción..." style="width:100%;padding:10px 14px;background:var(--color-acero);border:1px solid #333;border-radius:8px;color:white;font-size:13px;outline:none;resize:vertical;font-family:inherit;"></textarea>
       </div>
       <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
         <button class="btn-secondary" id="btn-edit-cancel" aria-label="Cancelar edición">Cancelar</button>

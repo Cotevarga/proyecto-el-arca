@@ -272,20 +272,6 @@
           if (d.transcripcion) html += '<div style="margin-top:16px;background:rgba(0,0,0,0.3);padding:16px;border-radius:8px;border-left:3px solid rgba(229,9,20,0.3);"><p style="font-size:11px;text-transform:uppercase;color:#888;margin-bottom:8px;">Transcripción</p><p style="font-size:13px;color:#aaa;line-height:1.6;white-space:pre-wrap;">' + d.transcripcion.replace(/</g, '&lt;') + '</p></div>';
           if (d.tags) { var tagList = Array.isArray(d.tags) ? d.tags : d.tags.split(','); html += '<div style="margin-top:16px;display:flex;gap:6px;flex-wrap:wrap;">' + tagList.map(function(t) { return '<span style="background:rgba(229,9,20,0.1);color:var(--color-mir);padding:2px 12px;border-radius:20px;font-size:11px;">' + t.trim().replace(/</g, '&lt;') + '</span>'; }).join('') + '</div>'; }
           if (d.created_at) html += '<p style="font-size:11px;color:#555;margin-top:20px;border-top:1px solid rgba(255,255,255,0.05);padding-top:12px;">Aportado el ' + new Date(d.created_at).toLocaleDateString('es-CL', { year:'numeric', month:'long', day:'numeric' }) + '</p>';
-          html += '<div style="margin-top:24px;border-top:2px solid rgba(229,9,20,0.15);padding-top:16px;">';
-          html += '<p style="font-size:11px;text-transform:uppercase;color:#888;margin-bottom:10px;letter-spacing:0.5px;">📖 Metadatos Dublin Core / UNESCO MoW</p>';
-          html += '<table style="width:100%;font-size:12px;border-collapse:collapse;">';
-          html += '<tr><td style="padding:4px 8px;color:#888;width:110px;">dc:title</td><td style="padding:4px 8px;color:#ccc;">' + (d.nombre || '').replace(/</g, '&lt;') + '</td></tr>';
-          html += '<tr style="background:rgba(255,255,255,0.02);"><td style="padding:4px 8px;color:#888;">dc:creator</td><td style="padding:4px 8px;color:#ccc;">' + (d.nombre || 'Anónimo').replace(/</g, '&lt;') + '</td></tr>';
-          html += '<tr><td style="padding:4px 8px;color:#888;">dc:date</td><td style="padding:4px 8px;color:#ccc;">' + (d.fecha_creacion_archivo || d.created_at ? (d.fecha_creacion_archivo || new Date(d.created_at).toISOString().split('T')[0]) : '—') + '</td></tr>';
-          html += '<tr style="background:rgba(255,255,255,0.02);"><td style="padding:4px 8px;color:#888;">dc:format</td><td style="padding:4px 8px;color:#ccc;">' + (d.tipo_archivo || 'texto').replace(/</g, '&lt;') + '</td></tr>';
-          html += '<tr><td style="padding:4px 8px;color:#888;">dc:identifier</td><td style="padding:4px 8px;color:#ccc;">rec-' + d.id + '</td></tr>';
-          html += '<tr style="background:rgba(255,255,255,0.02);"><td style="padding:4px 8px;color:#888;">dc:language</td><td style="padding:4px 8px;color:#ccc;">es</td></tr>';
-          html += '<tr><td style="padding:4px 8px;color:#888;">dc:coverage</td><td style="padding:4px 8px;color:#ccc;">' + (origen || 'Chile').replace(/</g, '&lt;') + '</td></tr>';
-          var subjectTags = d.tags ? (Array.isArray(d.tags) ? d.tags.join(', ') : d.tags) : 'memoria popular, comunidad'; html += '<tr style="background:rgba(255,255,255,0.02);"><td style="padding:4px 8px;color:#888;">dc:subject</td><td style="padding:4px 8px;color:#ccc;">' + subjectTags.replace(/</g, '&lt;') + '</td></tr>';
-          html += '<tr><td style="padding:4px 8px;color:#888;">dc:rights</td><td style="padding:4px 8px;color:#ccc;">CC BY-NC-SA 4.0</td></tr>';
-          html += '<tr style="background:rgba(255,255,255,0.02);"><td style="padding:4px 8px;color:#888;">dc:type</td><td style="padding:4px 8px;color:#ccc;">Community Archive — Memory of the World (UNESCO MoW)</td></tr>';
-          html += '</table></div>';
           content.innerHTML = html;
         });
       });

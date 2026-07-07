@@ -61,6 +61,9 @@
     A.dom.adminUploadGeo = q('admin-upload-geo');
     A.dom.adminUploadFecha = q('admin-upload-fecha');
     A.dom.adminUploadTags = q('admin-upload-tags');
+    A.dom.adminUploadTranscripcion = q('admin-upload-transcripcion');
+    A.dom.approvalTranscripcion = q('approval-transcripcion');
+    A.dom.editTranscripcion = q('edit-transcripcion');
     A.dom.btnAdminUpload = q('btn-admin-upload');
     A.dom.userBadge = q('user-badge');
     A.dom.userDropdown = q('user-dropdown');
@@ -269,7 +272,8 @@
       fecha_subida: now,
       geolocalizacion: extraData.geolocalizacion || null,
       tags: extraData.tags || null,
-      fecha_creacion_archivo: extraData.fecha_creacion_archivo || null
+      fecha_creacion_archivo: extraData.fecha_creacion_archivo || null,
+      transcripcion: extraData.transcripcion || null
     };
 
     var { data: inserted, error: insertError } = await s.from('recuerdos').insert(insertData).select().single();

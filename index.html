@@ -520,15 +520,40 @@
             <input type="number" id="anio" name="anio" min="1990" max="2026" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
           </div>
           <div>
-            <label for="archivo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Foto o Audio</label>
+            <label for="archivo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Foto, Audio o Video</label>
             <input type="file" id="archivo" name="archivo" accept=".jpg,.jpeg,.png,.mp3,.wav,.mp4" class="block w-full text-sm text-white/50 border border-white/20 p-2 bg-black">
             <div id="file-error" class="text-mir text-sm mt-1 hidden"></div>
             <div id="file-info" class="text-white/50 text-sm mt-1 hidden"></div>
             <p class="text-white/40 text-xs mt-2">Formatos: JPG, PNG, MP3, WAV, MP4 &middot; Máx 50 MB.</p>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);">
+              <label for="link-externo" class="block text-sm font-bold text-white/80 mb-1 uppercase">O pega un link externo</label>
+              <input type="url" id="link-externo" name="link_externo" placeholder="https://www.youtube.com/watch?v=... o https://facebook.com/... o https://ejemplo.com/audio.mp3" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
+              <p class="text-white/40 text-xs mt-1">Si no puedes subir el archivo, pega un enlace a YouTube, Facebook o un audio/video público.</p>
+            </div>
           </div>
           <div>
-            <label for="mensaje" class="block text-sm font-bold text-white/80 mb-1 uppercase">Mensaje (opcional)</label>
-            <textarea id="mensaje" name="mensaje" rows="3" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-none"></textarea>
+            <label for="relato" class="block text-sm font-bold text-white/80 mb-1 uppercase">Relato</label>
+            <textarea id="relato" name="relato" rows="5" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir resize-y" placeholder="Escribe aquí tu relato, entrevista o descripción completa..."></textarea>
+          </div>
+          <div>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);">
+              <p style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:12px;">¿Quieres compartir una canción?</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                <div>
+                  <label for="cancion-titulo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Título de la canción</label>
+                  <input type="text" id="cancion-titulo" name="cancion-titulo" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir" placeholder="Nombre de la canción">
+                </div>
+                <div>
+                  <label for="cancion-artista" class="block text-sm font-bold text-white/80 mb-1 uppercase">Artista</label>
+                  <input type="text" id="cancion-artista" name="cancion-artista" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir" placeholder="Nombre del artista o banda">
+                </div>
+              </div>
+              <div>
+                <label for="cancion-archivo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Archivo de audio (MP3)</label>
+                <input type="file" id="cancion-archivo" name="cancion-archivo" accept=".mp3,.wav,.ogg" class="block w-full text-sm text-white/50 border border-white/20 p-2 bg-black">
+                <p class="text-white/40 text-xs mt-1">Sube tu canción para la radio comunitaria. Pasará por revisión antes de publicarse.</p>
+              </div>
+            </div>
           </div>
           <div id="metadata-fields" style="padding:12px 16px;background:rgba(229,9,20,0.04);border:1px solid rgba(229,9,20,0.1);border-radius:8px;">
             <p style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:12px;">Metadatos adicionales (opcionales)</p>
@@ -608,11 +633,12 @@
 
         var nombre = document.getElementById('nombre').value.trim();
         var anio = document.getElementById('anio').value.trim();
-        var mensaje = document.getElementById('mensaje').value.trim();
+        var relato = document.getElementById('relato').value.trim();
+        var linkUrl = document.getElementById('link-externo') ? document.getElementById('link-externo').value.trim() : '';
         var file = fileInput && fileInput.files ? fileInput.files[0] : null;
 
         if (!nombre) { mostrarFeedback(messages, 'Escribe tu nombre o pseud\u00f3nimo.', 'error'); return; }
-        if (!file && !mensaje) { mostrarFeedback(messages, 'Agrega un archivo o escribe un mensaje.', 'error'); return; }
+        if (!file && !linkUrl && !relato) { mostrarFeedback(messages, 'Agrega un archivo, un link o escribe un relato.', 'error'); return; }
 
         var autorizacion = document.getElementById('autorizacion');
         if (!autorizacion || !autorizacion.checked) { mostrarFeedback(messages, 'Debes autorizar el resguardo y publicaci\u00f3n de tu aporte.', 'error'); return; }
@@ -654,7 +680,8 @@
                 tipo_archivo: file.type,
                 nombre_original: file.name,
                 tamanio_bytes: file.size,
-                mensaje_largo: mensaje || null,
+                link_externo: linkUrl || null,
+                mensaje_largo: relato || null,
                 aprobado: false,
                 seccion: null,
                 consentimiento: true,
@@ -669,7 +696,8 @@
               .insert({
                 nombre: nombre,
                 anio: anio || null,
-                mensaje_largo: mensaje || null,
+                link_externo: linkUrl || null,
+                mensaje_largo: relato || null,
                 aprobado: false,
                 seccion: null,
                 consentimiento: true,
@@ -678,6 +706,33 @@
                 fecha_creacion_archivo: meta.fecha_creacion_archivo || null
               });
             if (dbError) throw dbError;
+          }
+
+          // Handle canción upload (separate from recuerdo)
+          var cancionTitulo = document.getElementById('cancion-titulo');
+          var cancionArtista = document.getElementById('cancion-artista');
+          var cancionArchivo = document.getElementById('cancion-archivo');
+          if (cancionTitulo && cancionTitulo.value.trim() && cancionArchivo && cancionArchivo.files && cancionArchivo.files[0]) {
+            var cancionFile = cancionArchivo.files[0];
+            var cancionFileName = 'cancion_' + Date.now() + '_' + cancionFile.name;
+            var { error: cancionUploadError } = await supabaseClient.storage
+              .from('elarca-uploads')
+              .upload('canciones/' + cancionFileName, cancionFile);
+            if (!cancionUploadError) {
+              var { data: { publicUrl: cancionUrl } } = supabaseClient.storage
+                .from('elarca-uploads')
+                .getPublicUrl('canciones/' + cancionFileName);
+              await supabaseClient.from('recuerdos').insert({
+                nombre: nombre,
+                titulo_relato: cancionTitulo.value.trim(),
+                nombre_serie: cancionArtista ? cancionArtista.value.trim() : null,
+                url_archivo: cancionUrl,
+                tipo_archivo: 'audio/mpeg',
+                seccion: 'Musica',
+                aprobado: false,
+                consentimiento: true
+              });
+            }
           }
 
           mostrarFeedback(messages, '\u00a1Gracias por compartir tu recuerdo!', 'success');

@@ -133,7 +133,6 @@
               .select('id, nombre, geolocalizacion, url_archivo, tipo_archivo, mensaje_largo')
               .eq('aprobado', true)
               .not('geolocalizacion', 'is', null)
-              .neq('geolocalizacion', '')
               .order('created_at', { ascending: false })
             .then(function (r) {
               if (r.error || !r.data || r.data.length === 0) {
