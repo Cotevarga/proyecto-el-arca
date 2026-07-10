@@ -193,7 +193,18 @@
     try {
       var fnUrl = window.EDGE_FUNCTIONS_URL;
       if (!fnUrl || !A.s.token) return;
-      await fetch(fnUrl + '/auditoria', {
+
+      // Refrescar token por si expiró
+      var sb = A.getSupabaseClient();
+      if (sb) {
+        var { data: { session } } = await sb.auth.getSession();
+        if (session && session.access_token && session.access_token !== A.s.token) {
+          A.s.token = session.access_token;
+          localStorage.setItem('admin_token', session.access_token);
+        }
+      }
+
+      var resp = await fetch(fnUrl + '/auditoria', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + A.s.token },
         body: JSON.stringify({
@@ -205,6 +216,27 @@
           metadata: metadata || null
         })
       });
+
+      // Si aún da 401, intentar forzar refresh y reintentar
+      if (resp.status === 401 && sb) {
+        var { data: { session: refreshed } } = await sb.auth.refreshSession();
+        if (refreshed && refreshed.access_token) {
+          A.s.token = refreshed.access_token;
+          localStorage.setItem('admin_token', refreshed.access_token);
+          await fetch(fnUrl + '/auditoria', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + refreshed.access_token },
+            body: JSON.stringify({
+              accion: accion,
+              entidad: entidad,
+              entidad_id: entidadId || null,
+              usuario_id: (A.s.userData && A.s.userData.id) || null,
+              usuario_email: (A.s.userData && A.s.userData.email) || null,
+              metadata: metadata || null
+            })
+          });
+        }
+      }
     } catch (err) {
       console.warn('[Auditoría] Error al registrar:', err.message);
     }

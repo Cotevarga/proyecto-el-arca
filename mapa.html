@@ -87,16 +87,22 @@
       <div id="map"></div>
       <div id="map-stats" class="mt-6 text-center text-sm text-white/40"></div>
       <script>
-      (function () {
+      window._mapaInitialized = false;
+
+      window.initMapa = async function () {
         'use strict';
 
         var mapEl = document.getElementById('map');
         if (!mapEl) return;
 
-        var mapLoaded = false;
+        // Limpiar mapa previo si existe
+        if (window._mapaInstance) {
+          window._mapaInstance.remove();
+          window._mapaInstance = null;
+        }
+        window._mapaInitialized = false;
 
-        function waitForLeaflet(maxRetries) {
-          if (maxRetries === undefined) maxRetries = 50;
+        function waitForLeaflet() {
           return new Promise(function (resolve) {
             if (typeof L !== 'undefined') { resolve(L); return; }
             var link = document.createElement('link');
@@ -110,78 +116,103 @@
           });
         }
 
-        async function cargarMapa() {
-          if (mapLoaded) return;
-          if (typeof L === 'undefined') { var _L = await waitForLeaflet(); if (!_L) { mapEl.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">Error al cargar mapa</p>'; return; } }
-          var client = window.miSupabase;
-          if (!client) { mapEl.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">Conectando...</p>'; return; }
-          mapLoaded = true;
-
-          var map = L.map('map', {
-            center: [-33.5, -70.6],
-            zoom: 5,
-            zoomControl: true,
-            attributionControl: false
-          });
-
-          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 19
-          }).addTo(map);
-
-          function cargarDatosMapa() {
-            client.from('recuerdos')
-              .select('id, nombre, geolocalizacion, url_archivo, tipo_archivo, mensaje_largo')
-              .eq('aprobado', true)
-              .not('geolocalizacion', 'is', null)
-              .order('created_at', { ascending: false })
-            .then(function (r) {
-              if (r.error || !r.data || r.data.length === 0) {
-                document.getElementById('map-stats').textContent = 'Aún no hay contribuciones con ubicación.';
-                return;
-              }
-              var count = 0;
-              r.data = r.data.filter(function (d) { return d.geolocalizacion && d.geolocalizacion.trim(); });
-              r.data.forEach(function (d) {
-                var geo = d.geolocalizacion || '';
-                var parts = geo.split(',').map(function (s) { return parseFloat(s.trim()); }).filter(function (n) { return !isNaN(n); });
-                if (parts.length >= 2) {
-                  var lat = parts[0], lng = parts[1];
-                  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
-                  count++;
-                  var icon = d.tipo_archivo && d.tipo_archivo.startsWith('audio')
-                    ? L.divIcon({ className: '', html: '<div style="background:#E50914;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(229,9,20,0.6);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] })
-                    : d.tipo_archivo && d.tipo_archivo.startsWith('video')
-                    ? L.divIcon({ className: '', html: '<div style="background:#ff6b35;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(255,107,53,0.6);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] })
-                    : L.divIcon({ className: '', html: '<div style="background:#fff;width:14px;height:14px;border-radius:50%;border:2px solid #E50914;box-shadow:0 0 8px rgba(229,9,20,0.4);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] });
-
-                  var popup = '<div style="text-align:left;"><strong>' + (d.nombre || 'Anónimo') + '</strong>';
-                  if (d.mensaje_largo) popup += '<br><span style="color:#aaa;font-size:11px;">' + d.mensaje_largo.substring(0, 120) + (d.mensaje_largo.length > 120 ? '…' : '') + '</span>';
-                  if (d.id) popup += '<br><a href="/archivo.html?view=rec-' + d.id + '" style="font-size:11px;">Ver detalle</a>';
-                  else if (d.url_archivo) popup += '<br><a href="' + d.url_archivo + '" target="_blank" style="font-size:11px;">Ver archivo</a>';
-                  popup += '</div>';
-
-                  L.marker([lat, lng], { icon: icon }).addTo(map).bindPopup(popup);
-                }
-              });
-              document.getElementById('map-stats').textContent = count + ' contribuciones con ubicación geográfica.';
-              if (count > 0) {
-                var group = L.featureGroup();
-                map.eachLayer(function (l) { if (l instanceof L.Marker) group.addLayer(l); });
-                map.fitBounds(group.getBounds().pad(0.1));
-              }
-            })
-            .catch(function () {
-              document.getElementById('map-stats').textContent = 'Error al cargar ubicaciones.';
-            });
+        if (!window.miSupabase) {
+          mapEl.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">Conectando...</p>';
+          // Esperar a que Supabase esté listo
+          for (var i = 0; i < 50; i++) {
+            await new Promise(function (r) { setTimeout(r, 200); });
+            if (window.miSupabase) break;
           }
-          cargarDatosMapa();
+          if (!window.miSupabase) {
+            mapEl.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">Error de conexión</p>';
+            return;
+          }
         }
 
-        if (window.miSupabase) { cargarMapa(); } else {
-          var checkReady = setInterval(function () {
-            if (window.miSupabase) { clearInterval(checkReady); cargarMapa(); }
+        if (typeof L === 'undefined') {
+          var _L = await waitForLeaflet();
+          if (!_L) { mapEl.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">Error al cargar mapa</p>'; return; }
+        }
+
+        var client = window.miSupabase;
+        window._mapaInitialized = true;
+
+        var map = L.map('map', {
+          center: [-33.5, -70.6],
+          zoom: 5,
+          zoomControl: true,
+          attributionControl: false
+        });
+        window._mapaInstance = map;
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          maxZoom: 19
+        }).addTo(map);
+
+        var statsEl = document.getElementById('map-stats');
+        if (statsEl) statsEl.textContent = 'Cargando ubicaciones...';
+
+        try {
+          var r = await client.from('recuerdos')
+            .select('id, nombre, geolocalizacion, url_archivo, tipo_archivo, mensaje_largo')
+            .eq('aprobado', true)
+            .not('geolocalizacion', 'is', null)
+            .order('created_at', { ascending: false });
+
+          if (r.error || !r.data || r.data.length === 0) {
+            if (statsEl) statsEl.textContent = 'Aún no hay contribuciones con ubicación.';
+            return;
+          }
+          var count = 0;
+          r.data = r.data.filter(function (d) { return d.geolocalizacion && d.geolocalizacion.trim(); });
+          r.data.forEach(function (d) {
+            var geo = d.geolocalizacion || '';
+            var parts = geo.split(',').map(function (s) { return parseFloat(s.trim()); }).filter(function (n) { return !isNaN(n); });
+            if (parts.length >= 2) {
+              var lat = parts[0], lng = parts[1];
+              if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
+              count++;
+              var icon = d.tipo_archivo && d.tipo_archivo.startsWith('audio')
+                ? L.divIcon({ className: '', html: '<div style="background:#E50914;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(229,9,20,0.6);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] })
+                : d.tipo_archivo && d.tipo_archivo.startsWith('video')
+                ? L.divIcon({ className: '', html: '<div style="background:#ff6b35;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(255,107,53,0.6);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] })
+                : L.divIcon({ className: '', html: '<div style="background:#fff;width:14px;height:14px;border-radius:50%;border:2px solid #E50914;box-shadow:0 0 8px rgba(229,9,20,0.4);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] });
+
+              var popup = '<div style="text-align:left;"><strong>' + (d.nombre || 'Anónimo') + '</strong>';
+              if (d.mensaje_largo) popup += '<br><span style="color:#aaa;font-size:11px;">' + d.mensaje_largo.substring(0, 120) + (d.mensaje_largo.length > 120 ? '…' : '') + '</span>';
+              if (d.id) popup += '<br><a href="/archivo.html?view=rec-' + d.id + '" style="font-size:11px;">Ver detalle</a>';
+              else if (d.url_archivo) popup += '<br><a href="' + d.url_archivo + '" target="_blank" style="font-size:11px;">Ver archivo</a>';
+              popup += '</div>';
+
+              L.marker([lat, lng], { icon: icon }).addTo(map).bindPopup(popup);
+            }
+          });
+          if (statsEl) statsEl.textContent = count + ' contribuciones con ubicación geográfica.';
+          if (count > 0) {
+            var group = L.featureGroup();
+            map.eachLayer(function (l) { if (l instanceof L.Marker) group.addLayer(l); });
+            map.fitBounds(group.getBounds().pad(0.1));
+          }
+        } catch (err) {
+          console.error('[Mapa] Error:', err);
+          if (statsEl) statsEl.textContent = 'Error al cargar ubicaciones.';
+        }
+      };
+
+      // Auto-inicializar en carga directa (incluye SPA via reejecutarScripts)
+      (function () {
+        function tryInit() {
+          if (document.getElementById('map')) {
+            window.initMapa();
+          }
+        }
+        if (window.miSupabase) {
+          tryInit();
+        } else {
+          var chk = setInterval(function () {
+            if (window.miSupabase) { clearInterval(chk); tryInit(); }
           }, 200);
-          setTimeout(function () { clearInterval(checkReady); }, 15000);
+          setTimeout(function () { clearInterval(chk); }, 15000);
         }
       })();
       </script>

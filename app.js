@@ -543,6 +543,12 @@ window.API_BASE = '';
         inicializarEventosGaleria();
       }, 150);
     }
+    if (targetPath.indexOf('mapa') !== -1) {
+      setTimeout(function () {
+        console.log("Navegando a mapa, forzando carga...");
+        if (typeof window.initMapa === 'function') window.initMapa();
+      }, 150);
+    }
     try { if (typeof gtag === 'function') gtag('config', 'G-0M3Q8DQ3QF', { 'page_path': targetPath }); } catch (e) {}
   }
 
