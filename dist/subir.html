@@ -108,18 +108,19 @@
             </div>
             <div>
               <label for="nombre" class="block text-sm font-bold text-white/80 mb-1 uppercase">Nombre o Pseudónimo</label>
-              <input type="text" id="nombre" name="nombre" required maxlength="200" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
+              <input type="text" id="nombre" name="nombre" required maxlength="200" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir" aria-required="true" aria-describedby="nombre-hint">
+              <div id="nombre-hint" class="text-white/40 text-xs mt-1">Puedes usar un seudónimo si prefieres mantener tu identidad anónima.</div>
             </div>
             <div id="archivo-group">
               <label for="archivo" class="block text-sm font-bold text-white/80 mb-1 uppercase">Foto, Audio o Video</label>
-              <input type="file" id="archivo" name="archivo" accept=".jpg,.jpeg,.png,.mp3,.wav,.mp4" class="block w-full text-sm text-white/50 border border-white/20 p-2 bg-black">
-              <div id="file-error" class="text-mir text-sm mt-1 hidden"></div>
-              <div id="file-info" class="text-white/50 text-sm mt-1 hidden"></div>
-              <p class="text-white/40 text-xs mt-2">Formatos: JPG, PNG, MP3, WAV, MP4 &middot; Máx 50 MB &middot; Opcional si solo es texto.</p>
+              <input type="file" id="archivo" name="archivo" accept=".jpg,.jpeg,.png,.mp3,.wav,.mp4" class="block w-full text-sm text-white/50 border border-white/20 p-2 bg-black" aria-describedby="archivo-hint">
+              <div id="file-error" class="text-mir text-sm mt-1 hidden" role="alert"></div>
+              <div id="file-info" class="text-white/50 text-sm mt-1 hidden" role="status"></div>
+              <div id="archivo-hint" class="text-white/40 text-xs mt-2">Formatos: JPG, PNG, MP3, WAV, MP4 &middot; Máx 50 MB &middot; Opcional si solo es texto.</div>
               <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);">
                 <label for="link-externo" class="block text-sm font-bold text-white/80 mb-1 uppercase">O pega un link externo</label>
-                <input type="url" id="link-externo" name="link_externo" placeholder="https://www.youtube.com/watch?v=... o https://facebook.com/... o https://ejemplo.com/audio.mp3" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir">
-                <p class="text-white/40 text-xs mt-1">Si no puedes subir el archivo, pega un enlace a YouTube, Facebook o un audio/video público.</p>
+                <input type="url" id="link-externo" name="link_externo" placeholder="https://www.youtube.com/watch?v=... o https://facebook.com/... o https://ejemplo.com/audio.mp3" class="w-full px-4 py-3 bg-black border border-white/20 text-white outline-none focus:border-mir" aria-describedby="link-hint">
+                <div id="link-hint" class="text-white/40 text-xs mt-1">Si no puedes subir el archivo, pega un enlace a YouTube, Facebook o un audio/video público.</div>
               </div>
             </div>
             <div>

@@ -248,6 +248,30 @@
     return String(text).replace(/[&<>"']/g, function(c) { return map[c]; });
   };
 
+  A.sanitizeTags = function(tagsStr) {
+    if (!tagsStr || !tagsStr.trim()) return null;
+    return tagsStr.split(',').map(function(t) { return t.trim().replace(/[<>&"']/g, '').substring(0, 50); }).filter(function(t) { return t.length > 0; });
+  };
+
+  A.verifyMagicBytes = async function(file) {
+    if (!file || file.size === 0) return true;
+    var validTypes = ['image/jpeg','image/png','image/webp','audio/mpeg','audio/wav','video/mp4','application/pdf'];
+    if (validTypes.indexOf(file.type) === -1) return false;
+    var header = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+    function match(sig) { for (var i = 0; i < sig.length; i++) { if (header[i] !== sig[i]) return false; } return true; }
+    var checks = {
+      'image/jpeg': function() { return match([0xFF, 0xD8, 0xFF]); },
+      'image/png': function() { return match([0x89, 0x50, 0x4E, 0x47]); },
+      'image/webp': function() { return header.length >= 12 && match([0x52, 0x49, 0x46, 0x46]) && new Uint8Array(header.slice(8,12)).every(function(b,i){return b===([0x57,0x45,0x42,0x50][i]);}); },
+      'audio/mpeg': function() { return match([0x49, 0x44, 0x33]) || match([0xFF, 0xFB]) || match([0xFF, 0xF3]) || match([0xFF, 0xF2]); },
+      'audio/wav': function() { return header.length >= 12 && match([0x52, 0x49, 0x46, 0x46]) && new Uint8Array(header.slice(8,12)).every(function(b,i){return b===([0x57,0x41,0x56,0x45][i]);}); },
+      'video/mp4': function() { return header.length >= 12 && new Uint8Array(header.slice(4,8)).every(function(b,i){return b===([0x66,0x74,0x79,0x70][i]);}); },
+      'application/pdf': function() { return match([0x25, 0x50, 0x44, 0x46]); },
+    };
+    var check = checks[file.type];
+    return check ? check() : false;
+  };
+
   A.mostrarToastExito = function(msg) { A.showToast(msg, 'success'); };
   A.mostrarToastError = function(msg) { A.showToast('Error al subir: ' + msg, 'error'); };
 
@@ -277,6 +301,17 @@
     if (!s) throw new Error('Cliente Supabase no disponible');
     var bucket = 'elarca-uploads';
     if (!A.validarSeccion(seccion)) throw new Error('Sección inválida');
+
+    // Magic byte verification
+    if (file && file.size > 0) {
+      var valid = await A.verifyMagicBytes(file);
+      if (!valid) throw new Error('El archivo no coincide con el tipo declarado o el formato está corrupto.');
+    }
+
+    // Sanitize tags
+    if (extraData.tags && typeof extraData.tags === 'string') {
+      extraData.tags = A.sanitizeTags(extraData.tags);
+    }
 
     var now = new Date().toISOString();
     var linkUrl = extraData.url_externo || null;

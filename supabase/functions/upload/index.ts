@@ -9,20 +9,72 @@ const MAX_STRING_LENGTH = 5000;
 const MAX_NOMBRE_LENGTH = 200;
 
 // ─── Magic byte signatures for allowed file types ───
-const MAGIC_BYTES: Record<string, Uint8Array[]> = {
-  "image/jpeg": [new Uint8Array([0xFF, 0xD8, 0xFF])],
-  "image/png": [new Uint8Array([0x89, 0x50, 0x4E, 0x47])],
-  "image/webp": [new Uint8Array([0x52, 0x49, 0x46, 0x46])],
-  "audio/mpeg": [
-    new Uint8Array([0x49, 0x44, 0x33]),
-    new Uint8Array([0xFF, 0xFB]),
-    new Uint8Array([0xFF, 0xF3]),
-    new Uint8Array([0xFF, 0xF2]),
-  ],
-  "audio/wav": [new Uint8Array([0x52, 0x49, 0x46, 0x46])],
-  "video/mp4": [new Uint8Array([0x00, 0x00, 0x00])],
-  "application/pdf": [new Uint8Array([0x25, 0x50, 0x44, 0x46])],
+function bytesMatch(data: Uint8Array, sig: number[]): boolean {
+  if (data.length < sig.length) return false;
+  for (let i = 0; i < sig.length; i++) {
+    if (data[i] !== sig[i]) return false;
+  }
+  return true;
+}
+
+function isJPEG(data: Uint8Array): boolean {
+  return bytesMatch(data, [0xFF, 0xD8, 0xFF]);
+}
+
+function isPNG(data: Uint8Array): boolean {
+  return bytesMatch(data, [0x89, 0x50, 0x4E, 0x47]);
+}
+
+function isWebP(data: Uint8Array): boolean {
+  // RIFF + 4 bytes size + WEBP
+  return data.length >= 12 &&
+    bytesMatch(data, [0x52, 0x49, 0x46, 0x46]) &&
+    bytesMatch(data.slice(8), [0x57, 0x45, 0x42, 0x50]);
+}
+
+function isMP3(data: Uint8Array): boolean {
+  return bytesMatch(data, [0x49, 0x44, 0x33]) ||
+    bytesMatch(data, [0xFF, 0xFB]) ||
+    bytesMatch(data, [0xFF, 0xF3]) ||
+    bytesMatch(data, [0xFF, 0xF2]);
+}
+
+function isWAV(data: Uint8Array): boolean {
+  // RIFF + 4 bytes size + WAVE
+  return data.length >= 12 &&
+    bytesMatch(data, [0x52, 0x49, 0x46, 0x46]) &&
+    bytesMatch(data.slice(8), [0x57, 0x41, 0x56, 0x45]);
+}
+
+function isMP4(data: Uint8Array): boolean {
+  // Check for ftyp box at start (MP4, M4V, etc.)
+  if (data.length < 12) return false;
+  // First 4 bytes = box size, next 4 = "ftyp"
+  if (!bytesMatch(data.slice(4), [0x66, 0x74, 0x79, 0x70])) return false;
+  const brands = ["isom", "mp42", "mp41", "avc1", "iso2", "mmp4", "dash", "qt  "];
+  const brand = String.fromCharCode(...data.slice(8, 12));
+  return brands.some(b => b === brand);
+}
+
+function isPDF(data: Uint8Array): boolean {
+  return bytesMatch(data, [0x25, 0x50, 0x44, 0x46]);
+}
+
+const MAGIC_VALIDATORS: Record<string, (data: Uint8Array) => boolean> = {
+  "image/jpeg": isJPEG,
+  "image/png": isPNG,
+  "image/webp": isWebP,
+  "audio/mpeg": isMP3,
+  "audio/wav": isWAV,
+  "video/mp4": isMP4,
+  "application/pdf": isPDF,
 };
+
+function validateMagicBytes(fileBytes: Uint8Array, mimeType: string): boolean {
+  const validator = MAGIC_VALIDATORS[mimeType];
+  if (!validator) return true;
+  return validator(fileBytes);
+}
 
 function matchesMagicByte(fileBytes: Uint8Array, mimeType: string): boolean {
   const signatures = MAGIC_BYTES[mimeType];
@@ -125,8 +177,8 @@ Deno.serve(async (req: Request) => {
       }
 
       // ─── Magic byte validation ───
-      const headerBytes = new Uint8Array(await file.slice(0, 12).arrayBuffer());
-      if (!matchesMagicByte(headerBytes, file.type)) {
+      const headerBytes = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+      if (!validateMagicBytes(headerBytes, file.type)) {
         console.warn(`[Upload] Magic byte mismatch: declared=${file.type}, firstBytes=${Array.from(headerBytes.slice(0, 4)).map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
         try {
           await supabase.from("audit_log").insert({

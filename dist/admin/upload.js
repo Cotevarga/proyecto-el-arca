@@ -81,12 +81,19 @@
     var destacado = A.dom.adminUploadDestacado.checked;
 
     if (textoLargo) {
-      textoLargo = textoLargo.replace(/<script[^>]*>.*?<\/script>/gi, '').replace(/on\w+=["'][^"']*["']/gi, '').replace(/<[^>]*>/g, function(m) {
-        var allowed = ['<b>','</b>','<i>','</i>','<u>','</u>','<br>','<br/>','<br />'];
-        if (allowed.indexOf(m.toLowerCase()) !== -1) return m;
-        if (/^<br\s*\/?>$/i.test(m)) return '<br>';
-        return '';
-      });
+      if (typeof DOMPurify !== 'undefined') {
+        textoLargo = DOMPurify.sanitize(textoLargo, {
+          ALLOWED_TAGS: ['b', 'i', 'u', 'br'],
+          ALLOWED_ATTR: [],
+        });
+      } else {
+        textoLargo = textoLargo.replace(/<script[^>]*>.*?<\/script>/gi, '').replace(/on\w+=["'][^"']*["']/gi, '').replace(/<[^>]*>/g, function(m) {
+          var allowed = ['<b>','</b>','<i>','</i>','<u>','</u>','<br>','<br/>','<br />'];
+          if (allowed.indexOf(m.toLowerCase()) !== -1) return m;
+          if (/^<br\s*\/?>$/i.test(m)) return '<br>';
+          return '';
+        });
+      }
     }
     if (!titulo) { A.showToast('El campo "Título" es obligatorio.', 'error'); return; }
     if (cfg.requireFile && !file && !linkUrl) { A.showToast('Debes seleccionar un archivo o ingresar un link para esta sección.', 'error'); return; }
