@@ -80,3 +80,13 @@ describe('formato enriquecido', () => {
     expect(C.collect(b, 'x').texts[0].markup).toBe('Hola **mundo**')
   })
 })
+
+describe('texto alternativo', () => {
+  it('aplica el alt editado a la imagen', () => {
+    const b = body('<img src="/a.jpg" alt="viejo">')
+    const f = C.collect(b, 'index')
+    expect(f.images[0].altKey).toBe(C.altKey('index', '/a.jpg'))
+    C.apply(b, 'index', { [f.images[0].altKey]: 'Marcha por la memoria' })
+    expect(b.querySelector('img').getAttribute('alt')).toBe('Marcha por la memoria')
+  })
+})

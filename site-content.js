@@ -28,6 +28,7 @@
     return h.toString(36);
   }
 
+  function altKey(page, src) { return imageKey(page, src).replace('|i|', '|a|'); }
   function textKey(page, text) { return page + '|t|' + hash(text); }
   function imageKey(page, src) { return page + '|i|' + String(src || '').trim().replace(/^\.?\//, '').split('?')[0]; }
 
@@ -80,7 +81,7 @@
         var ik = imageKey(page, src);
         if (seen[ik]) return;
         seen[ik] = true;
-        images.push({ key: ik, src: src, alt: el.getAttribute('alt') || '' });
+        images.push({ key: ik, altKey: altKey(page, src), src: src, alt: el.getAttribute('alt') || '' });
         return;
       }
       if (!isEditableText(el)) return;
@@ -184,6 +185,8 @@
         if (!src || el.closest(SKIP)) return;
         var ik = imageKey(page, src);
         if (Object.prototype.hasOwnProperty.call(overrides, ik) && isSafeUrl(overrides[ik])) targets.push([el, 'img', overrides[ik]]);
+        var ak = altKey(page, src);
+        if (Object.prototype.hasOwnProperty.call(overrides, ak)) targets.push([el, 'alt', overrides[ak]]);
         return;
       }
       if (!isEditableText(el)) return;
@@ -191,7 +194,9 @@
       if (Object.prototype.hasOwnProperty.call(overrides, key)) targets.push([el, 'text', overrides[key]]);
     });
     targets.forEach(function (t) {
-      if (t[1] === 'img') {
+      if (t[1] === 'alt') {
+        t[0].setAttribute('alt', String(t[2]).slice(0, 300));
+      } else if (t[1] === 'img') {
         t[0].setAttribute('src', t[2]);
         t[0].removeAttribute('srcset');
       } else {
@@ -233,6 +238,7 @@
     hash: hash,
     textKey: textKey,
     imageKey: imageKey,
+    altKey: altKey,
     isSafeUrl: isSafeUrl,
     toMarkup: toMarkup,
     fromEditor: fromEditor,

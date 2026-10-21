@@ -94,6 +94,58 @@
     ['redo', '↷', 'Rehacer', '']
   ];
 
+  var ACCIONES = { crear: 'Creado', editar: 'Editado', restaurar: 'Restaurado al original' };
+
+  // Panel de historial: muestra las últimas versiones de una clave y permite recuperarlas.
+  function historyPanel(field, key, onPick) {
+    var box = make('div', 'cms-history');
+    box.appendChild(make('div', 'cms-history-title', 'Cargando historial…'));
+    (async function () {
+      try {
+        var s = await A.waitForSupabase();
+        var res = await s.from('contenido_historial').select('accion,valor,created_at').eq('clave', key).order('created_at', { ascending: false }).limit(15);
+        box.textContent = '';
+        if (res.error) {
+          box.appendChild(make('div', 'cms-history-title', 'Historial no disponible. Ejecuta supabase/migrations/013_contenido_historial.sql.'));
+          return;
+        }
+        box.appendChild(make('div', 'cms-history-title', 'Versiones anteriores'));
+        if (!res.data.length) box.appendChild(make('div', 'cms-history-empty', 'Aún no hay cambios registrados.'));
+        res.data.forEach(function (r) {
+          var row = make('div', 'cms-history-row');
+          var meta = make('div', 'cms-history-meta', new Date(r.created_at).toLocaleString('es-CL') + ' · ' + (ACCIONES[r.accion] || r.accion));
+          row.appendChild(meta);
+          if (r.valor != null) {
+            var preview = document.createElement('div');
+            preview.className = 'cms-history-preview';
+            if (field.type === 'img') preview.textContent = r.valor;
+            else C.setText(preview, r.valor);
+            row.appendChild(preview);
+            var use = make('button', 'btn-sm btn-sm-approve', 'Usar esta versión');
+            use.type = 'button';
+            use.addEventListener('click', function () { onPick(r.valor); });
+            row.appendChild(use);
+          }
+          box.appendChild(row);
+        });
+      } catch (e) {
+        box.textContent = 'No se pudo cargar el historial.';
+      }
+    })();
+    return box;
+  }
+
+  function historyToggle(card, actions, field, key, onPick) {
+    var btn = make('button', 'btn-sm btn-secondary', '🕘 Historial');
+    btn.type = 'button';
+    var panel = null;
+    btn.addEventListener('click', function () {
+      if (panel) { panel.remove(); panel = null; return; }
+      panel = historyPanel(field, key, function (v) { onPick(v); panel.remove(); panel = null; });
+      card.appendChild(panel);
+    });
+    actions.appendChild(btn);
+  }
   function textCard(field) {
     var base = field.markup != null ? field.markup : field.text;
     var current = Object.prototype.hasOwnProperty.call(state.overrides, field.key) ? state.overrides[field.key] : base;
@@ -167,6 +219,7 @@
     save.type = restore.type = 'button';
     actions.appendChild(save);
     actions.appendChild(restore);
+    historyToggle(card, actions, field, field.key, function (v) { editor.textContent = ''; C.setText(editor, v); markDirty(); A.showToast('Versión cargada: pulsa Guardar para publicarla.', 'success'); });
     card.appendChild(actions);
 
     function refresh() {
@@ -241,12 +294,45 @@
     file.accept = 'image/jpeg,image/png,image/webp';
     file.setAttribute('aria-label', 'Elegir imagen nueva');
     side.appendChild(file);
+
+    var altLabel = make('label', 'cms-alt-label', 'Texto alternativo (describe la imagen para lectores de pantalla y buscadores)');
+    var altInput = make('input', 'cms-alt-input');
+    altInput.type = 'text';
+    altInput.maxLength = 300;
+    var altField = { key: field.altKey };
+    var hasAlt = Object.prototype.hasOwnProperty.call(state.overrides, field.altKey);
+    altInput.value = hasAlt ? state.overrides[field.altKey] : (field.alt || '');
+    altLabel.appendChild(altInput);
+    side.appendChild(altLabel);
+    var saveAlt = make('button', 'btn-sm btn-secondary', 'Guardar descripción');
+    saveAlt.type = 'button';
+    saveAlt.addEventListener('click', async function () {
+      var v = altInput.value.trim();
+      saveAlt.disabled = true;
+      try {
+        if (!v || v === (field.alt || '')) {
+          if (Object.prototype.hasOwnProperty.call(state.overrides, field.altKey)) await removeOverride(altField);
+        } else {
+          await saveOverride(altField, 'alt', v, field.alt || '');
+        }
+        img.alt = v || field.alt || 'Imagen';
+        updateSummary();
+        A.showToast('Descripción guardada', 'success');
+      } catch (e) { reportError(e, 'No se pudo guardar la descripción'); }
+      saveAlt.disabled = false;
+    });
+    side.appendChild(saveAlt);
+
     var actions = make('div', 'cms-actions');
     var upload = make('button', 'btn-sm btn-sm-approve', 'Subir y reemplazar');
     var restore = make('button', 'btn-sm btn-sm-reject', 'Restaurar original');
     upload.type = restore.type = 'button';
     actions.appendChild(upload);
     actions.appendChild(restore);
+    historyToggle(card, actions, { type: 'img' }, field.key, function (url) {
+      if (!C.isSafeUrl(url)) { A.showToast('Esa versión no es una URL válida.', 'error'); return; }
+      saveOverride(field, 'imagen', url, field.src).then(function () { refresh(); updateSummary(); A.showToast('Imagen recuperada', 'success'); }, function (e) { reportError(e, 'No se pudo recuperar'); });
+    });
     side.appendChild(actions);
     body.appendChild(side);
     card.appendChild(body);

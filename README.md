@@ -265,3 +265,5 @@ Memoria Popular El Arca — La Pintana, Santiago de Chile.
 ## Editor de contenido (admin)
 
 Desde **Admin → Contenido del sitio** se pueden editar títulos, textos e imágenes de cada página. Los cambios se guardan en la tabla `contenido_sitio` (ejecutar antes `supabase/migrations/012_contenido_sitio.sql` en el SQL Editor de Supabase) y se aplican al renderizar la página; «Restaurar original» elimina la edición.
+
+El editor incluye formato (negrita, cursiva, subrayado, enlaces), texto alternativo de imágenes e historial de versiones. Para el historial y el texto alternativo ejecutar también `supabase/migrations/013_contenido_historial.sql`.
