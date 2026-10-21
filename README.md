@@ -24,7 +24,7 @@ La memoria colectiva de nuestro barrio —sus luchas, sus organizaciones, sus re
 | Autenticación | Supabase Auth + JWT |
 | Almacenamiento | Supabase Storage (bucket: `elarca-uploads`) |
 | Notificaciones | Resend (SMTP API) — notificación por email al subir recuerdos |
-| Frontend | SPA (HTML/CSS/JS vanilla) + Supabase JS SDK |
+| Frontend | React 19 + React Router 7 + Vite + Supabase JS SDK |
 | Frontend host | Vercel (o cualquier host estático) |
 
 ---
@@ -44,21 +44,70 @@ La memoria colectiva de nuestro barrio —sus luchas, sus organizaciones, sus re
 │   │   └── upload/           # POST /upload — subida + email (Resend)
 │   ├── config.toml
 │   └── deno.json
-├── *.html                    # Frontend estático en raíz
-│   ├── index.html            # Portada del archivo
-│   ├── relatos.html          # Relatos organizados por sección
-│   ├── galeria.html          # Galería de imágenes
-│   ├── videos.html           # Videos y material audiovisual
-│   ├── admin.html            # Panel de administración y curaduría
-│   ├── subir.html            # Formulario público de contribución
-│   └── ...
+├── web/
+│   ├── index.html            # Shell de la aplicación React
+│   └── src/
+│       ├── App.jsx           # Navegación cliente y shell persistente
+│       ├── navigation.js     # Rutas públicas del sitio
+│       ├── audio/            # Helpers de lista y reproducción persistente
+│       ├── components/       # Shell, adaptadores y componentes reutilizables
+│       ├── styles/           # Tema global y estilos extraídos por vista
+│       ├── utils/            # Validación visual de formularios
+│       └── __tests__/        # Pruebas unitarias de rutas, formularios y audio
+├── *.html                    # Contenido y scripts originales de las páginas
+├── relatos/                  # Relatos y contenido estático
+├── scripts/                  # Build, extracción de CSS y validaciones
+├── supabase/functions/_shared/ # Servicios compartidos (correo, CORS, Supabase)
+├── vite.config.js
 ├── images/                   # Fotos históricas del territorio
+├── musica/                   # Recursos de audio públicos usados por el sitio y el backend
 ├── supabase.js               # Cliente Supabase compartido
-├── app.js                    # SPA router
+├── app.js                    # Funciones compartidas y compatibilidad SPA anterior
 ├── .env.template
 ├── vercel.json
 └── README.md
 ```
+
+`images/` y `musica/` son las ubicaciones canónicas de los recursos. Se retiraron
+de `frontend/` únicamente las copias con contenido idéntico; los recursos únicos
+se conservaron.
+
+La navegación pública se ejecuta en React sin recargar el documento. El encabezado y
+el reproductor de audio permanecen montados entre rutas. Las páginas y sus scripts
+existentes se sirven mediante `LegacyPage` como etapa de compatibilidad, preservando
+formularios, galerías, mapas e integraciones mientras se migran sus vistas de forma
+incremental. El panel de administración y el endpoint de estado mantienen sus páginas
+independientes.
+
+### Desarrollo y validación del frontend
+
+```bash
+npm install
+npm run dev
+npm run build
+npm run test:frontend
+npm run test:unit
+npm run lint
+npm run preview
+```
+
+Bootstrap 5 aporta la cuadrícula, tarjetas y controles de formulario del tema oscuro;
+las reglas específicas de cada página se mantienen en hojas CSS separadas. Al
+incorporar una vista HTML heredada nueva, ejecutar `npm run styles:extract` para
+extraer sus bloques `<style>` a `web/src/styles/legacy/`.
+
+El build conserva las rutas y contenido original en `dist/_legacy-pages/` y genera
+una shell React para cada URL existente. El encabezado, la cola musical y el mismo
+elemento de audio sobreviven a la navegación cliente. El botón siguiente recorre la
+cola en orden y el final de una canción avanza a la siguiente.
+
+Las pruebas unitarias cubren las rutas principales, validación visual de formularios,
+avance de la cola y el contrato de notificación de correo Resend. Para las pruebas de
+Edge Functions completas se mantiene `npm test` (requiere Deno). Las plantillas
+heredadas conservan algunos estilos inline asociados a estados que modifican scripts
+en tiempo de ejecución; retirarlos automáticamente podría alterar interacciones.
+No se eliminaron archivos históricos o de compatibilidad sin evidencia de que sean
+obsoletos. El backend y las funciones de correo mantienen su flujo existente.
 
 ---
 
@@ -125,8 +174,8 @@ supabase secrets set DOMAIN=elarca.cl
 
 1. Ir a [vercel.com](https://vercel.com) → Importar repositorio
 2. **Root Directory:** `/` (la raíz del proyecto)
-3. **Build Command:** ninguno (solo estáticos)
-4. **Output:** ninguno
+3. **Build Command:** `npm run build`
+4. **Output Directory:** `dist`
 
 **Importante:** Setear estas variables de entorno en Vercel:
 
@@ -136,7 +185,7 @@ supabase secrets set DOMAIN=elarca.cl
 | `SUPABASE_URL` | `https://tu-project.supabase.co` |
 | `SUPABASE_ANON_KEY` | tu anon key (pública) |
 
-Luego reemplazar `${SUPABASE_PROJECT_ID}` y `${SUPABASE_ANON_KEY}` en los HTMLs con los valores reales, o inyectarlos vía Vercel Environment Variables.
+El build inyecta las variables de entorno en los recursos del frontend.
 
 ---
 

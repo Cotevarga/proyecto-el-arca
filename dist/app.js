@@ -356,6 +356,7 @@ window.API_BASE = '';
 
   // ─── Interceptar clicks en links internos ───
   document.addEventListener('click', function (e) {
+    if (window.__ELARCA_REACT_ROUTER__) return;
     var link = e.target.closest('a');
     if (!link) return;
 
@@ -384,6 +385,7 @@ window.API_BASE = '';
 
   // ─── popstate ───
   window.addEventListener('popstate', function () {
+    if (window.__ELARCA_REACT_ROUTER__) return;
     navegar(window.location.pathname);
   });
 

@@ -4,7 +4,7 @@
    Network First para navegación (SPA)
    =========================================================== */
 
-const CACHE_NAME = 'elarca-v1';
+const CACHE_NAME = 'elarca-react-v5';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -18,6 +18,45 @@ const STATIC_ASSETS = [
   '/legado.html',
   '/terminos.html',
   '/plan-gestion.html',
+  '/impacto.html',
+  '/_legacy-pages/index.html',
+  '/_legacy-pages/archivo.html',
+  '/_legacy-pages/autora.html',
+  '/_legacy-pages/galeria.html',
+  '/_legacy-pages/impacto.html',
+  '/_legacy-pages/legado.html',
+  '/_legacy-pages/mapa.html',
+  '/_legacy-pages/plan-gestion.html',
+  '/_legacy-pages/relatos.html',
+  '/_legacy-pages/subir.html',
+  '/_legacy-pages/terminos.html',
+  '/_legacy-pages/videos.html',
+  '/_legacy-pages/relatos/anecdotas.html',
+  '/_legacy-pages/relatos/arca.html',
+  '/_legacy-pages/relatos/jano-arca.html',
+  '/_legacy-pages/relatos/jano.html',
+  '/_legacy-pages/relatos/organizaciones.html',
+  '/assets/app.js',
+  '/assets/index.css',
+  '/audio-playlist.js',
+  '/css/legacy/archivo.css',
+  '/css/legacy/autora.css',
+  '/css/legacy/galeria.css',
+  '/css/legacy/impacto.css',
+  '/css/legacy/index.css',
+  '/css/legacy/legado.css',
+  '/css/legacy/mapa.css',
+  '/css/legacy/plan-gestion.css',
+  '/css/legacy/relatos.css',
+  '/css/legacy/relatos/anecdotas.css',
+  '/css/legacy/relatos/arca.css',
+  '/css/legacy/relatos/jano-arca.css',
+  '/css/legacy/relatos/jano.css',
+  '/css/legacy/relatos/organizaciones.css',
+  '/css/legacy/status.css',
+  '/css/legacy/subir.css',
+  '/css/legacy/terminos.css',
+  '/css/legacy/videos.css',
   '/config.js',
   '/supabase.js',
   '/app.js',
@@ -58,6 +97,13 @@ self.addEventListener('fetch', (event) => {
 
   // Solo interesar peticiones al mismo origen
   if (url.origin !== self.location.origin) return;
+
+  // The React entry bundle has a stable URL, so always revalidate it before
+  // falling back to the cached copy for offline use.
+  if (url.pathname === '/assets/app.js' || url.pathname.startsWith('/_legacy-pages/')) {
+    event.respondWith(networkFirst(request));
+    return;
+  }
 
   // Estrategia: Cache First para assets estáticos (JS, CSS, imágenes)
   if (

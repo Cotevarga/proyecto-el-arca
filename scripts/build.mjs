@@ -1,116 +1,176 @@
-import { readFileSync, writeFileSync, readdirSync, statSync, mkdirSync, existsSync } from 'fs';
-import { join, dirname, relative, extname } from 'path';
-import { fileURLToPath } from 'url';
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { build as buildVite } from 'vite';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, '..');
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const environment = process.env.VERCEL_ENV || process.env.NODE_ENV || 'development';
 
-const ENV = process.env.VERCEL_ENV || process.env.NODE_ENV || 'development';
+let config = {
+  supabaseUrl: 'https://ukpoprkdgezgxlkjjuve.supabase.co',
+  anonKey: '',
+  projectId: 'ukpoprkdgezgxlkjjuve',
+};
 
-// Leer variables desde config.js como fallback
-let cfgSupabaseUrl = 'https://ukpoprkdgezgxlkjjuve.supabase.co';
-let cfgAnonKey = '';
-let cfgProjectId = 'ukpoprkdgezgxlkjjuve';
 try {
-  const cfgPath = join(ROOT, 'config.js');
-  const cfgContent = readFileSync(cfgPath, 'utf-8');
-  const urlMatch = cfgContent.match(/SUPABASE_URL\s*=\s*'([^']+)'/);
-  const keyMatch = cfgContent.match(/SUPABASE_ANON_KEY\s*=\s*'([^']+)'/);
-  const projMatch = cfgContent.match(/SUPABASE_PROJECT_ID\s*=\s*'([^']+)'/);
-  if (urlMatch) cfgSupabaseUrl = urlMatch[1];
-  if (keyMatch) cfgAnonKey = keyMatch[1];
-  if (projMatch) cfgProjectId = projMatch[1];
-} catch {}
+  const source = readFileSync(join(root, 'config.js'), 'utf-8');
+  const values = {
+    supabaseUrl: /SUPABASE_URL\s*=\s*'([^']+)'/,
+    anonKey: /SUPABASE_ANON_KEY\s*=\s*'([^']+)'/,
+    projectId: /SUPABASE_PROJECT_ID\s*=\s*'([^']+)'/,
+  };
+  for (const [key, pattern] of Object.entries(values)) {
+    const match = source.match(pattern);
+    if (match) config[key] = match[1];
+  }
+} catch (error) {
+  if (error.code !== 'ENOENT') throw error;
+}
 
-const SUPABASE_URL = process.env.SUPABASE_URL || cfgSupabaseUrl;
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || cfgAnonKey;
-const SUPABASE_PROJECT_ID = process.env.SUPABASE_PROJECT_ID || cfgProjectId;
-const EDGE_FUNCTIONS_URL = process.env.EDGE_FUNCTIONS_URL || `https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1`;
+config.supabaseUrl = process.env.SUPABASE_URL || config.supabaseUrl;
+config.anonKey = process.env.SUPABASE_ANON_KEY || config.anonKey;
+config.projectId = process.env.SUPABASE_PROJECT_ID || config.projectId;
+config.edgeFunctionsUrl =
+  process.env.EDGE_FUNCTIONS_URL ||
+  `https://${config.projectId}.supabase.co/functions/v1`;
 
-function injectEnv(filePath, content) {
-  let result = content
-    .replace(/\$\{SUPABASE_PROJECT_ID\}/g, SUPABASE_PROJECT_ID)
-    .replace(/\$\{SUPABASE_URL\}/g, SUPABASE_URL)
-    .replace(/\$\{SUPABASE_ANON_KEY\}/g, SUPABASE_ANON_KEY)
-    .replace(/\$\{EDGE_FUNCTIONS_URL\}/g, EDGE_FUNCTIONS_URL);
-  return result;
+function injectEnvironment(content) {
+  return content
+    .replace(/\$\{SUPABASE_PROJECT_ID\}/g, config.projectId)
+    .replace(/\$\{SUPABASE_URL\}/g, config.supabaseUrl)
+    .replace(/\$\{SUPABASE_ANON_KEY\}/g, config.anonKey)
+    .replace(/\$\{EDGE_FUNCTIONS_URL\}/g, config.edgeFunctionsUrl);
+}
+
+function copyDirectory(source, destination, filter = () => true) {
+  if (!existsSync(source)) return;
+  mkdirSync(destination, { recursive: true });
+  for (const entry of readdirSync(source)) {
+    const sourcePath = join(source, entry);
+    const destinationPath = join(destination, entry);
+    if (statSync(sourcePath).isDirectory()) {
+      copyDirectory(sourcePath, destinationPath, filter);
+    } else if (filter(entry, sourcePath)) {
+      writeFileSync(destinationPath, readFileSync(sourcePath));
+    }
+  }
+}
+
+function copyInjectedDirectory(source, destination) {
+  if (!existsSync(source)) return;
+  for (const entry of readdirSync(source)) {
+    const sourcePath = join(source, entry);
+    const destinationPath = join(destination, entry);
+    if (statSync(sourcePath).isDirectory()) {
+      copyInjectedDirectory(sourcePath, destinationPath);
+    } else {
+      copyInjectedFile(sourcePath, destinationPath);
+    }
+  }
+}
+
+function copyInjectedFile(source, destination) {
+  if (!existsSync(source)) return;
+  mkdirSync(dirname(destination), { recursive: true });
+  writeFileSync(
+    destination,
+    injectEnvironment(readFileSync(source, 'utf-8')),
+    'utf-8',
+  );
 }
 
 async function build() {
-  console.log(`🚀 Building El Arca v3.0.0 [${ENV}]`);
+  console.log(`Building El Arca React frontend [${environment}]`);
+  await buildVite();
 
-  // 1. Inject environment variables into HTML files
-  const htmlFiles = [
-    'admin.html', 'index.html', 'galeria.html', 'videos.html',
-    'relatos.html', 'archivo.html', 'subir.html', 'mapa.html',
-    'legado.html', 'autora.html', 'status.html', 'terminos.html',
-    'plan-gestion.html', 'impacto.html'
+  const output = join(root, 'dist');
+  const legacyPages = [
+    'archivo.html', 'autora.html', 'galeria.html', 'impacto.html', 'index.html',
+    'legado.html', 'mapa.html', 'plan-gestion.html', 'relatos.html', 'subir.html',
+    'terminos.html', 'videos.html',
+    'relatos/anecdotas.html', 'relatos/arca.html', 'relatos/jano-arca.html',
+    'relatos/jano.html', 'relatos/organizaciones.html',
   ];
 
-  const distDir = join(ROOT, 'dist');
-  if (!existsSync(distDir)) mkdirSync(distDir, { recursive: true });
-
-  for (const file of htmlFiles) {
-    const srcPath = join(ROOT, file);
-    try {
-      let content = readFileSync(srcPath, 'utf-8');
-      content = injectEnv(file, content);
-      writeFileSync(join(distDir, file), content, 'utf-8');
-      console.log(`  ✅ ${file} -> dist/${file}`);
-    } catch (e) {
-      if (e.code !== 'ENOENT') console.error(`  ❌ ${file}: ${e.message}`);
-    }
+  for (const page of legacyPages) {
+    copyInjectedFile(join(root, page), join(output, '_legacy-pages', page));
   }
 
-  // 2. Copy static assets
-  const staticDirs = ['images', 'musica', 'i18n', 'relatos'];
-  for (const dir of staticDirs) {
-    const srcDir = join(ROOT, dir);
-    const dstDir = join(distDir, dir);
-    if (!existsSync(srcDir)) continue;
-    if (!existsSync(dstDir)) mkdirSync(dstDir, { recursive: true });
-    const entries = readdirSync(srcDir);
-    for (const entry of entries) {
-      const srcPath = join(srcDir, entry);
-      if (statSync(srcPath).isFile()) {
-        writeFileSync(join(dstDir, entry), readFileSync(srcPath));
+  const shellPath = join(output, 'index.html');
+  const shell = readFileSync(shellPath, 'utf-8').replace(/\r\n?/g, '\n');
+  writeFileSync(shellPath, shell, 'utf-8');
+  for (const page of legacyPages) {
+    const source = readFileSync(join(root, page), 'utf-8');
+    const title = source.match(/<title>([\s\S]*?)<\/title>/i)?.[1];
+    const description = source.match(/<meta\s+name=["']description["']\s+content=["']([^"']*)["'][^>]*>/i)?.[1];
+    let routeShell = shell;
+    if (title) routeShell = routeShell.replace(/<title>[\s\S]*?<\/title>/i, `<title>${title}</title>`);
+    if (description) {
+      routeShell = routeShell.replace(
+        /<meta\s+name="description"[^>]*>/i,
+        `<meta name="description" content="${description.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}">`,
+      );
+    }
+    for (const property of ['og:title', 'og:description', 'og:url', 'og:type', 'og:image']) {
+      const metadata = source.match(new RegExp(`<meta\\s+property=["']${property}["'][^>]*>`, 'i'))?.[0];
+      if (metadata) {
+        routeShell = routeShell.replace(
+          new RegExp(`<meta\\s+property=["']${property}["'][^>]*>`, 'i'),
+          metadata,
+        );
       }
     }
-    console.log(`  📁 ${dir}/ -> dist/${dir}/`);
+    const canonical = source.match(/<link\s+rel=["']canonical["'][^>]*>/i)?.[0];
+    if (canonical) {
+      routeShell = routeShell.replace(
+        /<link\s+rel=["']canonical["'][^>]*>/i,
+        canonical,
+      );
+    }
+    const structuredData = source.match(/<script\s+type=["']application\/ld\+json["'][\s\S]*?<\/script>/i)?.[0];
+    if (structuredData) {
+      routeShell = routeShell.replace('</head>', `${structuredData}\n  </head>`);
+    }
+    const destination = join(output, page);
+    mkdirSync(dirname(destination), { recursive: true });
+    writeFileSync(destination, routeShell, 'utf-8');
   }
 
-  // 3. Copy root assets
-  const rootFiles = ['config.js', 'supabase.js', 'app.js', 'search.js', 'audio-player.js',
-    'manifest.json', 'sw.js', 'robots.txt', 'sitemap.xml', 'favicon.ico'];
+  for (const page of ['admin.html', 'status.html']) {
+    copyInjectedFile(join(root, page), join(output, page));
+  }
+
+  for (const directory of ['images', 'musica', 'i18n', 'relatos']) {
+    copyDirectory(
+      join(root, directory),
+      join(output, directory),
+      (_entry, sourcePath) =>
+        directory !== 'relatos' || !sourcePath.toLowerCase().endsWith('.html'),
+    );
+  }
+
+  const rootFiles = [
+    'config.js', 'supabase.js', 'app.js', 'search.js', 'audio-player.js',
+    'manifest.json', 'sw.js', 'robots.txt', 'sitemap.xml', 'favicon.ico',
+  ];
   for (const file of rootFiles) {
-    const srcPath = join(ROOT, file);
-    try {
-      let content = readFileSync(srcPath, 'utf-8');
-      content = injectEnv(file, content);
-      writeFileSync(join(distDir, file), content, 'utf-8');
-    } catch (e) {
-      if (e.code !== 'ENOENT') console.error(`  ⚠️  ${file} not found, skipping`);
-    }
+    copyInjectedFile(join(root, file), join(output, file));
   }
+  copyInjectedFile(
+    join(root, 'web', 'src', 'audio', 'playlist.js'),
+    join(output, 'audio-playlist.js'),
+  );
 
-  // 4. Copy admin scripts
-  const adminSrcDir = join(ROOT, 'admin');
-  const adminDstDir = join(distDir, 'admin');
-  if (existsSync(adminSrcDir)) {
-    if (!existsSync(adminDstDir)) mkdirSync(adminDstDir, { recursive: true });
-    const adminEntries = readdirSync(adminSrcDir);
-    for (const entry of adminEntries) {
-      const srcPath = join(adminSrcDir, entry);
-      if (statSync(srcPath).isFile()) {
-        let content = readFileSync(srcPath, 'utf-8');
-        content = injectEnv(entry, content);
-        writeFileSync(join(adminDstDir, entry), content, 'utf-8');
-      }
-    }
-    console.log(`  📁 admin/ -> dist/admin/`);
-  }
+  copyDirectory(
+    join(root, 'web', 'src', 'styles', 'legacy'),
+    join(output, 'css', 'legacy'),
+  );
 
-  console.log('\n✅ Build complete');
+  copyInjectedDirectory(join(root, 'admin'), join(output, 'admin'));
+  console.log('React frontend build complete');
 }
 
-build().catch(e => { console.error(e); process.exit(1); });
+build().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

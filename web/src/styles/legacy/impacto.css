@@ -1,0 +1,32 @@
+:root { --color-mir: #E50914; --color-noche: #0a0a0a; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #000; color: #e0e0e0; margin: 0; min-height: 100vh; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+    h1 { color: var(--color-mir); font-size: 28px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; text-align: center; }
+    h2 { font-size: 16px; color: #888; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: #0a0a0a; border: 1px solid rgba(229,9,20,0.15); border-radius: 12px; padding: 24px; text-align: center; transition: border-color 0.3s, transform 0.3s; }
+    .stat-card:hover { border-color: rgba(229,9,20,0.4); transform: translateY(-2px); }
+    .stat-number { font-size: 36px; font-weight: 800; color: #fff; line-height: 1.2; }
+    .stat-number.mir { color: var(--color-mir); }
+    .stat-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 8px; }
+    .bar-container { margin-bottom: 12px; }
+    .bar-label { display: flex; justify-content: space-between; font-size: 13px; color: #ccc; margin-bottom: 4px; }
+    .bar-track { height: 8px; background: #1a1a1a; border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; background: var(--color-mir); transition: width 1s ease; }
+    .section-title { text-align: center; color: var(--color-mir); font-size: 18px; font-weight: 700; margin: 40px 0 24px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .badge-blue { background: rgba(33,150,243,0.15); color: #2196f3; }
+    .badge-green { background: rgba(76,175,80,0.15); color: #4caf50; }
+    .badge-orange { background: rgba(255,152,0,0.15); color: #ff9800; }
+    .badge-purple { background: rgba(156,39,176,0.15); color: #9c27b0; }
+    .badge-mir { background: rgba(229,9,20,0.15); color: var(--color-mir); }
+    .footer { text-align: center; color: #555; font-size: 11px; margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .last-updated { text-align: center; color: #555; font-size: 11px; margin-bottom: 32px; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .animate-in { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
+    .skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; height: 80px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .map-placeholder { background: #0a0a0a; border: 1px solid rgba(229,9,20,0.15); border-radius: 12px; padding: 60px 24px; text-align: center; color: #555; font-size: 14px; }

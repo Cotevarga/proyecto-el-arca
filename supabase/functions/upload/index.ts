@@ -1,6 +1,7 @@
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
 import { getSupabaseAdmin } from "../_shared/supabase.ts";
 import { checkRateLimit, recordRateLimit, getClientIp, rateLimitHeaders } from "../_shared/rateLimit.ts";
+import { sendUploadNotificationEmail } from "../_shared/uploadNotificationEmail.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
 const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") ?? "mariajosevarga@gmail.com";
@@ -86,14 +87,6 @@ function matchesMagicByte(fileBytes: Uint8Array, mimeType: string): boolean {
     }
     return true;
   });
-}
-
-function escapeHtml(text: string): string {
-  const map: Record<string, string> = {
-    "&": "&amp;", "<": "&lt;", ">": "&gt;",
-    '"': "&quot;", "'": "&#039;",
-  };
-  return String(text).replace(/[&<>"']/g, (c) => map[c] ?? c);
 }
 
 Deno.serve(async (req: Request) => {
@@ -290,34 +283,16 @@ Deno.serve(async (req: Request) => {
     await recordRateLimit(clientIp, "upload_recuerdo");
 
     // ─── Send email notification via Resend ───
-    if (RESEND_API_KEY) {
-      try {
-        const emailHtml = `
-          <h2>Nuevo recuerdo recibido en El Arca</h2>
-          <p><strong>Nombre:</strong> ${escapeHtml(nombre)}</p>
-          ${texto ? `<p><strong>Texto:</strong> ${escapeHtml(texto)}</p>` : ""}
-          ${nombreOriginal ? `<p><strong>Archivo:</strong> ${escapeHtml(nombreOriginal)} (${(tamanioBytes! / 1024 / 1024).toFixed(1)} MB)</p>` : ""}
-          <p><strong>Sección:</strong> ${escapeHtml(seccion)}</p>
-          <hr>
-          <p style="color:#888;">Revisa los recuerdos pendientes en el panel de administración.</p>
-        `;
-
-        await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${RESEND_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from: "El Arca <recuerdos@elarca.cl>",
-            to: [ADMIN_EMAIL],
-            subject: "Nuevo recuerdo pendiente de revisión",
-            html: emailHtml,
-          }),
-        });
-      } catch (emailErr) {
-        console.error("[Upload] Error al enviar email:", emailErr);
-      }
+    try {
+      await sendUploadNotificationEmail(RESEND_API_KEY, ADMIN_EMAIL, {
+        nombre,
+        texto,
+        nombreOriginal,
+        tamanioBytes,
+        seccion,
+      });
+    } catch (emailErr) {
+      console.error("[Upload] Error al enviar email:", emailErr);
     }
 
     return new Response(

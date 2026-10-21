@@ -210,7 +210,8 @@
       cargarPlaylistDesdeBD();
       return;
     }
-    playRandom();
+    currentTrackIndex = window.ArcaPlaylist.nextIndex(currentTrackIndex, canciones.length);
+    playCancion(canciones[currentTrackIndex]);
   }
 
   function prevTrack() {
@@ -218,7 +219,7 @@
       cargarPlaylistDesdeBD();
       return;
     }
-    currentTrackIndex = (currentTrackIndex - 1 + canciones.length) % canciones.length;
+    currentTrackIndex = window.ArcaPlaylist.previousIndex(currentTrackIndex, canciones.length);
     playCancion(canciones[currentTrackIndex]);
   }
 
@@ -254,7 +255,7 @@
     audio.addEventListener('ended', async function () {
       await cargarPlaylistDesdeBD();
       if (canciones.length > 0) {
-        playRandom();
+        nextTrack();
       }
     });
     audio.addEventListener('play', function () {

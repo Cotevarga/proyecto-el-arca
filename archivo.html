@@ -36,27 +36,7 @@
   }
   </script>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
-  <style>
-    :root { --color-mir: #E50914; --color-noche: #111111; }
-    html { scroll-behavior: smooth; }
-    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000 !important; color: #fff !important; }
-    h1, h2, h3, h4, h5, h6, footer, p { text-align: center !important; }
-    .card-mir p, article p { text-align: justify !important; }
-    .card-mir { background-color: var(--color-noche) !important; border: 1px solid rgba(229,9,20,0.4) !important; padding: 1.5rem; }
-    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; }
-    .text-mir { color: var(--color-mir) !important; }
-    .border-mir { border-color: var(--color-mir) !important; }
-    .bg-mir { background-color: var(--color-mir) !important; }
-    .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
-    .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
-    .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
-    .hover\:text-mir:hover { color: var(--color-mir) !important; }
-    .hover\:border-mir:hover { border-color: var(--color-mir) !important; }
-    @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
-    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
-    .btn-outline-mir { background-color: transparent !important; color: white !important; font-weight: bold; padding: 0.75rem 2rem; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem; border: 2px solid var(--color-mir); }
-    .btn-outline-mir:hover { background-color: var(--color-mir) !important; }
-  </style>
+  
   <script src="/config.js"></script>
   <script src="/supabase.js" defer></script>
   <script src="/audio-player.js" defer></script>
@@ -67,6 +47,7 @@
     gtag('js', new Date());
     gtag('config', 'G-0M3Q8DQ3QF');
   </script>
+  <link rel="stylesheet" href="/css/legacy/archivo.css">
 </head>
 <body class="bg-black text-white antialiased">
 
@@ -181,13 +162,7 @@
       </div>
     </section>
 
-    <style>
-      @keyframes spin { to { transform:rotate(360deg); } }
-      #visor-content img { max-width:100%; height:auto; border-radius:8px; margin:16px 0; }
-      #visor-content video, #visor-content audio { width:100%; border-radius:8px; margin:16px 0; }
-      #visor-content .embed-container { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; margin:16px 0; border-radius:8px; }
-      #visor-content .embed-container iframe { position:absolute; top:0; left:0; width:100%; height:100%; }
-    </style>
+    
     <script src="/search.js"></script>
     <script>
     var menuToggle = document.getElementById('menu-toggle');

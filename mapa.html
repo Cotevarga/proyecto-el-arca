@@ -16,35 +16,13 @@
   <link rel="canonical" href="https://elarca.cl/mapa.html">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <style>
-    :root { --color-mir: #E50914; --color-noche: #111111; }
-    html { scroll-behavior: smooth; }
-    body { font-family: 'Inter', system-ui, sans-serif; background-color: #000 !important; color: #fff !important; }
-    h1, h2, h3, h4, h5, h6, footer, p { text-align: center !important; }
-    .heading-mir { font-family: Arial, Helvetica, sans-serif !important; color: var(--color-mir) !important; text-transform: uppercase; letter-spacing: 0.05em; }
-    .text-mir { color: var(--color-mir) !important; }
-    .border-mir { border-color: var(--color-mir) !important; }
-    .border-mir\/20 { border-color: rgba(229,9,20,0.2) !important; }
-    .border-mir\/30 { border-color: rgba(229,9,20,0.3) !important; }
-    .bg-mir { background-color: var(--color-mir) !important; }
-    .font-title { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: 0.05em; }
-    .hover\:text-mir:hover { color: var(--color-mir) !important; }
-    .btn-mir { background-color: var(--color-mir) !important; color: white !important; font-weight: bold; padding: 0.75rem 2rem; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem; border: 2px solid var(--color-mir); }
-    .btn-mir:hover { background-color: #000 !important; color: var(--color-mir) !important; }
-    #map { height: 60vh; width: 100%; border-radius: 12px; border: 1px solid rgba(229,9,20,0.3); z-index: 1; }
-    .leaflet-container { background: #1a1a1a !important; }
-    .leaflet-popup-content-wrapper { background: #111 !important; color: #fff !important; border: 1px solid rgba(229,9,20,0.3); border-radius: 8px !important; }
-    .leaflet-popup-tip { background: #111 !important; border: 1px solid rgba(229,9,20,0.3); }
-    .leaflet-popup-content { margin: 12px 16px; font-size: 13px; }
-    .leaflet-popup-content a { color: var(--color-mir); }
-    @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
-    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
-  </style>
+  
   <script src="/config.js"></script>
   <script src="/supabase.js" defer></script>
   <script src="/audio-player.js" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0M3Q8DQ3QF');</script>
+  <link rel="stylesheet" href="/css/legacy/mapa.css">
 </head>
 <body class="bg-black text-white antialiased">
 
@@ -165,12 +143,74 @@
           }
           var count = 0;
           r.data = r.data.filter(function (d) { return d.geolocalizacion && d.geolocalizacion.trim(); });
+
+          var CENTRO = [-33.5602, -70.6358]; // La Pintana (La Goya)
+          var cache = {};
+          try { cache = JSON.parse(localStorage.getItem('arca_geocache_v2') || '{}'); } catch (e) { cache = {}; }
+          function saveCache() { try { localStorage.setItem('arca_geocache_v2', JSON.stringify(cache)); } catch (e) {} }
+          function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+          function parseCoords(geo) {
+            var m = geo.match(/^\s*(-?\d+(?:\.\d+)?)\s*[,;]\s*(-?\d+(?:\.\d+)?)\s*$/);
+            if (!m) return null;
+            var la = parseFloat(m[1]), ln = parseFloat(m[2]);
+            return (la < -90 || la > 90 || ln < -180 || ln > 180) ? null : [la, ln];
+          }
+          // Geocodificación con OpenStreetMap Nominatim (sin clave), sesgada a Chile / La Pintana.
+          async function geocode(name) {
+            var key = name.toLowerCase();
+            if (cache[key] !== undefined) return cache[key];
+            var queries = [
+              { q: name, local: true },
+              { q: name + ', La Pintana', local: true },
+              { q: name + ', Santiago, Chile', local: false }
+            ];
+            for (var q = 0; q < queries.length; q++) {
+              try {
+                var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=cl&accept-language=es&q=' + encodeURIComponent(queries[q].q) +
+                  (queries[q].local ? '&viewbox=-70.80,-33.45,-70.45,-33.75&bounded=1' : '');
+                var res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                if (res.ok) {
+                  var rows = await res.json();
+                  if (rows && rows.length) {
+                    cache[key] = [parseFloat(rows[0].lat), parseFloat(rows[0].lon)];
+                    saveCache();
+                    return cache[key];
+                  }
+                }
+              } catch (e) { /* red no disponible: se usa el respaldo */ }
+              await new Promise(function (ok) { setTimeout(ok, 1100); });
+            }
+            return null;
+          }
+
+          var places = {};
+          var jobs = [];
           r.data.forEach(function (d) {
-            var geo = d.geolocalizacion || '';
-            var parts = geo.split(',').map(function (s) { return parseFloat(s.trim()); }).filter(function (n) { return !isNaN(n); });
-            if (parts.length >= 2) {
-              var lat = parts[0], lng = parts[1];
-              if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
+            var geo = d.geolocalizacion.trim();
+            var c = parseCoords(geo);
+            if (c) { d._pos = c; return; }
+            jobs.push(geo);
+          });
+          var unique = jobs.filter(function (g, i) { return jobs.indexOf(g) === i; });
+          if (statsEl && unique.length) statsEl.textContent = 'Ubicando ' + unique.length + ' lugares...';
+          for (var u = 0; u < unique.length; u++) {
+            var found = cache[unique[u].toLowerCase()] !== undefined ? cache[unique[u].toLowerCase()] : await geocode(unique[u]);
+            places[unique[u]] = found;
+          }
+
+          var stack = {};
+          if (window._mapaInstance !== map) return;
+          r.data.forEach(function (d) {
+            var pos = d._pos || places[d.geolocalizacion.trim()] || CENTRO;
+            // Separa levemente marcadores que comparten el mismo punto
+            var k = pos[0].toFixed(5) + ',' + pos[1].toFixed(5);
+            var n = stack[k] = (stack[k] || 0) + 1;
+            if (n > 1) {
+              var ang = n * 2.4, rad = 0.0003 * Math.ceil(n / 6);
+              pos = [pos[0] + rad * Math.sin(ang), pos[1] + rad * Math.cos(ang)];
+            }
+            var lat = pos[0], lng = pos[1];
+            {
               count++;
               var icon = d.tipo_archivo && d.tipo_archivo.startsWith('audio')
                 ? L.divIcon({ className: '', html: '<div style="background:#E50914;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(229,9,20,0.6);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] })
@@ -178,10 +218,9 @@
                 ? L.divIcon({ className: '', html: '<div style="background:#ff6b35;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(255,107,53,0.6);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] })
                 : L.divIcon({ className: '', html: '<div style="background:#fff;width:14px;height:14px;border-radius:50%;border:2px solid #E50914;box-shadow:0 0 8px rgba(229,9,20,0.4);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] });
 
-              var popup = '<div style="text-align:left;"><strong>' + (d.nombre || 'Anónimo') + '</strong>';
-              if (d.mensaje_largo) popup += '<br><span style="color:#aaa;font-size:11px;">' + d.mensaje_largo.substring(0, 120) + (d.mensaje_largo.length > 120 ? '…' : '') + '</span>';
-              if (d.id) popup += '<br><a href="/archivo.html?view=rec-' + d.id + '" style="font-size:11px;">Ver detalle</a>';
-              else if (d.url_archivo) popup += '<br><a href="' + d.url_archivo + '" target="_blank" style="font-size:11px;">Ver archivo</a>';
+              var popup = '<div style="text-align:left;"><strong>' + esc(d.nombre || 'Anónimo') + '</strong><br><span style="font-size:11px;">📍 ' + esc(d.geolocalizacion) + '</span>';
+              if (d.mensaje_largo) popup += '<br><span style="color:#aaa;font-size:11px;">' + esc(d.mensaje_largo.substring(0, 120)) + (d.mensaje_largo.length > 120 ? '…' : '') + '</span>';
+              if (d.id) popup += '<br><a href="/archivo.html?view=rec-' + encodeURIComponent(d.id) + '" style="font-size:11px;">Ver detalle</a>';
               popup += '</div>';
 
               L.marker([lat, lng], { icon: icon }).addTo(map).bindPopup(popup);

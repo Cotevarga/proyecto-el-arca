@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa — El Arca</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺️</text></svg>">
+  <meta property="og:title" content="EL ARCA — Mapa">
+  <meta property="og:description" content="Archivo Comunitario de la Población Francisco de Goya, La Pintana. Memoria viva del trabajo con niños, niñas y jóvenes.">
+  <meta property="og:image" content="https://elarca.cl/images/og-image.jpg">
+  <meta property="og:url" content="https://elarca.cl/mapa.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta name="description" content="Mapa interactivo del Archivo Comunitario El Arca">
+  <link rel="canonical" href="https://elarca.cl/mapa.html">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <script src="/config.js"></script>
+  <script src="/supabase.js" defer></script>
+  <script src="/audio-player.js" defer></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M3Q8DQ3QF"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0M3Q8DQ3QF');</script>
+  <link rel="stylesheet" href="/css/legacy/mapa.css">
+</head>
+<body class="bg-black text-white antialiased">
+
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-mir/30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/index.html" class="text-white font-bold text-2xl tracking-wide font-title">EL ARCA</a>
+      <div id="nav-player" class="flex items-center gap-1 md:gap-2 mx-1 md:mx-3"></div>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition border-b-2 border-transparent hover:border-mir pb-1">Archivo</a>
+      </div>
+      <button id="menu-toggle" class="md:hidden text-white p-2" aria-label="Abrir menú">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-t border-mir/30 px-4 py-4">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-white/80">
+        <a href="/index.html" class="hover:text-mir transition">Inicio</a>
+        <a href="/galeria.html" class="hover:text-mir transition">Galería</a>
+        <a href="/mapa.html" class="hover:text-mir transition">Mapa</a>
+        <a href="/videos.html" class="hover:text-mir transition">Videos</a>
+        <a href="/relatos.html" class="hover:text-mir transition">Relatos</a>
+        <a href="/legado.html" class="hover:text-mir transition">El Legado</a>
+        <a href="/archivo.html" class="hover:text-mir transition">Archivo</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content" class="pt-32 pb-16">
+    <div class="max-w-6xl mx-auto px-4 animate-fade-in-up">
+      <span class="text-mir font-bold text-xs tracking-[0.3em] uppercase">Geografía de la Memoria</span>
+      <h1 class="heading-mir text-4xl md:text-5xl mt-4 mb-4">Mapa de Contribuciones</h1>
+      <div style="width:4rem;height:0.25rem;background-color:var(--color-mir);margin:1.5rem auto;"></div>
+      <p class="text-white/50 text-lg max-w-2xl mx-auto mb-8">Cada marcador representa un recuerdo archivado. Explora las contribuciones de cada territorio.</p>
+      <div id="map"></div>
+      <div id="map-stats" class="mt-6 text-center text-sm text-white/40"></div>
+      <script>
+      window._mapaInitialized = false;
+
+      window.initMapa = async function () {
+        'use strict';
+
+        var mapEl = document.getElementById('map');
+        if (!mapEl) return;
+
+        // Limpiar mapa previo si existe
+        if (window._mapaInstance) {
+          window._mapaInstance.remove();
+          window._mapaInstance = null;
+        }
+        window._mapaInitialized = false;
+
+        function waitForLeaflet() {
+          return new Promise(function (resolve) {
+            if (typeof L !== 'undefined') { resolve(L); return; }
+            var link = document.createElement('link');
+            link.rel = 'stylesheet'; link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+            document.head.appendChild(link);
+            var script = document.createElement('script');
+            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+            script.onload = function () { resolve(L); };
+            script.onerror = function () { resolve(null); };
+            document.head.appendChild(script);
+          });
+        }
+
+        if (!window.miSupabase) {
+          mapEl.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">Conectando...</p>';
+          // Esperar a que Supabase esté listo
+          for (var i = 0; i < 50; i++) {
+            await new Promise(function (r) { setTimeout(r, 200); });
+            if (window.miSupabase) break;
+          }
+          if (!window.miSupabase) {
+            mapEl.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">Error de conexión</p>';
+            return;
+          }
+        }
+
+        if (typeof L === 'undefined') {
+          var _L = await waitForLeaflet();
+          if (!_L) { mapEl.innerHTML = '<p style="color:#888;text-align:center;padding:40px;">Error al cargar mapa</p>'; return; }
+        }
+
+        var client = window.miSupabase;
+        window._mapaInitialized = true;
+
+        var map = L.map('map', {
+          center: [-33.5, -70.6],
+          zoom: 5,
+          zoomControl: true,
+          attributionControl: false
+        });
+        window._mapaInstance = map;
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          maxZoom: 19
+        }).addTo(map);
+
+        var statsEl = document.getElementById('map-stats');
+        if (statsEl) statsEl.textContent = 'Cargando ubicaciones...';
+
+        try {
+          var r = await client.from('recuerdos')
+            .select('id, nombre, geolocalizacion, url_archivo, tipo_archivo, mensaje_largo')
+            .eq('aprobado', true)
+            .not('geolocalizacion', 'is', null)
+            .order('created_at', { ascending: false });
+
+          if (r.error || !r.data || r.data.length === 0) {
+            if (statsEl) statsEl.textContent = 'Aún no hay contribuciones con ubicación.';
+            return;
+          }
+          var count = 0;
+          r.data = r.data.filter(function (d) { return d.geolocalizacion && d.geolocalizacion.trim(); });
+
+          var CENTRO = [-33.5602, -70.6358]; // La Pintana (La Goya)
+          var cache = {};
+          try { cache = JSON.parse(localStorage.getItem('arca_geocache_v2') || '{}'); } catch (e) { cache = {}; }
+          function saveCache() { try { localStorage.setItem('arca_geocache_v2', JSON.stringify(cache)); } catch (e) {} }
+          function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+          function parseCoords(geo) {
+            var m = geo.match(/^\s*(-?\d+(?:\.\d+)?)\s*[,;]\s*(-?\d+(?:\.\d+)?)\s*$/);
+            if (!m) return null;
+            var la = parseFloat(m[1]), ln = parseFloat(m[2]);
+            return (la < -90 || la > 90 || ln < -180 || ln > 180) ? null : [la, ln];
+          }
+          // Geocodificación con OpenStreetMap Nominatim (sin clave), sesgada a Chile / La Pintana.
+          async function geocode(name) {
+            var key = name.toLowerCase();
+            if (cache[key] !== undefined) return cache[key];
+            var queries = [
+              { q: name, local: true },
+              { q: name + ', La Pintana', local: true },
+              { q: name + ', Santiago, Chile', local: false }
+            ];
+            for (var q = 0; q < queries.length; q++) {
+              try {
+                var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=cl&accept-language=es&q=' + encodeURIComponent(queries[q].q) +
+                  (queries[q].local ? '&viewbox=-70.80,-33.45,-70.45,-33.75&bounded=1' : '');
+                var res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                if (res.ok) {
+                  var rows = await res.json();
+                  if (rows && rows.length) {
+                    cache[key] = [parseFloat(rows[0].lat), parseFloat(rows[0].lon)];
+                    saveCache();
+                    return cache[key];
+                  }
+                }
+              } catch (e) { /* red no disponible: se usa el respaldo */ }
+              await new Promise(function (ok) { setTimeout(ok, 1100); });
+            }
+            return null;
+          }
+
+          var places = {};
+          var jobs = [];
+          r.data.forEach(function (d) {
+            var geo = d.geolocalizacion.trim();
+            var c = parseCoords(geo);
+            if (c) { d._pos = c; return; }
+            jobs.push(geo);
+          });
+          var unique = jobs.filter(function (g, i) { return jobs.indexOf(g) === i; });
+          if (statsEl && unique.length) statsEl.textContent = 'Ubicando ' + unique.length + ' lugares...';
+          for (var u = 0; u < unique.length; u++) {
+            var found = cache[unique[u].toLowerCase()] !== undefined ? cache[unique[u].toLowerCase()] : await geocode(unique[u]);
+            places[unique[u]] = found;
+          }
+
+          var stack = {};
+          if (window._mapaInstance !== map) return;
+          r.data.forEach(function (d) {
+            var pos = d._pos || places[d.geolocalizacion.trim()] || CENTRO;
+            // Separa levemente marcadores que comparten el mismo punto
+            var k = pos[0].toFixed(5) + ',' + pos[1].toFixed(5);
+            var n = stack[k] = (stack[k] || 0) + 1;
+            if (n > 1) {
+              var ang = n * 2.4, rad = 0.0003 * Math.ceil(n / 6);
+              pos = [pos[0] + rad * Math.sin(ang), pos[1] + rad * Math.cos(ang)];
+            }
+            var lat = pos[0], lng = pos[1];
+            {
+              count++;
+              var icon = d.tipo_archivo && d.tipo_archivo.startsWith('audio')
+                ? L.divIcon({ className: '', html: '<div style="background:#E50914;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(229,9,20,0.6);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] })
+                : d.tipo_archivo && d.tipo_archivo.startsWith('video')
+                ? L.divIcon({ className: '', html: '<div style="background:#ff6b35;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(255,107,53,0.6);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] })
+                : L.divIcon({ className: '', html: '<div style="background:#fff;width:14px;height:14px;border-radius:50%;border:2px solid #E50914;box-shadow:0 0 8px rgba(229,9,20,0.4);"></div>', iconSize: [14, 14], iconAnchor: [7, 7] });
+
+              var popup = '<div style="text-align:left;"><strong>' + esc(d.nombre || 'Anónimo') + '</strong><br><span style="font-size:11px;">📍 ' + esc(d.geolocalizacion) + '</span>';
+              if (d.mensaje_largo) popup += '<br><span style="color:#aaa;font-size:11px;">' + esc(d.mensaje_largo.substring(0, 120)) + (d.mensaje_largo.length > 120 ? '…' : '') + '</span>';
+              if (d.id) popup += '<br><a href="/archivo.html?view=rec-' + encodeURIComponent(d.id) + '" style="font-size:11px;">Ver detalle</a>';
+              popup += '</div>';
+
+              L.marker([lat, lng], { icon: icon }).addTo(map).bindPopup(popup);
+            }
+          });
+          if (statsEl) statsEl.textContent = count + ' contribuciones con ubicación geográfica.';
+          if (count > 0) {
+            var group = L.featureGroup();
+            map.eachLayer(function (l) { if (l instanceof L.Marker) group.addLayer(l); });
+            map.fitBounds(group.getBounds().pad(0.1));
+          }
+        } catch (err) {
+          console.error('[Mapa] Error:', err);
+          if (statsEl) statsEl.textContent = 'Error al cargar ubicaciones.';
+        }
+      };
+
+      // Auto-inicializar en carga directa (incluye SPA via reejecutarScripts)
+      (function () {
+        function tryInit() {
+          if (document.getElementById('map')) {
+            window.initMapa();
+          }
+        }
+        if (window.miSupabase) {
+          tryInit();
+        } else {
+          var chk = setInterval(function () {
+            if (window.miSupabase) { clearInterval(chk); tryInit(); }
+          }, 200);
+          setTimeout(function () { clearInterval(chk); }, 15000);
+        }
+      })();
+      </script>
+    </div>
+  </main>
+
+  <footer class="bg-black text-white/50 py-12 border-t border-mir/20">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <a href="/index.html" class="text-mir font-title text-3xl font-bold mb-4 block tracking-wide">EL ARCA</a>
+      <p class="text-sm max-w-md mx-auto mb-6 text-white/40">Memoria Viva de la Población Francisco de Goya, La Pintana.</p>
+      <nav class="flex justify-center gap-4 text-xs text-white/40 mb-4">
+        <a href="/terminos.html" class="hover:text-mir transition">Términos y Condiciones</a>
+        <span>|</span>
+        <a href="/plan-gestion.html" class="hover:text-mir transition">Plan de Gestión</a>
+      </nav>
+      <div><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:rgba(255,255,255,0.4);font-size:11px;text-decoration:none;">CC BY-NC-SA 4.0 — Contenido bajo licencia Creative Commons</a></div>
+      <div class="border-t border-white/10 pt-6 text-xs text-white/30">&copy; 2026 — Memoria Popular El Arca.</div>
+    </div>
+  </footer>
+</body>
+</html>
