@@ -359,9 +359,11 @@
               <label for="cms-filter">Buscar texto</label>
               <input type="search" id="cms-filter" placeholder="Filtrar por palabra…" autocomplete="off">
             </div>
+            <label class="cms-check"><input type="checkbox" id="cms-only-edited"> Solo editados</label>
             <a id="cms-open" class="btn-secondary cms-open" href="/" target="_blank" rel="noopener">Ver página ↗</a>
           </div>
-          <p class="cms-hint">Edita cualquier título, texto o imagen de la página elegida. Los cambios se publican al instante y puedes volver al original con «Restaurar». Si un mismo texto aparece varias veces en una página, se cambia en todas. Los recuerdos y relatos cargados desde el archivo se gestionan en Pendientes / Aprobados.</p>
+          <p class="cms-hint">Edita cualquier título, texto o imagen de la página elegida con formato (negrita, cursiva, subrayado y enlaces). Ctrl+S guarda. Los cambios se publican al instante y puedes volver al original con «Restaurar». Si un mismo texto aparece varias veces en una página, se cambia en todas. Los recuerdos y relatos cargados desde el archivo se gestionan en Pendientes / Aprobados.</p>
+          <div id="cms-summary" class="cms-summary"></div>
           <div id="cms-status" class="cms-status" role="status"></div>
           <div id="cms-list"></div>
         </div>

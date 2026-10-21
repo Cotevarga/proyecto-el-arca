@@ -24,7 +24,7 @@
     ['terminos', 'Términos y Condiciones']
   ];
 
-  var state = { page: null, fields: null, overrides: {}, filter: '', loadId: 0 };
+  var state = { page: null, fields: null, overrides: {}, filter: '', onlyEdited: false, loadId: 0 };
   var els = {};
 
   function $(id) { return document.getElementById(id); }
@@ -83,20 +83,78 @@
     return '/' + src.replace(/^\.\//, '');
   }
 
+  var TOOLS = [
+    ['bold', 'B', 'Negrita (Ctrl+B)', 'cms-t-b'],
+    ['italic', 'I', 'Cursiva (Ctrl+I)', 'cms-t-i'],
+    ['underline', 'U', 'Subrayado (Ctrl+U)', 'cms-t-u'],
+    ['link', '🔗', 'Insertar enlace', ''],
+    ['unlink', '⛓️‍💥', 'Quitar enlace', ''],
+    ['clear', 'Tx', 'Quitar formato', ''],
+    ['undo', '↶', 'Deshacer', ''],
+    ['redo', '↷', 'Rehacer', '']
+  ];
+
   function textCard(field) {
-    var current = Object.prototype.hasOwnProperty.call(state.overrides, field.key) ? state.overrides[field.key] : field.text;
+    var base = field.markup != null ? field.markup : field.text;
+    var current = Object.prototype.hasOwnProperty.call(state.overrides, field.key) ? state.overrides[field.key] : base;
     var card = make('div', 'cms-card');
     var head = make('div', 'cms-card-head');
     head.appendChild(make('span', 'cms-tag', '<' + field.tag + '>'));
     var badge = make('span', 'cms-edited', 'Editado');
     head.appendChild(badge);
+    var dirty = make('span', 'cms-dirty', '● sin guardar');
+    head.appendChild(dirty);
+    var count = make('span', 'cms-count', '');
+    head.appendChild(count);
     card.appendChild(head);
 
-    var area = make('textarea', 'cms-input');
-    area.value = current;
-    area.rows = Math.min(10, Math.max(1, Math.ceil(current.length / 70) + (current.split('\n').length - 1)));
-    area.setAttribute('aria-label', 'Texto de ' + field.tag);
-    card.appendChild(area);
+    var bar = make('div', 'cms-toolbar-rt');
+    bar.setAttribute('role', 'toolbar');
+    var editor = make('div', 'cms-editor');
+    editor.contentEditable = 'true';
+    editor.setAttribute('role', 'textbox');
+    editor.setAttribute('aria-multiline', 'true');
+    editor.setAttribute('aria-label', 'Texto de ' + field.tag);
+    C.setText(editor, current);
+
+    function plainLength() { return (editor.textContent || '').length; }
+    function markDirty() {
+      dirty.style.display = C.fromEditor(editor) === current ? 'none' : 'inline';
+      count.textContent = plainLength() + ' caracteres';
+    }
+
+    TOOLS.forEach(function (t) {
+      var btn = make('button', 'cms-tool ' + t[3], t[1]);
+      btn.type = 'button';
+      btn.title = t[2];
+      btn.setAttribute('aria-label', t[2]);
+      btn.addEventListener('mousedown', function (e) { e.preventDefault(); });
+      btn.addEventListener('click', function () {
+        editor.focus();
+        if (t[0] === 'link') {
+          var url = window.prompt('Dirección del enlace (https://… o /pagina.html):', 'https://');
+          if (url && C.isSafeUrl(url.trim()) && !/[()\s]/.test(url.trim())) document.execCommand('createLink', false, url.trim());
+          else if (url) A.showToast('Enlace no válido: usa https://… sin espacios ni paréntesis.', 'error');
+        } else if (t[0] === 'clear') {
+          document.execCommand('removeFormat');
+          document.execCommand('unlink');
+        } else {
+          document.execCommand(t[0]);
+        }
+        markDirty();
+      });
+      bar.appendChild(btn);
+    });
+    card.appendChild(bar);
+    card.appendChild(editor);
+
+    // Pegar siempre como texto plano: evita arrastrar estilos y HTML ajeno.
+    editor.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var txt = (e.clipboardData || window.clipboardData).getData('text/plain');
+      document.execCommand('insertText', false, txt);
+    });
+    editor.addEventListener('input', markDirty);
 
     var original = make('div', 'cms-original');
     original.appendChild(make('strong', null, 'Original: '));
@@ -113,34 +171,43 @@
 
     function refresh() {
       var edited = Object.prototype.hasOwnProperty.call(state.overrides, field.key);
+      current = edited ? state.overrides[field.key] : base;
       badge.style.display = edited ? 'inline-block' : 'none';
       restore.style.display = edited ? 'inline-block' : 'none';
       card.classList.toggle('is-edited', edited);
+      markDirty();
     }
     refresh();
 
-    save.addEventListener('click', async function () {
-      var value = area.value.trim();
-      if (!value) { A.showToast('El texto no puede quedar vacío. Usa «Restaurar original» para volver atrás.', 'error'); return; }
+    async function doSave() {
+      var value = C.fromEditor(editor);
+      if (!value.replace(/\\./g, 'x').trim()) { A.showToast('El texto no puede quedar vacío. Usa «Restaurar original» para volver atrás.', 'error'); return; }
       save.disabled = true;
       try {
-        if (value === field.text) {
+        if (value === base) {
           if (Object.prototype.hasOwnProperty.call(state.overrides, field.key)) await removeOverride(field);
         } else {
           await saveOverride(field, 'texto', value, field.text);
         }
         refresh();
+        updateSummary();
         A.showToast('Texto guardado', 'success');
       } catch (e) { reportError(e, 'No se pudo guardar'); }
       save.disabled = false;
+    }
+    save.addEventListener('click', doSave);
+    editor.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); doSave(); }
     });
 
     restore.addEventListener('click', async function () {
       restore.disabled = true;
       try {
         await removeOverride(field);
-        area.value = field.text;
+        editor.textContent = '';
+        C.setText(editor, base);
         refresh();
+        updateSummary();
         A.showToast('Texto restaurado', 'success');
       } catch (e) { reportError(e, 'No se pudo restaurar'); }
       restore.disabled = false;
@@ -148,6 +215,12 @@
     return card;
   }
 
+  function updateSummary() {
+    if (!els.summary || !state.fields) return;
+    var total = state.fields.texts.length + state.fields.images.length;
+    var edited = Object.keys(state.overrides).length;
+    els.summary.textContent = total + ' elementos editables · ' + edited + ' modificados';
+  }
   function imageCard(field) {
     var card = make('div', 'cms-card cms-card-image');
     var head = make('div', 'cms-card-head');
@@ -228,11 +301,16 @@
     if (!state.fields) return;
     var q = C.normalize(state.filter).toLowerCase();
     var texts = state.fields.texts.filter(function (f) {
+      var has = Object.prototype.hasOwnProperty.call(state.overrides, f.key);
+      if (state.onlyEdited && !has) return false;
       if (!q) return true;
-      var cur = Object.prototype.hasOwnProperty.call(state.overrides, f.key) ? state.overrides[f.key] : f.text;
+      var cur = has ? state.overrides[f.key] : f.text;
       return (f.text + ' ' + cur).toLowerCase().indexOf(q) !== -1;
     });
-    var images = q ? [] : state.fields.images;
+    var images = q ? [] : state.fields.images.filter(function (f) {
+      return !state.onlyEdited || Object.prototype.hasOwnProperty.call(state.overrides, f.key);
+    });
+    updateSummary();
 
     if (images.length) {
       list.appendChild(make('h4', 'cms-group', 'Imágenes (' + images.length + ')'));
@@ -282,6 +360,8 @@
     els.list = $('cms-list');
     els.status = $('cms-status');
     els.open = $('cms-open');
+    els.summary = $('cms-summary');
+    els.edited = $('cms-only-edited');
     if (!els.page || !els.list) return;
     if (!els.page.options.length) {
       PAGES.forEach(function (p) {
@@ -291,6 +371,8 @@
         els.page.appendChild(opt);
       });
       els.page.addEventListener('change', function () { els.filter.value = ''; state.filter = ''; loadPage(els.page.value); });
+      els.edited.addEventListener('change', function () { state.onlyEdited = els.edited.checked; render(); });
+      els.edited.addEventListener('change', function () { state.onlyEdited = els.edited.checked; render(); });
       var timer;
       els.filter.addEventListener('input', function () {
         clearTimeout(timer);

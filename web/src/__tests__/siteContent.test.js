@@ -45,3 +45,38 @@ describe('site-content', () => {
     expect(b.querySelector('img').getAttribute('src')).toBe('/a.jpg')
   })
 })
+
+describe('formato enriquecido', () => {
+  it('aplica negrita, cursiva, subrayado y enlaces seguros', () => {
+    const el = document.createElement('p')
+    C.setText(el, 'Hola **fuerte** y *suave* y __sub__ [web](https://a.cl) [mal](javascript:x)\nlínea')
+    expect(el.querySelector('strong').textContent).toBe('fuerte')
+    expect(el.querySelector('em').textContent).toBe('suave')
+    expect(el.querySelector('u').textContent).toBe('sub')
+    expect(el.querySelectorAll('a')).toHaveLength(1)
+    expect(el.querySelector('a').getAttribute('rel')).toContain('noopener')
+    expect(el.querySelector('br')).not.toBeNull()
+  })
+
+  it('nunca inyecta HTML', () => {
+    const el = document.createElement('p')
+    C.setText(el, '<img src=x onerror=alert(1)> **<b>x</b>**')
+    expect(el.querySelector('img')).toBeNull()
+    expect(el.querySelector('b')).toBeNull()
+  })
+
+  it('convierte HTML del editor a marcado y viceversa', () => {
+    const ed = document.createElement('div')
+    ed.innerHTML = 'Un <b>fuerte</b> <i>texto</i> con <a href="https://x.cl">link</a> * literal'
+    const m = C.fromEditor(ed)
+    expect(m).toBe('Un **fuerte** *texto* con [link](https://x.cl) \\* literal')
+    const back = document.createElement('p')
+    C.setText(back, m)
+    expect(back.textContent).toBe('Un fuerte texto con link * literal')
+  })
+
+  it('collect conserva el formato original como marcado', () => {
+    const b = body('<p>Hola <strong>mundo</strong></p>')
+    expect(C.collect(b, 'x').texts[0].markup).toBe('Hola **mundo**')
+  })
+})

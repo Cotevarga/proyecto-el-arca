@@ -87,19 +87,91 @@
       var key = textKey(page, el.textContent);
       if (seen[key]) return;
       seen[key] = true;
-      texts.push({ key: key, tag: el.tagName.toLowerCase(), text: displayText(el) });
+      texts.push({ key: key, tag: el.tagName.toLowerCase(), text: displayText(el), markup: toMarkup(el).replace(/^\s+|\s+$/g, '').replace(/ ?\n ?/g, '\n') });
     });
     return { texts: texts, images: images };
   }
 
-  function setText(el, value) {
-    while (el.firstChild) el.removeChild(el.firstChild);
-    String(value).split('\n').forEach(function (line, i) {
-      if (i > 0) el.appendChild(el.ownerDocument.createElement('br'));
-      el.appendChild(el.ownerDocument.createTextNode(line));
+  // ---- Formato enriquecido ------------------------------------------------
+  // Los valores se guardan como un marcado mínimo y seguro (no HTML):
+  //   **negrita**  *cursiva*  __subrayado__  [texto](https://enlace)  y saltos de línea.
+  // Se reconstruyen siempre con nodos DOM, nunca con innerHTML.
+  function escapeMarkup(s) { return s.replace(/[\\*_\[\]()]/g, '\\$&'); }
+
+  function toMarkup(node) {
+    var out = '';
+    node.childNodes.forEach(function (n) {
+      if (n.nodeType === 3) { out += escapeMarkup(n.nodeValue.replace(/[ \t\r\n\f]+/g, ' ')); return; }
+      if (n.nodeType !== 1) return;
+      var t = n.tagName;
+      if (t === 'BR') { out += '\n'; return; }
+      var inner = toMarkup(n);
+      if (!inner.trim()) { out += inner; return; }
+      var style = (n.getAttribute('style') || '').toLowerCase();
+      var bold = t === 'STRONG' || t === 'B' || /font-weight:\s*(bold|[6-9]00)/.test(style);
+      var ital = t === 'EM' || t === 'I' || /font-style:\s*italic/.test(style);
+      var under = t === 'U' || /text-decoration[^;]*underline/.test(style);
+      var lead = inner.match(/^\s*/)[0];
+      var trail = inner.match(/\s*$/)[0];
+      var core = inner.slice(lead.length, inner.length - trail.length);
+      if (t === 'A') {
+        var href = n.getAttribute('href') || '';
+        if (isSafeUrl(href) && !/[()\s]/.test(href)) core = '[' + core + '](' + href + ')';
+      }
+      if (under) core = '__' + core + '__';
+      if (ital) core = '*' + core + '*';
+      if (bold) core = '**' + core + '**';
+      out += lead + core + trail;
+    });
+    return out;
+  }
+
+  // Serializa el contenido de un editor contenteditable (bloques DIV/P = salto de línea).
+  function fromEditor(editor) {
+    var clone = editor.cloneNode(true);
+    clone.querySelectorAll('div, p').forEach(function (b) {
+      if (b.previousSibling) b.parentNode.insertBefore(b.ownerDocument.createElement('br'), b);
+    });
+    return toMarkup(clone).replace(/\n{3,}/g, '\n\n').replace(/^\n+|\n+$/g, '').trim();
+  }
+
+  var TOKEN = /\\([\\*_\[\]()])|\*\*([\s\S]+?)\*\*|__([\s\S]+?)__|\*([\s\S]+?)\*|\[([^\]]+)\]\((https:\/\/[^\s)]+|\/[^\s)]*)\)/;
+
+  function parseInto(parent, str, depth) {
+    var doc = parent.ownerDocument;
+    var rest = String(str);
+    while (rest) {
+      var m = depth < 6 ? TOKEN.exec(rest) : null;
+      if (!m) { addPlain(parent, rest); return; }
+      if (m.index) addPlain(parent, rest.slice(0, m.index));
+      var el = null;
+      if (m[1] !== undefined) { parent.appendChild(doc.createTextNode(m[1])); }
+      else if (m[2] !== undefined) el = doc.createElement('strong'), parseInto(el, m[2], depth + 1);
+      else if (m[3] !== undefined) el = doc.createElement('u'), parseInto(el, m[3], depth + 1);
+      else if (m[4] !== undefined) el = doc.createElement('em'), parseInto(el, m[4], depth + 1);
+      else if (isSafeUrl(m[6])) {
+        el = doc.createElement('a');
+        el.setAttribute('href', m[6]);
+        if (/^https:/i.test(m[6])) { el.setAttribute('target', '_blank'); el.setAttribute('rel', 'noopener noreferrer'); }
+        parseInto(el, m[5], depth + 1);
+      } else parent.appendChild(doc.createTextNode(m[0]));
+      if (el) parent.appendChild(el);
+      rest = rest.slice(m.index + m[0].length);
+    }
+  }
+
+  function addPlain(parent, text) {
+    var doc = parent.ownerDocument;
+    text.split('\n').forEach(function (line, i) {
+      if (i > 0) parent.appendChild(doc.createElement('br'));
+      if (line) parent.appendChild(doc.createTextNode(line));
     });
   }
 
+  function setText(el, value) {
+    while (el.firstChild) el.removeChild(el.firstChild);
+    parseInto(el, value, 0);
+  }
   // Aplica las ediciones sobre un árbol DOM aún no montado. Solo usa nodos de texto y
   // atributos validados, por lo que un valor guardado nunca puede inyectar HTML ni scripts.
   function apply(rootNode, page, overrides) {
@@ -162,6 +234,9 @@
     textKey: textKey,
     imageKey: imageKey,
     isSafeUrl: isSafeUrl,
+    toMarkup: toMarkup,
+    fromEditor: fromEditor,
+    setText: setText,
     collect: collect,
     apply: apply,
     load: load,
