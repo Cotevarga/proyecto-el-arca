@@ -43,7 +43,11 @@ function runInlineScript(code) {
 
   try {
     // Legacy templates expose declarations to inline handlers in the global scope.
-    window.eval(code);
+    // Un <script> inline cumple la CSP de producción (no permite 'unsafe-eval').
+    const el = document.createElement('script');
+    el.textContent = code;
+    document.head.appendChild(el);
+    el.remove();
   } finally {
     document.addEventListener = originalAddEventListener;
   }
