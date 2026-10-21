@@ -119,7 +119,7 @@ body {
 .arca-app .card-mir,
 .arca-app .card-mir > * {
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .arca-app .card-mir {
@@ -152,16 +152,55 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
+  justify-content: flex-start;
+  padding: 2rem 1.25rem;
   white-space: normal;
   text-align: center;
   font: inherit;
   color: inherit;
+  background: linear-gradient(160deg, #1a1a1a 0%, #0f0f0f 100%);
+  border: 1px solid rgb(229 9 20 / 35%);
+  border-top: 3px solid var(--color-mir);
+  border-radius: .85rem;
+  box-shadow: 0 .5rem 1.25rem rgb(0 0 0 / 55%), 0 .15rem .4rem rgb(229 9 20 / 12%);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.arca-app .cat-card:hover,
+.arca-app .cat-card:focus-visible {
+  transform: translateY(-6px);
+  box-shadow: 0 1.25rem 2.25rem rgb(0 0 0 / 70%), 0 .35rem 1.25rem rgb(229 9 20 / 30%);
+}
+
+.arca-app .cat-card h2,
+.arca-app .cat-card h3 {
+  min-height: 3.8em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 .75rem;
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  line-height: 1.25;
+  letter-spacing: .06em;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+  text-align: center;
+}
+
+.arca-app .cat-card > div:first-child {
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: 1rem;
 }
 
 .arca-app .cat-card > p {
   max-width: 100%;
+  margin: 0;
+  font-size: .875rem;
+  text-align: center !important;
+  hyphens: none;
+  overflow-wrap: normal;
 }
 
 .arca-app .ratio > iframe {
