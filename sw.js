@@ -4,7 +4,7 @@
    Network First para navegaciÃ³n (SPA)
    =========================================================== */
 
-const CACHE_NAME = 'elarca-react-v6';
+const CACHE_NAME = 'elarca-react-v7';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
