@@ -1,10 +1,10 @@
-/* ===========================================================
-   El Arca — Service Worker v1.0.0
-   Estrategia: Cache First para assets estáticos,
-   Network First para navegación (SPA)
+﻿/* ===========================================================
+   El Arca â€” Service Worker v1.0.0
+   Estrategia: Cache First para assets estÃ¡ticos,
+   Network First para navegaciÃ³n (SPA)
    =========================================================== */
 
-const CACHE_NAME = 'elarca-react-v5';
+const CACHE_NAME = 'elarca-react-v6';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -70,7 +70,7 @@ const STATIC_ASSETS = [
   '/relatos/organizaciones.html',
 ];
 
-// Instalación: precachear assets estáticos
+// InstalaciÃ³n: precachear assets estÃ¡ticos
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -79,7 +79,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activación: limpiar caches antiguas
+// ActivaciÃ³n: limpiar caches antiguas
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -90,13 +90,16 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Intercepción de fetch
+// IntercepciÃ³n de fetch
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
   // Solo interesar peticiones al mismo origen
   if (url.origin !== self.location.origin) return;
+
+  // El panel admin nunca debe pasar por la cache del SW.
+  if (url.pathname === '/admin' || url.pathname.startsWith('/admin/') || url.pathname === '/admin.html') return;
 
   // The React entry bundle has a stable URL, so always revalidate it before
   // falling back to the cached copy for offline use.
@@ -105,7 +108,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Estrategia: Cache First para assets estáticos (JS, CSS, imágenes)
+  // Estrategia: Cache First para assets estÃ¡ticos (JS, CSS, imÃ¡genes)
   if (
     request.destination === 'script' ||
     request.destination === 'style' ||
@@ -117,13 +120,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Estrategia: Network First para HTML (navegación)
+  // Estrategia: Network First para HTML (navegaciÃ³n)
   if (request.destination === 'document') {
     event.respondWith(networkFirst(request));
     return;
   }
 
-  // Para todo lo demás (API, etc.): Network Only
+  // Para todo lo demÃ¡s (API, etc.): Network Only
   event.respondWith(fetch(request).catch(() => {
     return new Response('Offline', { status: 503 });
   }));
@@ -155,15 +158,15 @@ async function networkFirst(request) {
   } catch (err) {
     const cached = await caches.match(request);
     if (cached) return cached;
-    // Fallback: mostrar página offline minimalista
+    // Fallback: mostrar pÃ¡gina offline minimalista
     return new Response(
       `<!DOCTYPE html>
       <html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-      <title>El Arca — Sin conexión</title>
+      <title>El Arca â€” Sin conexiÃ³n</title>
       <style>body{font-family:sans-serif;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:2rem;}
       h1{color:#E50914;}a{color:#E50914;}</style></head>
-      <body><div><h1>⚡ Sin conexión</h1>
-      <p>Estás desconectado. Vuelve a intentar cuando tengas internet.</p>
+      <body><div><h1>âš¡ Sin conexiÃ³n</h1>
+      <p>EstÃ¡s desconectado. Vuelve a intentar cuando tengas internet.</p>
       <p><a href="/">Volver al inicio</a></p></div></body></html>`,
       { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
     );

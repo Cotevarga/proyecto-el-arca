@@ -156,8 +156,17 @@
             return (la < -90 || la > 90 || ln < -180 || ln > 180) ? null : [la, ln];
           }
           // Geocodificación con OpenStreetMap Nominatim (sin clave), sesgada a Chile / La Pintana.
+          // Lugares ya registrados: se ubican al instante, sin depender de la red.
+          var LUGARES = {
+            'la goya': [-33.5605, -70.6346],
+            'goya': [-33.5605, -70.6346],
+            '30 de santa rosa': [-33.5850, -70.6340],
+            'santa rosa': [-33.5850, -70.6340],
+            'la pintana': CENTRO
+          };
           async function geocode(name) {
             var key = name.toLowerCase();
+            if (LUGARES[key]) return LUGARES[key];
             if (cache[key] !== undefined) return cache[key];
             var queries = [
               { q: name, local: true },
@@ -194,7 +203,7 @@
           var unique = jobs.filter(function (g, i) { return jobs.indexOf(g) === i; });
           if (statsEl && unique.length) statsEl.textContent = 'Ubicando ' + unique.length + ' lugares...';
           for (var u = 0; u < unique.length; u++) {
-            var found = cache[unique[u].toLowerCase()] !== undefined ? cache[unique[u].toLowerCase()] : await geocode(unique[u]);
+            var found = await geocode(unique[u]);
             places[unique[u]] = found;
           }
 
