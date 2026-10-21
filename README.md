@@ -261,3 +261,7 @@ Todas las tablas tienen RLS habilitado:
 **Contenido del archivo:** CC BY-NC-SA 4.0  
 
 Memoria Popular El Arca — La Pintana, Santiago de Chile.
+
+## Editor de contenido (admin)
+
+Desde **Admin → Contenido del sitio** se pueden editar títulos, textos e imágenes de cada página. Los cambios se guardan en la tabla `contenido_sitio` (ejecutar antes `supabase/migrations/012_contenido_sitio.sql` en el SQL Editor de Supabase) y se aplican al renderizar la página; «Restaurar original» elimina la edición.

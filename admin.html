@@ -52,6 +52,7 @@
         <a href="#" data-section="history"><span class="icon">📋</span> Historial</a>
         <a href="#" data-section="music"><span class="icon">🎵</span> Música</a>
         <a href="#" data-section="upload"><span class="icon">📤</span> Subida Manual</a>
+        <a href="#" data-section="content"><span class="icon">✏️</span> Contenido del sitio</a>
         <a href="#" data-section="security"><span class="icon">🛡️</span> Seguridad <span id="security-alert-badge" style="display:none;background:var(--color-mir);color:white;font-size:10px;padding:1px 7px;border-radius:10px;margin-left:auto;">0</span></a>
       </div>
       <div class="sidebar-footer">
@@ -347,6 +348,24 @@
           </div>
         </div>
 
+        <!-- CONTENIDO DEL SITIO -->
+        <div class="content-section" id="section-content">
+          <div class="cms-toolbar">
+            <div class="form-group" style="margin:0;">
+              <label for="cms-page">Página</label>
+              <select id="cms-page"></select>
+            </div>
+            <div class="form-group" style="margin:0;flex:1;min-width:200px;">
+              <label for="cms-filter">Buscar texto</label>
+              <input type="search" id="cms-filter" placeholder="Filtrar por palabra…" autocomplete="off">
+            </div>
+            <a id="cms-open" class="btn-secondary cms-open" href="/" target="_blank" rel="noopener">Ver página ↗</a>
+          </div>
+          <p class="cms-hint">Edita cualquier título, texto o imagen de la página elegida. Los cambios se publican al instante y puedes volver al original con «Restaurar». Si un mismo texto aparece varias veces en una página, se cambia en todas. Los recuerdos y relatos cargados desde el archivo se gestionan en Pendientes / Aprobados.</p>
+          <div id="cms-status" class="cms-status" role="status"></div>
+          <div id="cms-list"></div>
+        </div>
+
         <!-- SEGURIDAD -->
         <div class="content-section" id="section-security">
           <div style="margin-bottom:24px;">
@@ -588,6 +607,8 @@
   <script src="/admin/upload.js"></script>
   <script src="/admin/realtime.js"></script>
   <script src="/admin/security.js"></script>
+  <script src="/site-content.js"></script>
+  <script src="/admin/contenido.js"></script>
   <script src="/admin/main.js"></script>
 </body>
 </html>

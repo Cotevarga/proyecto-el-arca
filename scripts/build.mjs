@@ -150,7 +150,7 @@ async function build() {
   }
 
   const rootFiles = [
-    'config.js', 'supabase.js', 'app.js', 'search.js', 'audio-player.js',
+    'config.js', 'supabase.js', 'app.js', 'search.js', 'audio-player.js', 'site-content.js',
     'manifest.json', 'sw.js', 'robots.txt', 'sitemap.xml', 'favicon.ico',
   ];
   for (const file of rootFiles) {

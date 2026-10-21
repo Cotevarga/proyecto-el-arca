@@ -164,6 +164,15 @@ function preparePage(documentNode) {
   };
 }
 
+async function loadSiteContent() {
+  try {
+    await loadExternalScript('/site-content.js');
+    return await window.ArcaContent.load();
+  } catch {
+    return {};
+  }
+}
+
 function LegacyPage({ templatePath }) {
   const [page, setPage] = useState(null);
   const [error, setError] = useState(false);
@@ -173,14 +182,17 @@ function LegacyPage({ templatePath }) {
     setPage(null);
     setError(false);
 
-    fetch(`/_legacy-pages/${templatePath}`, { signal: controller.signal })
-      .then((response) => {
+    Promise.all([
+      fetch(`/_legacy-pages/${templatePath}`, { signal: controller.signal }).then((response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return response.text();
-      })
-      .then((html) => {
+      }),
+      loadSiteContent(),
+    ])
+      .then(([html, overrides]) => {
         if (controller.signal.aborted) return;
         const parsed = new DOMParser().parseFromString(html, 'text/html');
+        window.ArcaContent?.apply(parsed.body, templatePath.replace(/\.html$/, ''), overrides);
         const nextPage = preparePage(parsed);
         document.title = nextPage.title || document.title;
         const description = document.querySelector('meta[name="description"]');

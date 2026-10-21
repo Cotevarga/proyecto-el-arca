@@ -4,7 +4,7 @@
    Network First para navegaciÃ³n (SPA)
    =========================================================== */
 
-const CACHE_NAME = 'elarca-react-v8';
+const CACHE_NAME = 'elarca-react-v9';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -103,7 +103,7 @@ self.addEventListener('fetch', (event) => {
 
   // The React entry bundle has a stable URL, so always revalidate it before
   // falling back to the cached copy for offline use.
-  if (url.pathname === '/assets/app.js' || url.pathname.startsWith('/_legacy-pages/')) {
+  if (url.pathname === '/assets/app.js' || url.pathname === '/site-content.js' || url.pathname.startsWith('/_legacy-pages/')) {
     event.respondWith(networkFirst(request));
     return;
   }

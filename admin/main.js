@@ -102,13 +102,14 @@
       document.querySelectorAll('.content-section').forEach(function(s) { s.classList.remove('active'); });
       var target = document.getElementById('section-' + section);
       if (target) target.classList.add('active');
-      var titles = { dashboard: 'Dashboard', pending: 'Pendientes', approved: 'Aprobados', history: 'Historial', music: 'Gesti\u00f3n de M\u00fasica', upload: 'Subida Manual', security: 'Centro de Seguridad' };
+      var titles = { dashboard: 'Dashboard', pending: 'Pendientes', approved: 'Aprobados', history: 'Historial', music: 'Gesti\u00f3n de M\u00fasica', upload: 'Subida Manual', content: 'Contenido del sitio', security: 'Centro de Seguridad' };
       if (A.dom.sectionTitle) A.dom.sectionTitle.textContent = titles[section] || 'Dashboard';
       if (section === 'pending') A.loadPending();
       if (section === 'approved') A.loadApproved();
       if (section === 'history') A.loadHistory();
       if (section === 'music') { A.actualizarListadoMusica(); A.iniciarRealtimeMusica(); }
       if (section === 'dashboard') A.loadDashboard();
+      if (section === 'content' && A.loadContenido) A.loadContenido();
       if (section === 'security') A.loadSecurityEvents();
     });
   });
